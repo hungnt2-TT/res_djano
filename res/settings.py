@@ -25,12 +25,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-^+g23c#3qlv2m6kq4lz6(t7gi$xsr%dt_bcz3fcr()ys%r=9aw"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 import dotenv
 
 ALLOWED_HOSTS = ['*']
 
-
+DEBUG = os.getenv('DEBUG', 'False')
 # Application definition
 
 INSTALLED_APPS = [
@@ -41,7 +40,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_celery_beat",
-    "geoposition"
+    "geoposition",
+    "employee",
+    "restaurant"
 ]
 
 MIDDLEWARE = [
@@ -95,6 +96,8 @@ DATABASES = {
             'PORT': os.getenv('RDS_PORT'),
         }
     }
+
+AUTH_USER_MODEL = 'employee.Profile'
 print("os.getenv('RDS_DB_NAME') ==", os.getenv('RDS_DB_NAME'))
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -134,8 +137,29 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / "static"
+STATICFILES_DIRS = [
+   'res/static'
+]
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / "media"
+# Add s3 in aws
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME', default=False)
+if AWS_STORAGE_BUCKET_NAME:
+    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+    AWS_DEFAULT_ACL = 'public-read'
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 
+    # s3 public media settings
+    PUBLIC_MEDIA_LOCATION = 'media'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
+else:
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / "media"
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", 'redis://localhost:6379')
 CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", 'redis://localhost:6379')
 CELERY_ACCEPT_CONTENT = ['application/json']
@@ -146,6 +170,7 @@ CELERY_TIMEZONE = TIME_ZONE
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 
 
 GEOPOSITION_GOOGLE_MAPS_API_KEY = os.getenv("GEOPOSITION_GOOGLE_MAPS_API_KEY", "AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY")

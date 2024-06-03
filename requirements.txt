@@ -33,3 +33,5 @@ Werkzeug==3.0.3
 psycopg2-binary==2.9.1
 python-dotenv~=1.0.1
 django-geoposition==0.3.0
+django-utils-six
+Pillow==10.3.0
