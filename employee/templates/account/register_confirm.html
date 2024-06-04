@@ -1,28 +1,26 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block css %}
     <link rel="stylesheet" type="text/css" href="{% static 'employee/css/form_register.css' %}">
 {% endblock %}
-{% block title %}
-{% endblock %}
+{% block title %} Register User Confirm | {{ block.super }} {% endblock %}
+
 {% block content %}
-    <!-- Main Section Start -->
     <div class="main-section">
         <div class="page-section nopadding cs-nomargin"
              style="margin-top: 0px;padding-top: 60px;padding-bottom: 60px;margin-bottom: 0px;">
             <div class="container">
-                <div class="row">
-                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                        <div class="user-dashboard loader-holder">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                    <div class="user-dashboard loader-holder">
                             <div class="user-holder">
-                                <h4 class="text-center" style="margin-bottom: 0;">WELCOME TO FOODONLINE</h4>
-                                <p class="text-center">Please fill this form to get yourself onboarded in the foodOnline
-                                    marketplace.</p>
+                                <h4 class="text-center" style="margin-bottom: 0;">Confirm Register User</h4>
+                                <p class="text-center">Please double check your information before creating a user account! </p>
                                 <hr>
                                 <div id="restaurant-sets-holder">
                                     {#                                    {% csrf_token %}#}
                                     <form class="form-fields-set foodbakery-dev-restaurant-form" method="post"
-                                          action="{% url 'register_confirm' %}">
+                                          action="{% url 'register_save' %}">
                                         <ul class="register-add-restaurant-tab-container restaurant-information-tab-container">
                                             <li>
                                                 <div class="row">
@@ -79,17 +77,18 @@
                                                 <div class="row">
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                         <div class="field-holder">
-                                                            <div class="payment-holder ">
-                                                                {#                                                                                                                                <input type="submit" value="Submit"#}
-                                                                {#                                                                                                                                       id="btn-next-restaurant-information"#}
-                                                                {#                                                                                                                                          class="bgcolor">#}
+                                                            <div class="payment-holder">
+                                                                {#                                                                <input type="submit" value="Submit"#}
+                                                                {#                                                                       id="btn-next-restaurant-information"#}
+                                                                {#                                                                       class="bgcolor">#}
                                                                 <div class="btnArea">
                                                                     <button type="submit" class="key" 
-                                                                            name="send" value="send">Next
+                                                                            name="confirm" value="confirm">Confirm
                                                                     </button>
                                                                 </div>
                                                             </div>
                                                             {% csrf_token %}
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -98,11 +97,11 @@
                                     </form>
                                 </div>
                             </div>
-                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Main Section End -->
+
 {% endblock %}
