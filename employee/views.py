@@ -16,42 +16,48 @@ def register(request):
 
 
 def register_user(request):
+    print('register_user333333', request.POST)
+
     form = RegisterForm(request.POST or None)
+    print(form.errors)
     ctx = {
         'form': form
     }
-    # print("form =111 ", form, form.is_valid(), request.POST)
-    # if request.method == 'POST' and form.is_valid():
-    #     print("post = ")
-    #     if request.POST.get('next', '') == 'confirm':
-    #         # return redirect('register_confirm')
-    #         return render(request, 'account/register_confirm.html', ctx)
-    #     # if request.POST.get('next', '') == 'send':
-    #     #     user = form.save(commit=False)
-    #     #     user.is_active = True
-    #     #     user.employee_type = Profile.EMPLOYEE_TYPE_OWNER
-    #     #     return render(request, 'account/register.html', ctx)
-    # print("111111111111111")
+    if request.method == 'POST':
+        print('register_user333333', request.POST)
+        if request.POST.get('next', '') == 'confirm':
+            print('confirm ==', ctx)
+            if form.is_valid():
+                print('confirm2 ==', ctx.get('form'))
+                return render(request, 'account/register_confirm.html', ctx)
+        if request.POST.get('next', '') == 'back':
+            return render(request, 'account/register.html', ctx)
+        # Check for "send" in request.POST
+        if request.POST.get('next', '') == 'send':
+            print('send ==', ctx)
+            if form.is_valid():
+                user = form.save(commit=False)
+                user.is_active = True
+                user.save()
+                return render(request, 'account/register_save.html', ctx)
     return render(request, 'account/register.html', ctx)
 
-
 def register_user_confirm(request):
+
     form = request.POST
     ctx = {
         'form': form
     }
     if request.method == 'POST':
         if request.POST.get('send', '') == 'send':
-            print('123123')
-            # user = form.save(commit=False)
-            # user.is_active = True
-            # print("user = ", user)
-            # user.employee_type = Profile.EMPLOYEE_TYPE_OWNER
+            print('send ==', ctx)
             return render(request, 'account/register_confirm.html', ctx)
     return render(request, 'account/register_confirm.html', ctx)
 
 
 def register_user_save(request):
+    print(request.POST)  # Add this line to print the POST data
+
     form = RegisterForm(request.POST or None)
 
     print('register_user_save')
@@ -63,12 +69,16 @@ def register_user_save(request):
     print('register_user_save', form.is_valid(), request.POST)
 
     if request.method == 'POST':
-        if request.POST.get('confirm', '') == 'confirm' and form.is_valid():
+        form = RegisterForm(request.POST)
+        if form.is_valid():
             user = form.save(commit=False)
             user.is_active = True
             user.employee_type = Profile.EMPLOYEE_TYPE_OWNER
-            print('-----------------------------------')
-            return render(request, 'account/register_confirm.html', ctx)
+            return render(request, 'account/register_save.html', ctx)
+        else:
+            print(form.errors)
+    else:
+        form = RegisterForm()
 
-    return render(request, 'account/register_confirm.html', ctx)
+    return render(request, 'account/register.html', ctx)  # Add this line
 

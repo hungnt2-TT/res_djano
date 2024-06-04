@@ -6,13 +6,13 @@ from .models import Profile, EmployeeProfile
 @receiver(post_save, sender=Profile)
 def create_employee_profile(sender, instance, created, **kwargs):
     if created:
-        EmployeeProfile.objects.create(profile=instance)
+        EmployeeProfile.objects.create(user=instance)
     else:
         try:
-            profile = EmployeeProfile.objects.get(profile=instance)
+            profile = EmployeeProfile.objects.get(user=instance)
             profile.save()
         except:
-            EmployeeProfile.objects.create(profile=instance)
+            EmployeeProfile.objects.create(user=instance)
 
 
 @receiver(pre_save, sender=Profile)

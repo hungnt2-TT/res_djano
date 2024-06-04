@@ -19,6 +19,10 @@ class RegisterForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
         self.fields['last_name'].widget.attrs['autofocus'] = 'autofocus'
         self.fields['password1'].widget.attrs['placeholder'] = '半角英数字記号8桁以上'
         self.fields['password2'].widget.attrs['placeholder'] = '半角英数字記号8桁以上'
+        self.fields['password1'].help_text = None
+        self.fields['password2'].help_text = None
