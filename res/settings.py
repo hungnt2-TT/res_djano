@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     "django_celery_beat",
     "geoposition",
     "employee",
-    "restaurant"
+    "restaurant",
+    "vendor",
 ]
 
 MIDDLEWARE = [
@@ -98,7 +99,6 @@ DATABASES = {
     }
 
 AUTH_USER_MODEL = 'employee.Profile'
-print("os.getenv('RDS_DB_NAME') ==", os.getenv('RDS_DB_NAME'))
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
