@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/form_register.css' %}">
+{% endblock %}
+{% block title %} Register User Confirm | {{ block.super }} {% endblock %}
+
+{% block content %}
+    <div class="main-section">
+        <div class="page-section nopadding cs-nomargin"
+             style="margin-top: 0px;padding-top: 60px;padding-bottom: 60px;margin-bottom: 0px;">
+            <div class="container">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                    <div class="user-dashboard loader-holder">
+                        <div class="user-holder">
+                            <h4 class="text-center" style="margin-bottom: 0;">Confirm Register User</h4>
+                            <p class="text-center">Please double check your information before creating a user
+                                account! </p>
+                            <hr>
+                            <div id="restaurant-sets-holder">
+                                {#                                    {% csrf_token %}#}
+                                <form class="form-fields-set foodbakery-dev-restaurant-form" method="POST" enctype="multipart/form-data">
+                                    <ul class="register-add-restaurant-tab-container restaurant-information-tab-container">
+                                        <li>
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                    <div class="row"  style="display: contents">
+                                                        <ul>
+                                                            <li>
+                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                    <div class="field-holder">
+                                                                        <label>First name</label>
+                                                                        {{ form.first_name.value }}
+
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                    <div class="field-holder">
+                                                                        <label>Last name</label>
+                                                                        {{ form.last_name.value }}
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                    <div class="field-holder">
+                                                                        <label>Email Address</label>
+                                                                        {{ form.email.value }}
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                    <div class="field-holder">
+                                                                        <label>Username</label>
+                                                                        {{ form.username.value }}
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>Vendor name</label>
+                                                                            {{ vendor_form.vendor_name.value }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>Vendor License</label>
+        {{ vendor_license_filename }}
+
+                                                                        </div>
+                                                                    </div>
+                                                            </li>
+
+                                                            <li>
+                                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                                    <div class="field-holder">
+                                                                        <label>Password</label>
+                                                                        {{ form.password1.value }}
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                                    <div class="field-holder">
+                                                                        <label>Confirm Password</label>
+                                                                        {{ form.password2.value }}
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                    <div class="field-holder">
+                                                        <div class="payment-holder">
+                                                            {% for field in form %}
+                                                                {{ field.as_hidden }}
+                                                            {% endfor %}
+                                                            <div class="btnArea button-container">
+                                                                <button type="submit" class="btn-secondary " name="next"
+                                                                        value="back">Back
+                                                                </button>
+                                                                <button type="submit" class="btn-primary key" name="next" value="send"
+                                                                        data-action="send">Send
+                                                                </button>
+                                                            </div>
+                                                            {% csrf_token %}
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block script %}
+    {{ block.super }}
+    <script>(function (b, f, d, a, c) {
+        var e = b.createElement(f);
+        e.src = c + "/" + a + "/atm.js";
+        e.id = d;
+        e.async = true;
+        b.getElementsByTagName(f)[0].parentElement.appendChild(e)
+    })(document, "script", "__cribnotesTagMgrCmd", "074f87a7-d6a9-4f50-bba5-843350148546", "https://tag.cribnotes.jp/container_manager");</script>
+    <script>
+        window.history.pushState(null, null, '');
+    </script>
+{% endblock %}

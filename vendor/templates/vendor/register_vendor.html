@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/form_register.css' %}">
 {% endblock %}
 {% block title %} Register Vendor | {{ block.super }} {% endblock %}
 {% block content %}
@@ -16,8 +17,7 @@
                                 <p class="text-center">Register your restaurant with foodOnline marketplace and get more customers.</p>
                                 <hr>
                                 <div id="restaurant-sets-holder">
-                                    {% csrf_token %}
-                                    <form class="form-fields-set foodbakery-dev-restaurant-form" method="post">
+                                    <form class="form-fields-set foodbakery-dev-restaurant-form" method="post" enctype="multipart/form-data">
                                         <ul class="register-add-restaurant-tab-container restaurant-information-tab-container">
                                             <li>
                                                 <div class="row">
@@ -64,7 +64,9 @@
                                                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                                                         <div class="field-holder">
                                                                             <label>Vendor License</label>
+
                                                                             {{ vendor_form.vendor_license }}
+
 {#                                                                            {{ form.username.errors }}#}
                                                                         </div>
                                                                     </div>
