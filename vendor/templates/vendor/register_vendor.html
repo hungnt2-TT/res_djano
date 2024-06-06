@@ -14,10 +14,12 @@
                         <div class="user-dashboard loader-holder">
                             <div class="user-holder">
                                 <h4 class="text-center" style="margin-bottom: 0;">PARTNER WITH FOOD ONLINE</h4>
-                                <p class="text-center">Register your restaurant with foodOnline marketplace and get more customers.</p>
+                                <p class="text-center">Register your restaurant with foodOnline marketplace and get more
+                                    customers.</p>
                                 <hr>
                                 <div id="restaurant-sets-holder">
-                                    <form class="form-fields-set foodbakery-dev-restaurant-form" method="post" enctype="multipart/form-data">
+                                    <form class="form-fields-set foodbakery-dev-restaurant-form" method="post"
+                                          enctype="multipart/form-data">
                                         <ul class="register-add-restaurant-tab-container restaurant-information-tab-container">
                                             <li>
                                                 <div class="row">
@@ -30,44 +32,41 @@
                                                                         <div class="field-holder">
                                                                             <label>First name</label>
                                                                             {{ form.first_name }}
-{#                                                                            {{ form.first_name.errors }}#}
+                                                                            {#                                                                            {{ form.first_name.errors }}#}
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                                                         <div class="field-holder">
                                                                             <label>Last name</label>
                                                                             {{ form.last_name }}
-{#                                                                            {{ form.last_name.errors }}#}
+                                                                            {#                                                                            {{ form.last_name.errors }}#}
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                                                         <div class="field-holder">
                                                                             <label>Email Address</label>
                                                                             {{ form.email }}
-{#                                                                            {{ form.email.errors }}#}
+                                                                            {#                                                                            {{ form.email.errors }}#}
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                                                         <div class="field-holder">
                                                                             <label>Username</label>
                                                                             {{ form.username }}
-{#                                                                            {{ form.username.errors }}#}
+                                                                            {#                                                                            {{ form.username.errors }}#}
                                                                         </div>
                                                                     </div>
-                                                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                                                         <div class="field-holder">
                                                                             <label>Vendor name</label>
                                                                             {{ vendor_form.vendor_name }}
-{#                                                                            {{ form.email.errors }}#}
+                                                                            {#                                                                            {{ form.email.errors }}#}
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                                                         <div class="field-holder">
                                                                             <label>Vendor License</label>
-
-                                                                            {{ vendor_form.vendor_license }}
-
-{#                                                                            {{ form.username.errors }}#}
+                                                                            <input type="file" name="vendor_license"/>
                                                                         </div>
                                                                     </div>
                                                                 </li>
