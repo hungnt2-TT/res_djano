@@ -13,12 +13,15 @@ class VendorForm(forms.ModelForm):
 
     class Meta:
         model = Vendor
-        fields = ['vendor_name', 'vendor_license']
+        fields = ['vendor_name', 'vendor_license', 'fax_number']
         error_messages = {
             'vendor_name': {
                 'required': 'This field is required'
             },
             'vendor_license': {
+                'required': 'This field is required'
+            },
+            'fax_number': {
                 'required': 'This field is required'
             }
         }

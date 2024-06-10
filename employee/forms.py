@@ -6,7 +6,7 @@ from django.contrib.auth import (
 
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm, UserCreationForm, PasswordChangeForm
 
-from employee.models import CustomProfile, Profile
+from employee.models import CustomProfile, Profile, EmployeeProfile
 
 
 class RegisterForm(UserCreationForm):
@@ -30,3 +30,11 @@ class RegisterForm(UserCreationForm):
         self.fields['password2'].widget.attrs['placeholder'] = 'Confirm Password'
         self.fields['password1'].help_text = None
         self.fields['password2'].help_text = None
+
+
+class RegisterEmployeeProfile(forms.ModelForm):
+    class Meta:
+        model = EmployeeProfile
+        fields = ['state', 'city', 'pin_code', 'longitude', 'latitude', 'address_line_1']
+
+    # def __init__(self, *args, **kwargs):

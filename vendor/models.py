@@ -7,6 +7,7 @@ from employee.models import Profile, EmployeeProfile
 class Vendor(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE)
     user_profile = models.ForeignKey(EmployeeProfile, on_delete=models.CASCADE, related_name='vendor_profile')
+    fax_number = models.CharField(max_length=15, blank=True, null=True)
     vendor_name = models.CharField(max_length=50)
     vendor_description = models.TextField()
     vendor_license = models.ImageField(upload_to='vendor/license', blank=True, null=True)
