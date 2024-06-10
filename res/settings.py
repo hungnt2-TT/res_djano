@@ -69,6 +69,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "vendor.views.get_google_api"
             ],
         },
     },
@@ -173,4 +174,4 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 
-GEOPOSITION_GOOGLE_MAPS_API_KEY = os.getenv("GEOPOSITION_GOOGLE_MAPS_API_KEY", "AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY")

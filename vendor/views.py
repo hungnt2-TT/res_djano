@@ -58,3 +58,6 @@ def register_vendor(request):
                 return render(request, 'vendor/register_save.html', ctx)
 
     return render(request, 'vendor/register_vendor.html', ctx)
+
+def get_google_api(request):
+    return {'GOOGLE_API_KEY': settings.GOOGLE_API_KEY}

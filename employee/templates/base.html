@@ -3,54 +3,65 @@
 {% load static %}
 
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}FoodOnline{% endblock %}</title>
-	<!-- Google Font Family Link Start -->
-	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Montserrat:400,700">
-	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,800">
-	<!-- Google Font Family Link End -->
+    <!-- Google Font Family Link Start -->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Montserrat:400,700">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,800">
+    <!-- Google Font Family Link End -->
 
-	<!-- CSS -->
-	<link href="{% static 'css/iconmoon.css' %}" rel="stylesheet">
-	<link href="{% static 'css/style.css' %}" rel="stylesheet">
-	<link href="{% static 'css/cs-foodbakery-plugin.css' %}" rel="stylesheet">
+    <!-- CSS -->
+    <link href="{% static 'css/iconmoon.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'css/cs-foodbakery-plugin.css' %}" rel="stylesheet">
 
-{#    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/form_register.css' %}">#}
+    {#    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/form_register.css' %}">#}
 
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-	<link href="{% static 'css/bootstrap-slider.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="{% static 'css/bootstrap-slider.css' %}" rel="stylesheet">
     <!-- Add the following line to the base.html file -->
     {% block css %}
     {% endblock %}
-	<!-- JAVASCRIPT -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-	<script src="{% static 'js/modernizr.js' %}"></script>
-	<script src="{% static 'js/bootstrap.js' %}"></script>
+    <!-- JAVASCRIPT -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="{% static 'js/modernizr.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
     <!-- lightSlider JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightslider/1.1.6/js/lightslider.min.js"></script>
     <!-- lightGallery JS -->
+    <script src="{% static 'js/lightgallery.es5.js' %}"></script>
+    <script src="{% static 'js/lightgallery.min.js' %}"></script>
+    <script src="{% static 'js/lightgallery.min.js' %}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.1/lightgallery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.1/plugins/thumbnail/lg-thumbnail.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.1/plugins/zoom/lg-zoom.min.js"></script>
+    {#    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.1/lightgallery.min.js"></script>#}
+    {#    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.1/plugins/thumbnail/lg-thumbnail.min.js"></script>#}
+    {#    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.1/plugins/zoom/lg-zoom.min.js"></script>#}
     <script src="{% static 'js/functions.js' %}"></script>
     <script src="{% static 'js/scripts.js' %}"></script>
     <script src="{% static 'js/functions_vendor.js' %}"></script>
-	<style>
-		body, .main-section p, .mce-content-body p{
-			font:Normal  14px/24px "Open Sans", sans-serif;letter-spacing: 0px;text-transform: none;color: #515151 !important;
-		}
-	</style>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&callback=initAutoComplete"
+            async defer></script>
+    <style>
+        body, .main-section p, .mce-content-body p {
+            font: Normal 14px/24px "Open Sans", sans-serif;
+            letter-spacing: 0px;
+            text-transform: none;
+            color: #515151 !important;
+        }
+    </style>
 </head>
 
 <body>
-    {% include 'includes/navbar.html' %}
+{% include 'includes/navbar.html' %}
 
-    {% block content %}
+{% block content %}
 
-    {% endblock %}
+{% endblock %}
 
-    {% include 'includes/footer.html' %}
+{% include 'includes/footer.html' %}
 </body>
 </html>
