@@ -70,7 +70,7 @@
                                                                                 <div class="drag-list">
                                                                                     <div class="item-thumb"
                                                                                          style="width:100%;height:0; padding-top:50%;position:relative;">
-                                                                                        <img src="{{ upload_file_url }}"
+                                                                                        <img src="{{ upload_file_url }}" id="previewImage"
                                                                                              alt="Vendor License"
                                                                                              style="position:absolute; top:0; left:0; width:100%; background-color: #fff;">
                                                                                     </div>
@@ -79,9 +79,8 @@
                                                                         </div>
 
                                                                         <div class="text-holder" style="flex: 1;">
-                                                                            <label>Vendor License</label>
                                                                             <div class="upload-gallery">
-                                                                                <input type="file" name="vendor_license"
+                                                                                <input type="file" name="vendor_license" id="imageInput"
                                                                                        class="btn btn-info">
                                                                             </div>
                                                                         </div>
@@ -252,6 +251,7 @@
     {{ block.super }}
 
     <script>
+        console.log('--------------------------------')
         document.querySelector('input[name="vendor_license"]').addEventListener('change', function (event) {
             console.log('------------------')
             var reader = new FileReader();
