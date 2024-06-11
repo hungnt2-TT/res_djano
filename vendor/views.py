@@ -20,7 +20,6 @@ def upload_file(file_name):
 
 # Create your views here.
 def register_vendor(request):
-    print("request.FILES['filename'].name", request.FILES)
     print('register_user333333', request.POST, request.FILES)
     profile_form = RegisterEmployeeProfile(request.POST or None)
     form = RegisterForm(request.POST or None)
@@ -37,7 +36,6 @@ def register_vendor(request):
         upload_file_url = None
     ctx['upload_file_url'] = upload_file_url
 
-    print('register_user333333', ctx)
     if request.method == 'POST':
         if request.POST.get('next', '') == 'confirm':
             if form.is_valid() and vendor_form.is_valid():
@@ -58,6 +56,7 @@ def register_vendor(request):
                 return render(request, 'vendor/register_save.html', ctx)
 
     return render(request, 'vendor/register_vendor.html', ctx)
+
 
 def get_google_api(request):
     return {'GOOGLE_API_KEY': settings.GOOGLE_API_KEY}

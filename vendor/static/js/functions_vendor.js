@@ -18,6 +18,7 @@
 function readURL(input) {
     if (input.files && input.files[0]) {
         var reader = new FileReader();
+        console.log('readURL')
         reader.onload = function(e) {
             $('#imagePreview').attr('src', e.target.result);
         }
@@ -29,22 +30,21 @@ $(document).ready(function() {
         console.log('change')
         readURL(this);
     });
-    $("#imagePreview").click(function() {
-        console.log('click')
-        $('#imagePreview').lightGallery({
-            gallery: true,
-            item: 1,
-            loop: true,
-            thumbItem: 9,
-            slideMargin: 0,
-            enableDrag: false,
-            currentPagerPosition: 'left',
-            onSliderLoad: function (el){
-                console.log('slider load')
-                $(el).lightGallery({
-                    selector: '.image-gallery'
-                });
-            }
-        });
-    });
+    // $("#imagePreview").click(function() {
+    //     console.log('click')
+    //     $('#imageGallery').lightSlider({
+    //         gallery: true,
+    //         item: 1,
+    //         loop: true,
+    //         thumbItem: 9,
+    //         slideMargin: 0,
+    //         enableDrag: false,
+    //         currentPagerPosition: 'left',
+    //         onSliderLoad: function(el) {
+    //         el.lightGallery({
+    //             selector: '#imageGallery .lslide'
+    //         });
+    //     }
+    //     });
+    // });
 });

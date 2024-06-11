@@ -19,12 +19,39 @@
                             <h4 class="text-center" style="margin-bottom: 0;">Success</h4>
                             <p class="text-center">The account creation process was successful! </p>
                             <hr>
+                            {% include 'vendor/process_regis.html' %}
+
                             <div id="restaurant-sets-holder">
-                                <div class="success-container">
-                                    <img src="{% static 'vendor/img/in_progress.jpg' %}" alt="Success">
-                                    <h1>Đăng ký thành công</h1>
-                                    <p>Cảm ơn bạn đã đăng ký. Chúng tôi đã nhận được thông tin của bạn.</p>
-                                </div>
+                                <form class="form-fields-set foodbakery-dev-restaurant-form" method="post">
+                                    <ul class="register-add-restaurant-tab-container activation-tab-container"
+                                        style="display: block;">
+                                        <li>
+                                            <div class="activation-tab-message">
+                                                <div class="media-holder">
+                                                    <figure>
+                                                        <img src="{% static 'img/thankyou.png' %}"
+                                                             alt="Thank You">
+                                                    </figure>
+                                                </div>
+                                                <div class="text-holder">
+                                                    <strong>Thank You</strong>
+                                                    <span>You have successfully created your restaurant, to add more
+											                    details, go
+											                    to your email inbox for login details.</span>
+                                                </div>
+                                                <div class="thankyou-contacts">
+                                                    <p>For cancellation or more infomation Please Contact Us</p>
+                                                    <ul class="list-inline clearfix">
+                                                        <li><i class="icon-phone4"></i>+84 965 399 614</li>
+                                                        <li><i class="icon-fax"></i>+84 965 399 614</li>
+                                                        <li><i class="icon-envelope-o"></i>thehungta13216@gmail.com</li>
+                                                    </ul>
+                                                </div>
+
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </form>
                             </div>
                         </div>
 

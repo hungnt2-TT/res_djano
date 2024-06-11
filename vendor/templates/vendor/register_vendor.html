@@ -25,17 +25,7 @@
                                 <p class="text-center">Register your restaurant with foodOnline marketplace and get more
                                     customers.</p>
                                 <hr>
-                                <ul class="restaurant-settings-nav progressbar-nav">
-                                    <li class="active processing"><a href="register-restaurant.html"
-                                                                     class="cond-restaurant-settings1">Information</a>
-                                    </li>
-                                    <li><a href="register-select-package.html" class="cond-restaurant-settings1">Select
-                                        Package</a></li>
-                                    <li><a href="register-payment-info.html" class="cond-restaurant-settings1">Payment
-                                        Information</a></li>
-                                    <li><a href="register-activation.html"
-                                           class="cond-restaurant-settings1">Activation</a></li>
-                                </ul>
+                                		{% include 'vendor/process_regis.html' %}
                                 <div id="restaurant-sets-holder">
                                     <form class="form-fields-set foodbakery-dev-restaurant-form" method="post"
                                           enctype="multipart/form-data">
@@ -74,7 +64,8 @@
                                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                                         <div class="restaurant-info">
                                                                             <div class="img-holder">
-                                                                                <ul class="foodbakery-gallery-holder">
+                                                                                <ul class="foodbakery-gallery-holder"
+                                                                                    id="imageGallery">
                                                                                     <li class="gal-img">
                                                                                         <div class="drag-list">
                                                                                             <div class="item-thumb">
@@ -227,8 +218,7 @@
                                                 </div>
                                             </div>
                                         </li>
-                                        <li     list-style-type: none;
->
+                                        <li>
                                             <ul class="errors">
                                                 {% for fields in form %}
                                                     {% if fields.errors %}
