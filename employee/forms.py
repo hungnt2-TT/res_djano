@@ -10,20 +10,14 @@ from employee.models import CustomProfile, Profile, EmployeeProfile
 
 
 class RegisterForm(UserCreationForm):
-    first_name = forms.CharField(max_length=30, required=True, help_text='First Name')
-    last_name = forms.CharField(max_length=30, required=True, help_text='Last Name')
-
     class Meta:
         model = Profile
-        fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2']
+        fields = ['username', 'email', 'password1', 'password2']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
-        self.fields['last_name'].widget.attrs['autofocus'] = 'autofocus'
-        self.fields['first_name'].widget.attrs['placeholder'] = 'First Name'
-        self.fields['last_name'].widget.attrs['placeholder'] = 'Last Name'
         self.fields['username'].widget.attrs['placeholder'] = 'Username'
         self.fields['email'].widget.attrs['placeholder'] = 'Requires entering correct email structure'
         self.fields['password1'].widget.attrs['placeholder'] = 'Password (min 8 characters)'
@@ -35,6 +29,6 @@ class RegisterForm(UserCreationForm):
 class RegisterEmployeeProfile(forms.ModelForm):
     class Meta:
         model = EmployeeProfile
-        fields = ['state', 'city', 'pin_code', 'longitude', 'latitude', 'address_line_1']
+        fields = ['state', 'city', 'longitude', 'latitude', 'address_line_1']
 
     # def __init__(self, *args, **kwargs):

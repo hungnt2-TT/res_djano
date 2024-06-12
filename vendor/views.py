@@ -10,6 +10,8 @@ def upload_file(file_name):
     if file_name:
         file_path = os.path.join(settings.MEDIA_ROOT, file_name.name)
 
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
         with open(file_path, 'wb+') as destination:
             for chunk in file_name.chunks():
                 destination.write(chunk)
@@ -20,6 +22,10 @@ def upload_file(file_name):
 
 # Create your views here.
 def register_vendor(request):
+    if 'vendor_license' in request.FILES:
+        upload_file_url = upload_file(request.FILES['vendor_license'])
+    else:
+        upload_file_url = None
     print('register_user333333', request.POST, request.FILES)
     profile_form = RegisterEmployeeProfile(request.POST or None)
     form = RegisterForm(request.POST or None)
@@ -30,16 +36,14 @@ def register_vendor(request):
         "vendor_form": vendor_form,
         "profile_form": profile_form
     }
-    if 'vendor_license' in request.FILES:
-        upload_file_url = upload_file(request.FILES['vendor_license'])
-    else:
-        upload_file_url = None
-    ctx['upload_file_url'] = upload_file_url
 
+    ctx['upload_file_url'] = upload_file_url
+    print('fomr.errors', form.errors, vendor_form.errors, profile_form.errors)
     if request.method == 'POST':
         if request.POST.get('next', '') == 'confirm':
             if form.is_valid() and vendor_form.is_valid():
-                return render(request, 'vendor/register_vendor_cf.html', ctx)
+                print('form.cleaned_data', form.cleaned_data)
+                return render(request, 'vendor/register_vendor_package.html', ctx)
         if request.POST.get('next', '') == 'back':
             return render(request, 'vendor/register_vendor.html', ctx)
         if request.POST.get('next', '') == 'send':

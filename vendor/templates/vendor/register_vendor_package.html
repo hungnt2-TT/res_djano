@@ -1,10 +1,13 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}
-    {% block css %}
-        <link rel="stylesheet" type="text/css" href="{% static 'employee/css/form_register.css' %}">
-        {#    <link rel="stylesheet" type="text/css" href="{% static 'css/lightslider.css' %}">#}
-        {#    <link rel="stylesheet" type="text/css" href="{% static 'css/lightgallery.css' %}">#}
-    {% endblock %}
+{% endblock %}
+
+{% block css %}
+    <link href="{% static 'employee/css/form_register.css' %}" rel="stylesheet">
+    {#    <link rel="stylesheet" type="text/css" href="{% static 'css/lightslider.css' %}">#}
+    {#    <link rel="stylesheet" type="text/css" href="{% static 'css/lightgallery.css' %}">#}
 {% endblock %}
 {% block content %}
     <div class="main-section">
