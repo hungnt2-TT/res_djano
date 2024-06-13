@@ -10,27 +10,17 @@ from vendor.models import Vendor
 
 
 class VendorForm(forms.ModelForm):
+    vendor_type = forms.ChoiceField(choices=Vendor.VENDOR_TYPE_CHOICES, required=False)
+    vendor_name = forms.CharField(max_length=50, required=False)
 
     class Meta:
         model = Vendor
-        fields = ['vendor_name', 'vendor_license', 'fax_number']
-        error_messages = {
-            'vendor_name': {
-                'required': 'This field is required'
-            },
-            'vendor_license': {
-                'required': 'This field is required'
-            },
-            'fax_number': {
-                'required': 'This field is required'
-            }
-        }
+        fields = ['vendor_license', 'fax_number', ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs['class'] = 'form-control'
-        self.fields['vendor_name'].widget.attrs['class'] = 'form-control'
-        self.fields['vendor_name'].widget.attrs['placeholder'] = 'Vendor Name'
-        self.fields['vendor_license'].widget.attrs['class'] = 'form-control'
-        self.fields['vendor_license'].widget.attrs['placeholder'] = 'Vendor License'
+    def clean(self):
+        cleaned_data = super().clean()
+        next_action = self.data.get('next', '')
+        vendor_type = cleaned_data.get('vendor_type')
+
+        if next_action != 'confirm' and not vendor_type:
+            self.add_error('vendor_type', 'This field is required.')

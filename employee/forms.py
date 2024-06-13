@@ -30,5 +30,11 @@ class RegisterEmployeeProfile(forms.ModelForm):
     class Meta:
         model = EmployeeProfile
         fields = ['state', 'city', 'longitude', 'latitude', 'address_line_1']
-
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+        self.fields['state'].widget.attrs['placeholder'] = 'State'
+        self.fields['city'].widget.attrs['placeholder'] = 'City'
+        self.fields['address_line_1'].widget.attrs['placeholder'] = 'Address '
     # def __init__(self, *args, **kwargs):
