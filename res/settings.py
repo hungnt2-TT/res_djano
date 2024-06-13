@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "employee",
     "restaurant",
     "vendor",
+    "wallet"
 ]
 
 MIDDLEWARE = [

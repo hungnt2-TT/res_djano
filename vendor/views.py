@@ -59,24 +59,28 @@ def handle_next_payment(request, form, vendor_form, profile_form):
     vendor_type_value = request.POST.get('vendor_type', '')
     if vendor_type_value.isdigit():
         form_data.update({'vendor_type': int(vendor_type_value)})
-    # form_data.update(request.POST.get('vendor_type', ''))
-    print('form_data', form_data, form_data, request.POST, form.errors, vendor_form.errors)
-    if form.is_valid() and vendor_form.is_valid():
-        user = form.save(commit=False)
-        user.is_active = True
-        user.employee_type = 2
-        user.save()
-        print('user = ', user)
-        vendor = vendor_form.save(commit=False)
-        vendor.user = user
-        user_profile = user.employee_type
-        vendor.user_profile = user_profile
-        vendor.save()
-        return render(request, 'vendor/register_vendor_send.html', {
+        return render(request, 'vendor/register_vendor_payment.html', {
             "form": form,
             "vendor_form": vendor_form,
             "profile_form": profile_form,
+            "form_data": form_data,
         })
+    # if form.is_valid() and vendor_form.is_valid():
+    #     user = form.save(commit=False)
+    #     user.is_active = True
+    #     user.employee_type = 2
+    #     user.save()
+    #     print('user = ', user)
+    #     vendor = vendor_form.save(commit=False)
+    #     vendor.user = user
+    #     user_profile = user.employee_type
+    #     vendor.user_profile = user_profile
+    #     vendor.save()
+    #     return render(request, 'vendor/register_vendor_send.html', {
+    #         "form": form,
+    #         "vendor_form": vendor_form,
+    #         "profile_form": profile_form,
+    #     })
     return render(request, 'vendor/register_vendor.html',{
         "form": form,
         "vendor_form": vendor_form,

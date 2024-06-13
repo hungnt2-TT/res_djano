@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, AbstractUser
 
+from django.utils.translation import gettext_lazy as _
 
 class UserManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email, password=None):
@@ -65,6 +66,7 @@ class Profile(AbstractBaseUser):
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    verified = models.BooleanField(_("verified"), default=False)
 
     objects = UserManager()
 

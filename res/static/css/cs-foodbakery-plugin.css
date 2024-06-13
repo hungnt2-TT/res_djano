@@ -1000,8 +1000,8 @@ li.gal-img.ui-sortable-placeholder, li.ui-sortable-placeholder { background: #EE
 .payment-list { margin-bottom: 30px; padding: 0; }
 .payment-list .payment-box input[type="radio"] { display: none; }
 .payment-list .payment-box { position: relative; }
-.payment-list .payment-box label { border: 1px solid #f4f4f4; margin-bottom: 0; cursor: pointer; border-radius: 3px; display: block; width: 100%; }
-.payment-list .payment-box label img { margin: 0; width: 100%; }
+.payment-list .payment-box label { border: 1px solid #f4f4f4; margin-bottom: 0; cursor: pointer; border-radius: 3px; display: block; width: 172px; }
+.payment-list .payment-box label img { margin: 0; width: 100%; height: 95px}
 .payment-list .payment-box input[type="radio"]:checked + label:after { background: none; border-radius: 0; content: "\f058"; color: #f97456; right: -5px; font-weight: normal; position: absolute; top: -10px; font-size: 20px; font-family: "icomoon"; }
 .payment-box span { display: block; text-align: center; font-size: 13px; color: #a3a7ab; padding: 10px 0 0; line-height: normal; margin: 0; text-decoration: none; text-transform: none; }
 .payment-holder .checkbox-area input[type="checkbox"] { display: none; }

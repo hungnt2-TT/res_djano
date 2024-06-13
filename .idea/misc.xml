@@ -3,4 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="gunicorn-nginx" />
   </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="res_djano" project-jdk-type="Python SDK" />
 </project>

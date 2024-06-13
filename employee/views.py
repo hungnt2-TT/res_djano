@@ -1,5 +1,9 @@
-from django.shortcuts import render, redirect
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
 
+from wallet.decorators import verified
+from wallet.models import Wallet
 from .forms import UserCreationForm, RegisterForm
 from .models import Profile
 
@@ -82,3 +86,16 @@ def register_user_save(request):
 
     return render(request, 'account/register.html', ctx)  # Add this line
 
+
+@login_required
+@verified
+def dashboard(request):
+    wallet = get_object_or_404(Wallet, user=request.user)
+    return render(request, "dashboard.html", context={"wallet":wallet})
+
+
+
+@login_required
+def logout_user(request):
+    logout(request)
+    return redirect("accounts:login")
