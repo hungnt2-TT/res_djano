@@ -23,6 +23,13 @@ class Vendor(models.Model):
     vendor_description = models.TextField()
     vendor_license = models.ImageField(upload_to='vendor/license', blank=True, null=True)
     is_approved = models.BooleanField(default=False)
+    address_line_1 = models.CharField(max_length=255, blank=True, null=True)
+    state = models.CharField(max_length=50, blank=True, null=True)
+    city = models.CharField(max_length=50, blank=True, null=True)
+    pin_code = models.CharField(max_length=10, blank=True, null=True)
+    longitude = models.CharField(max_length=50, blank=True, null=True)
+    location = models.CharField(max_length=50, blank=True, null=True)
+    latitude = models.CharField(max_length=50, blank=True, null=True)
     create_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

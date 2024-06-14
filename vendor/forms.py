@@ -15,7 +15,7 @@ class VendorForm(forms.ModelForm):
 
     class Meta:
         model = Vendor
-        fields = ['vendor_license', 'fax_number', ]
+        fields = ['vendor_license', 'fax_number', 'state', 'city', 'longitude', 'latitude', 'address_line_1']
 
     def clean(self):
         cleaned_data = super().clean()
@@ -24,3 +24,11 @@ class VendorForm(forms.ModelForm):
 
         if next_action != 'confirm' and not vendor_type:
             self.add_error('vendor_type', 'This field is required.')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+        self.fields['state'].widget.attrs['placeholder'] = 'State'
+        self.fields['city'].widget.attrs['placeholder'] = 'City'
+        self.fields['address_line_1'].widget.attrs['placeholder'] = 'Address '

@@ -1,11 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
-from employee.forms import RegisterForm, RegisterEmployeeProfile
+from employee.forms import RegisterForm
+from employee.models import EmployeeProfile, Profile
 from vendor.forms import VendorForm
 from django.conf import settings
 import os
 
 from vendor.models import Vendor
+from wallet.models import Wallet
 
 
 def upload_file(file_name):
@@ -27,90 +29,112 @@ def get_type_vendor():
     return vendor_type
 
 
-def handle_confirm(request, form, vendor_form, profile_form):
-    print('form_data', request.POST, form.errors, vendor_form.errors, profile_form.errors)
+def handle_confirm(request, form, vendor_form, upload_file_url):
     if form.is_valid() and vendor_form.is_valid():
         request.session['form_data'] = request.POST.copy()
+        request.session['form_data'].update(upload_file_url=upload_file_url)
         vendor_type = get_type_vendor()
         return render(request, 'vendor/register_vendor_package.html', {
             "form": form,
             "vendor_form": vendor_form,
-            "profile_form": profile_form,
             "vendor_type": vendor_type,
         })
     return render(request, 'vendor/register_vendor.html', {
         "form": form,
         "vendor_form": vendor_form,
-        "profile_form": profile_form,
     })
 
-def handle_back(request, form, vendor_form, profile_form):
+
+def handle_back(request, form, vendor_form):
     return render(request, 'vendor/register_vendor.html', {
         "form": form,
         "vendor_form": vendor_form,
-        "profile_form": profile_form,
     })
 
 
-def handle_next_payment(request, form, vendor_form, profile_form):
-    print('request.POST', request.POST, form.errors, vendor_form.errors, profile_form.errors)
+def handle_next_payment(request, form, vendor_form):
     form_data = request.session.get('form_data', {})
-    print('form_data', form_data)
     vendor_type_value = request.POST.get('vendor_type', '')
     if vendor_type_value.isdigit():
         form_data.update({'vendor_type': int(vendor_type_value)})
+        request.session['form_data'] = form_data  # Update the session data
         return render(request, 'vendor/register_vendor_payment.html', {
             "form": form,
             "vendor_form": vendor_form,
-            "profile_form": profile_form,
             "form_data": form_data,
         })
-    # if form.is_valid() and vendor_form.is_valid():
-    #     user = form.save(commit=False)
-    #     user.is_active = True
-    #     user.employee_type = 2
-    #     user.save()
-    #     print('user = ', user)
-    #     vendor = vendor_form.save(commit=False)
-    #     vendor.user = user
-    #     user_profile = user.employee_type
-    #     vendor.user_profile = user_profile
-    #     vendor.save()
-    #     return render(request, 'vendor/register_vendor_send.html', {
-    #         "form": form,
-    #         "vendor_form": vendor_form,
-    #         "profile_form": profile_form,
-    #     })
-    return render(request, 'vendor/register_vendor.html',{
+    return render(request, 'vendor/register_vendor.html', {
         "form": form,
         "vendor_form": vendor_form,
-        "profile_form": profile_form,
     })
+
+
+def handle_send(request):
+    form_data = request.session.get('form_data', {})
+    print('request.POST', request.FILES)
+    print('form_data', form_data)
+    print('request.POST', request.POST)
+    if form_data:
+        user = Profile.objects.create_user(
+            username=form_data.get('username', ''),
+            email=form_data.get('email', ''),
+            password=form_data.get('password1', ''),
+            first_name=form_data.get('first_name', ''),
+            last_name=form_data.get('last_name', ''),
+        )
+        user.is_active = True
+        user.employee_type = 2
+        user.save()
+
+        Wallet.objects.create(user=user, balance=0)
+        employee = EmployeeProfile.objects.filter(user=user).first()
+        employee.success_privacy_policy = True
+        employee.save()
+        Vendor.objects.create(
+            user=user,
+            user_profile=employee,
+            vendor_name=form_data.get('vendor_name', ''),
+            fax_number=form_data.get('fax_number', ''),
+            vendor_type=form_data.get('vendor_type', ''),
+            vendor_license=form_data.get('upload_file_url', ''),
+            is_approved=False,
+            address_line_1=form_data.get('address_line_1', ''),
+            state=form_data.get('state', ''),
+            city=form_data.get('city', ''),
+            longitude=form_data.get('longitude', ''),
+            latitude=form_data.get('latitude', ''),
+        )
+        return render(request, 'vendor/register_vendor_send.html', {
+            "form_data": form_data,
+        })
+    return redirect('vendor:register_vendor')
 
 
 def register_vendor(request):
     print('request =', request.POST)
+    print('request.POST', request.FILES)
+
     form_data = request.session.get('form_data', {})
 
     upload_file_url = upload_file(request.FILES.get('vendor_license'))
-    profile_form = RegisterEmployeeProfile(request.POST or None)
     form = RegisterForm(request.POST or None)
     vendor_form = VendorForm(request.POST or None)
 
     if request.method == 'POST':
         next_action = request.POST.get('next', '')
         if next_action == 'confirm':
-            return handle_confirm(request, form, vendor_form, profile_form)
+            return handle_confirm(request, form, vendor_form, upload_file_url )
         elif next_action == 'back':
-            return handle_back(request, form, vendor_form, profile_form)
+            return handle_back(request, form, vendor_form)
         elif next_action == 'next_payment':
             print('next_payment')
-            return handle_next_payment(request, form, vendor_form, profile_form)
+            return handle_next_payment(request, form, vendor_form, )
+        elif next_action == 'send':
+            return handle_send(request)
 
     return render(request, 'vendor/register_vendor.html', {
         "form": form,
         "vendor_form": vendor_form,
-        "profile_form": profile_form,
         "upload_file_url": upload_file_url,
     })
 

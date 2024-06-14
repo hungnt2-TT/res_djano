@@ -1,6 +1,8 @@
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, authenticate
 
 from wallet.decorators import verified
 from wallet.models import Wallet
@@ -46,8 +48,8 @@ def register_user(request):
                 return render(request, 'account/register_save.html', ctx)
     return render(request, 'account/register.html', ctx)
 
-def register_user_confirm(request):
 
+def register_user_confirm(request):
     form = request.POST
     ctx = {
         'form': form
@@ -91,8 +93,28 @@ def register_user_save(request):
 @verified
 def dashboard(request):
     wallet = get_object_or_404(Wallet, user=request.user)
-    return render(request, "dashboard.html", context={"wallet":wallet})
+    return render(request, "dashboard.html", context={"wallet": wallet})
 
+
+class LoginResView(LoginView):
+    def post(self, form):
+        form = self.get_form()
+        print('form =========', form)
+        user = self.request.POST.get('username', '')
+        password = self.request.POST.get('password', '')
+        print('user =========', user, password)
+        user = authenticate(username=user, password=password)
+        print('user ==========', user)
+        if user is not None:
+            if user.is_staff:
+                print('user.is_staff')
+                form.add_error(None, 'You are not allowed to login here')
+                return redirect('home')
+
+        if form.is_valid:
+            self.request.session['member_last_login'] = True if user and user.last_login else False
+            return self.form_valid(form)
+        return self.form_invalid(form)
 
 
 @login_required

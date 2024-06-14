@@ -19,7 +19,18 @@
                             <h4 class="text-center" style="margin-bottom: 0;">Success</h4>
                             <p class="text-center">The account creation process was successful! </p>
                             <hr>
-                            {% include 'vendor/process_regis.html' %}
+                            <ul class="restaurant-settings-nav progressbar-nav">
+                                <li class="active processing"><a href="register-restaurant.html"
+                                                                 class="cond-restaurant-settings1">Information</a>
+                                </li>
+                                <li class="active processing"><a href="" class="cond-restaurant-settings1">Select
+                                    Package</a></li>
+                                <li class="active processing"><a href="register-payment-info.html "
+                                                                 class="cond-restaurant-settings1">Payment
+                                    Information</a></li>
+                                <li class="active processing"><a href="register-activation.html"
+                                       class="cond-restaurant-settings1">Activation</a></li>
+                            </ul>
 
                             <div id="restaurant-sets-holder">
                                 <form class="form-fields-set foodbakery-dev-restaurant-form" method="post">
@@ -29,7 +40,7 @@
                                             <div class="activation-tab-message">
                                                 <div class="media-holder">
                                                     <figure>
-                                                        <img src="{% static 'img/thankyou.png' %}"
+                                                        <img src="{% static 'img/thankyou-image.png' %}"
                                                              alt="Thank You">
                                                     </figure>
                                                 </div>
