@@ -23,8 +23,8 @@ from employee.views import LoginResView
 
 urlpatterns = [
                   path("admin/", admin.site.urls),
-                  path("employee/", include("employee.urls")),
+                  path("employee/", include("employee.urls"), name="employee"),
                   path("vendor/", include("vendor.urls")),
                   path('accounts/', include('django.contrib.auth.urls')),
-                  path('employee/login/', LoginResView.as_view(), name='login'),
+                  path('', LoginResView.as_view(), name='login'),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

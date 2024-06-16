@@ -1,4 +1,6 @@
 {% load static %}
+{% block css %}
+{% endblock %}
 <!-- Header Start -->
 <header id="header">
     <div class="main-header">
@@ -69,13 +71,32 @@
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                    <div class="login-option">
-                        <a class="cs-color cs-popup-joinus-btn login-popup" data-target="#sign-in" data-toggle="modal"
-                           href="#user-register">Login</a>/ <span> <a href="{%url 'register' %}"class="cs-color cs-popup-joinus-btn login-popup ml-0" >Register</a></span><a class="get-start-btn"
-                                                                        href="register-restaurant.html">
-                        Register
-                        Restaurant </a>
-                    </div>
+                    {% if user.is_authenticated %}
+                        <div class="login-option">
+                            <a class="cs-color cs-popup-joinus-btn login-popup" data-target="#sign-in"
+                               data-toggle="modal"
+                               href="#user-register">Welcome, {{ user.first_name }}</a>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="get-start-btn" style="">Logout</button>
+                                <a class="get-start-btn" href="{% url 'logout' %}">Logout</a>
+
+                            </form>
+
+                        </div>
+
+                    {% else %}
+                        <div class="login-option">
+                            <a class="cs-color cs-popup-joinus-btn login-popup" data-target="#sign-in"
+                               data-toggle="modal"
+                               href="#user-register">Login</a>/ <span> <a href="{% url 'register' %}"
+                                                                          class="cs-color cs-popup-joinus-btn login-popup ml-0">Register</a></span><a
+                                class="get-start-btn"
+                                href="register-restaurant.html">
+                            Register
+                            Restaurant </a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

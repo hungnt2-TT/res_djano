@@ -174,3 +174,5 @@ CELERY_TIMEZONE = TIME_ZONE
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY")
+
+LOGOUT_REDIRECT_URL = '/home'

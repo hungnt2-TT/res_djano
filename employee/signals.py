@@ -14,7 +14,6 @@ def create_employee_profile(sender, instance, created, **kwargs):
         except:
             EmployeeProfile.objects.create(user=instance)
 
-
-@receiver(pre_save, sender=Profile)
-def pre_save_employee_profile(sender, instance, **kwargs):
-    print("pre_save_employee_profile")
+# @receiver(pre_save, sender=Profile)
+# def pre_save_employee_profile(sender, instance, **kwargs):
+#     return instance

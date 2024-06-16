@@ -1,8 +1,13 @@
+from django.contrib import auth
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
+from django.core.mail import message
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
+from django.urls import reverse
+from django.views.decorators.http import require_POST, require_GET
+from django.views.decorators.http import require_http_methods
 
 from wallet.decorators import verified
 from wallet.models import Wallet
@@ -105,18 +110,24 @@ class LoginResView(LoginView):
         print('user =========', user, password)
         user = authenticate(username=user, password=password)
         print('user ==========', user)
-        if user is not None:
+        if user:
             if user.is_staff:
                 print('user.is_staff')
                 form.add_error(None, 'You are not allowed to login here')
                 return redirect('home')
+        print('form.is_valid()', form.is_valid())
+        if form.is_valid():
+            print('form.is_valid')
 
-        if form.is_valid:
             self.request.session['member_last_login'] = True if user and user.last_login else False
             return self.form_valid(form)
         return self.form_invalid(form)
 
+    def get_success_url(self):
+        return reverse('home')
 
+
+@require_http_methods(["GET", "POST"])
 @login_required
 def logout_user(request):
     logout(request)
