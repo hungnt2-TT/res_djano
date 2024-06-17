@@ -26,5 +26,5 @@ urlpatterns = [
                   path("employee/", include("employee.urls"), name="employee"),
                   path("vendor/", include("vendor.urls")),
                   path('accounts/', include('django.contrib.auth.urls')),
-                  path('', LoginResView.as_view(), name='login'),
+                  path('accounts/login/', LoginResView.as_view(), name='login'),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     "employee",
     "restaurant",
     "vendor",
-    "wallet"
+    "wallet",
+    "widget_tweaks"
 ]
 
 MIDDLEWARE = [
@@ -162,6 +163,8 @@ MEDIA_ROOT = BASE_DIR / "media"
 # else:
 #     MEDIA_URL = '/media/'
 #     MEDIA_ROOT = BASE_DIR / "media"
+
+# Celery base setup
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", 'redis://localhost:6379')
 CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", 'redis://localhost:6379')
 CELERY_ACCEPT_CONTENT = ['application/json']
@@ -175,4 +178,16 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY")
 
-LOGOUT_REDIRECT_URL = '/home'
+
+# LOGIN redirections
+LOGIN_REDIRECT_URL = '/employee/home/'
+LOGOUT_REDIRECT_URL = '/'
+
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_PORT = 587
+EMAIL_HOST_USER = str(os.getenv('EMAIL_USER'))
+EMAIL_HOST_PASSWORD = str(os.getenv('EMAIL_PASSWORD'))

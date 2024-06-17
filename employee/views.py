@@ -1,17 +1,20 @@
 from django.contrib import auth
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordResetView, PasswordContextMixin, PasswordResetCompleteView, \
+    PasswordResetConfirmView
 from django.core.mail import message
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.http import require_http_methods
+from django.views.generic import TemplateView
+from django.utils.translation import gettext_lazy as _
 
 from wallet.decorators import verified
 from wallet.models import Wallet
-from .forms import UserCreationForm, RegisterForm
+from .forms import UserCreationForm, RegisterForm, MyPasswordResetForm, MySetPasswordForm
 from .models import Profile
 
 
@@ -102,29 +105,27 @@ def dashboard(request):
 
 
 class LoginResView(LoginView):
+
     def post(self, form):
+        """
+        Handle POST requests: instantiate a form instance with the passed
+        POST variables and then check if it's valid.
+        """
         form = self.get_form()
-        print('form =========', form)
         user = self.request.POST.get('username', '')
         password = self.request.POST.get('password', '')
-        print('user =========', user, password)
         user = authenticate(username=user, password=password)
-        print('user ==========', user)
         if user:
             if user.is_staff:
-                print('user.is_staff')
                 form.add_error(None, 'You are not allowed to login here')
-                return redirect('home')
-        print('form.is_valid()', form.is_valid())
-        if form.is_valid():
-            print('form.is_valid')
+                return self.form_invalid(form)
 
+        if form.is_valid():
             self.request.session['member_last_login'] = True if user and user.last_login else False
             return self.form_valid(form)
         return self.form_invalid(form)
-
-    def get_success_url(self):
-        return reverse('home')
+    # def get_success_url(self):
+    #     return reverse('home')
 
 
 @require_http_methods(["GET", "POST"])
@@ -132,3 +133,57 @@ class LoginResView(LoginView):
 def logout_user(request):
     logout(request)
     return redirect("accounts:login")
+
+
+class PasswordReset(PasswordResetView):
+    subject_template_name = 'account/password_reset_subject.txt'
+    success_url = reverse_lazy('ep_password_reset_done')
+    form_class = MyPasswordResetForm
+    email_template_name = 'account/password_reset_message.txt'
+    template_name = 'password_reset_form.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['username'] = self.request.user.username
+        return context
+
+    def form_valid(self, form):
+        users = form.get_users(form.cleaned_data['email'])
+        if users:
+            user = users[0]
+            form.user = user
+            return super().form_valid(form)
+        else:
+            print('No users found with this email')
+        return self.form_invalid(form)
+
+
+class PasswordResetDoneView(PasswordContextMixin, TemplateView):
+    template_name = 'password_reset_done.html'
+    title = _('Password reset sent')
+
+
+class PasswordResetComplete(PasswordResetCompleteView):
+    template_name = 'password_reset_complete.html'
+    title = _('Password reset complete')
+
+
+class PasswordResetConfirm(PasswordResetConfirmView):
+    form_class = MySetPasswordForm
+    fields = ('new_password1', 'new_password2')
+    template_name = 'password_reset_confirm.html'
+    success_url = reverse_lazy('ep_password_reset_complete')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.fields['new_password1'].widget.attrs['placeholder'] = '半角英数字記号8桁以上'
+        form.fields['new_password2'].widget.attrs['placeholder'] = '半角英数字記号8桁以上'
+
+        return form
+
+    # def get_form_kwargs(self):
+    #     kwargs = super().get_form_kwargs()
+    #     if 'user' in kwargs and 'data' in kwargs and kwargs['data'].get('new_password1'):
+    #         kwargs['data']['new_password1'] = kwargs['data']['new_password1'].strip()
+    #         kwargs['data']['new_password2'] = kwargs['data']['new_password2'].strip()
+    #     return kwargs

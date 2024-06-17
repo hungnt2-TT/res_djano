@@ -1,5 +1,6 @@
 {% load static %}
 {% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/profile.css' %}">
 {% endblock %}
 <!-- Header Start -->
 <header id="header">
@@ -72,27 +73,58 @@
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                     {% if user.is_authenticated %}
-                        <div class="login-option">
-                            <a class="cs-color cs-popup-joinus-btn login-popup" data-target="#sign-in"
-                               data-toggle="modal"
-                               href="#user-register">Welcome, {{ user.first_name }}</a>
-                            <form method="post" action="{% url 'logout' %}">
-                                {% csrf_token %}
-                                <button type="submit" class="get-start-btn" style="">Logout</button>
-                                <a class="get-start-btn" href="{% url 'logout' %}">Logout</a>
+{#                        <div class="login-option">#}
+{#                            <a class="cs-color cs-popup-joinus-btn login-popup" data-target="#sign-in"#}
+{#                               data-toggle="modal"#}
+{#                               href="#user-register">Welcome, {{ user.first_name }}</a>#}
+{#                            <form method="post" action="{% url 'logout' %}">#}
+{#                                {% csrf_token %}#}
+{#                                <button type="submit" class="get-start-btn" style="">Logout</button>#}
+{#                            </form>#}
+{#                        </div>#}
+                        <button type="button" class="btn btn-dark" data-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false">Action
+                        </button>
 
-                            </form>
-
+                        <div class="dropdown-menu profile-dropdown p-0">
+                            <div class="card border-0 p-0" style="width: 18rem;">
+                                <div class="card-body p-0">
+                                    <div class="row m-0 mt-3 p-0 align-items-center">
+                                        <div class="col-3 m-0 p-0 text-center">
+                                            <img src="https://s.cdpn.io/profiles/user/1907024/80.jpg?1540562790"
+                                                 alt="John Doe"
+                                                 class="rounded-circle" width="50px" hight="50px">
+                                        </div>
+                                        <div class="col-9 m-0 p-0">
+                                            <h5 class="card-title m-0">John Doe</h5>
+                                            <h6 class="card-subtitle mb-2 text-muted m-0">Head Manager</h6>
+                                        </div>
+                                    </div>
+                                    <div class="px-4 pt-2 pb-2">
+                                    </div>
+                                    <div class="list-group m-0">
+                                        <a href="#" class="list-group-item border-0 list-group-item-action"><i
+                                                class="far fa-user mr-3"></i>Profil</a>
+                                        <a href="#" class="list-group-item border-0 list-group-item-action"><i
+                                                class="fas fa-key mr-3"></i>Changer de mot de passe</a>
+                                    </div>
+                                    <div class="dropdown-divider m-0"></div>
+                                    <a href="#" class="list-group-item border-0 list-group-item-action text-danger"><i
+                                            class="fas fa-power-off mr-3"></i>Deconnexion</a>
+                                </div>
+                            </div>
                         </div>
 
                     {% else %}
                         <div class="login-option">
+                        <span>
                             <a class="cs-color cs-popup-joinus-btn login-popup" data-target="#sign-in"
                                data-toggle="modal"
-                               href="#user-register">Login</a>/ <span> <a href="{% url 'register' %}"
-                                                                          class="cs-color cs-popup-joinus-btn login-popup ml-0">Register</a></span><a
+                               href="{% url 'login' %}">Login</a> </span>/ <span> 
+                            <a href="{% url 'register_user' %}"
+                               class="cs-color cs-popup-joinus-btn login-popup ml-0">Register</a></span><a
                                 class="get-start-btn"
-                                href="register-restaurant.html">
+                                href="{% url 'register_vendor' %}">
                             Register
                             Restaurant </a>
                         </div>

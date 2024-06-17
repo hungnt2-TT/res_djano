@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import (
     authenticate, get_user_model, password_validation,
 )
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm, UserCreationForm, PasswordChangeForm
 
@@ -38,3 +40,54 @@ class RegisterForm(UserCreationForm):
 #         self.fields['city'].widget.attrs['placeholder'] = 'City'
 #         self.fields['address_line_1'].widget.attrs['placeholder'] = 'Address '
     # def __init__(self, *args, **kwargs):
+
+class MyPasswordResetForm(PasswordResetForm):
+    def __init__(self, *args, **kwargs):
+        super(MyPasswordResetForm, self).__init__(*args, **kwargs)
+        self.fields['email'].widget.attrs['class'] = 'form-control'
+        self.fields['email'].widget.attrs['placeholder'] = 'Email'
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        profile = Profile.objects.filter(email__iexact=email, is_active=True)
+        if not len(profile):
+            raise forms.ValidationError('There is no user associated with this email address')
+        return email
+
+    def send_mail(
+        self,
+        subject_template_name,
+        email_template_name,
+        context,
+        from_email,
+        to_email,
+        html_email_template_name=None,
+    ):
+        """
+        Send a django.core.mail.EmailMultiAlternatives to `to_email`.
+        """
+        subject = render_to_string(subject_template_name, context)
+        # Email subject *must not* contain newlines
+        subject = ''.join(subject.splitlines())
+        body = render_to_string(email_template_name, context)
+
+        email_message = EmailMultiAlternatives(subject, body, from_email, [to_email])
+        if html_email_template_name is not None:
+            html_email = render_to_string(html_email_template_name, context)
+            email_message.attach_alternative(html_email, 'text/html')
+
+        email_message.send()
+
+    def get_users(self, email):
+        active_users = get_user_model()._default_manager.filter(
+            email__iexact=email, is_active=True)
+        return active_users
+
+
+class MySetPasswordForm(SetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super(MySetPasswordForm, self).__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+            field.help_text = None
+            field.widget.attrs['placeholder'] = field.label
