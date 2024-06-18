@@ -1,8 +1,9 @@
-from django.contrib import auth
+from django.contrib import auth, messages
 from django.contrib.auth import logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordContextMixin, PasswordResetCompleteView, \
     PasswordResetConfirmView
+from django.core.exceptions import PermissionDenied
 from django.core.mail import message
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
@@ -16,6 +17,7 @@ from wallet.decorators import verified
 from wallet.models import Wallet
 from .forms import UserCreationForm, RegisterForm, MyPasswordResetForm, MySetPasswordForm
 from .models import Profile
+from .utils import detect_usertype
 
 
 # Create your views here.
@@ -107,10 +109,14 @@ def dashboard(request):
 class LoginResView(LoginView):
 
     def post(self, form):
+
         """
         Handle POST requests: instantiate a form instance with the passed
         POST variables and then check if it's valid.
         """
+        if self.request.user.is_authenticated:
+            messages.warning(self.request, 'You are already logged in')
+            return redirect('home')
         form = self.get_form()
         user = self.request.POST.get('username', '')
         password = self.request.POST.get('password', '')
@@ -187,3 +193,36 @@ class PasswordResetConfirm(PasswordResetConfirmView):
     #         kwargs['data']['new_password1'] = kwargs['data']['new_password1'].strip()
     #         kwargs['data']['new_password2'] = kwargs['data']['new_password2'].strip()
     #     return kwargs
+
+
+def check_role_vendor(user):
+    if user.employee_type == 1:
+        return True
+    else:
+        raise PermissionDenied
+
+
+def check_role_employee(user):
+    if user.employee_type == 2:
+        return True
+    else:
+        raise PermissionDenied
+
+
+@login_required(redirect_field_name='next', login_url='login')
+def middleware_account(request):
+    user_type = request.user
+    redirect_url = detect_usertype(user_type)
+    return redirect(redirect_url)
+
+
+@login_required(redirect_field_name='next', login_url='login')
+@user_passes_test(check_role_vendor, login_url='login')
+def owner_dashboard(request):
+    return render(request, 'owner.html')
+
+
+@login_required(redirect_field_name='next', login_url='login')
+@user_passes_test(check_role_employee, login_url='login')
+def customer_dashboard(request):
+    return render(request, 'customer.html')

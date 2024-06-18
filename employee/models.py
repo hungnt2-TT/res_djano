@@ -82,6 +82,15 @@ class Profile(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
 
+    def get_role(self):
+        if self.employee_type == 1:
+            user_role = 'owner'
+        elif self.employee_type == 2:
+            user_role = 'customer'
+        else:
+            user_role = 'cancel'
+        return user_role
+
 
 class EmployeeProfile(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE, blank=True, null=True)

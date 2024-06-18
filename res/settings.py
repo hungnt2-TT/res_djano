@@ -13,10 +13,10 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -63,7 +63,7 @@ ROOT_URLCONF = "res.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, 'res/templates')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -79,7 +79,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "res.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -91,15 +90,15 @@ WSGI_APPLICATION = "res.wsgi.application"
 # }
 
 DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('RDS_DB_NAME'),
-            'USER': os.getenv('RDS_USERNAME'),
-            'PASSWORD': os.getenv('RDS_PASSWORD'),
-            'HOST': os.getenv('RDS_HOSTNAME'),
-            'PORT': os.getenv('RDS_PORT'),
-        }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('RDS_DB_NAME'),
+        'USER': os.getenv('RDS_USERNAME'),
+        'PASSWORD': os.getenv('RDS_PASSWORD'),
+        'HOST': os.getenv('RDS_HOSTNAME'),
+        'PORT': os.getenv('RDS_PORT'),
     }
+}
 
 AUTH_USER_MODEL = 'employee.Profile'
 # Password validation
@@ -136,14 +135,13 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "static"
 STATICFILES_DIRS = [
-   'res/static'
+    'res/static'
 ]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
@@ -178,10 +176,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY")
 
-
 # LOGIN redirections
 LOGIN_REDIRECT_URL = '/employee/home/'
-LOGOUT_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/employee/home/'
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

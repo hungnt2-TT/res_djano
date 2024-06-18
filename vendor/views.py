@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import render, redirect
 
 from employee.forms import RegisterForm
@@ -71,9 +72,6 @@ def handle_next_payment(request, form, vendor_form):
 
 def handle_send(request):
     form_data = request.session.get('form_data', {})
-    print('request.POST', request.FILES)
-    print('form_data', form_data)
-    print('request.POST', request.POST)
     if form_data:
         user = Profile.objects.create_user(
             username=form_data.get('username', ''),
@@ -111,10 +109,9 @@ def handle_send(request):
 
 
 def register_vendor(request):
-    print('request =', request.POST)
-    print('request.POST', request.FILES)
-
-    form_data = request.session.get('form_data', {})
+    if request.user.is_authenticated:
+        messages.warning(request, 'You are already logged in')
+        return redirect('home')
 
     upload_file_url = upload_file(request.FILES.get('vendor_license'))
     form = RegisterForm(request.POST or None)
@@ -127,7 +124,6 @@ def register_vendor(request):
         elif next_action == 'back':
             return handle_back(request, form, vendor_form)
         elif next_action == 'next_payment':
-            print('next_payment')
             return handle_next_payment(request, form, vendor_form, )
         elif next_action == 'send':
             return handle_send(request)

@@ -1,3 +1,22 @@
-.profile-dropdown .list-group-item-action:hover {
-    color: #028090;
+.btn-logout {
+    background: none;
+    border: none;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    position: relative;
+    font-weight: normal;
+    color: #484848;
+    width: 100%;
+    text-align: left;
+}
+
+.btn-logout i {
+    padding-right: 14px;
+    color: #f97456;
+}
+
+.btn-logout i.icon-log-out {
+    font-size: 16px;
 }
