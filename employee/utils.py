@@ -9,5 +9,5 @@ def detect_usertype(user):
         redirect_url = '/admin'
         return redirect_url
     else:
-        redirect_url = 'login'
+        redirect_url = '_login'
         return redirect_url

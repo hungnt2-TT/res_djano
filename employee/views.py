@@ -1,6 +1,7 @@
 from django.contrib import auth, messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordContextMixin, PasswordResetCompleteView, \
     PasswordResetConfirmView
 from django.core.exceptions import PermissionDenied
@@ -8,6 +9,7 @@ from django.core.mail import message
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from django.urls import reverse, reverse_lazy
+from django.utils.http import urlsafe_base64_decode
 from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.http import require_http_methods
 from django.views.generic import TemplateView
@@ -16,6 +18,7 @@ from django.utils.translation import gettext_lazy as _
 from wallet.decorators import verified
 from wallet.models import Wallet
 from .forms import UserCreationForm, RegisterForm, MyPasswordResetForm, MySetPasswordForm
+from .mails import send_verification_email
 from .models import Profile
 from .utils import detect_usertype
 
@@ -53,8 +56,8 @@ def register_user(request):
             print('send ==', ctx)
             if form.is_valid():
                 user = form.save(commit=False)
-                user.is_active = True
                 user.save()
+                send_verification_email(request, user)
                 return render(request, 'account/register_save.html', ctx)
     return render(request, 'account/register.html', ctx)
 
@@ -76,25 +79,20 @@ def register_user_save(request):
 
     form = RegisterForm(request.POST or None)
 
-    print('register_user_save')
-
     ctx = {
         'form': form
     }
-    print("form ==", form)
-    print('register_user_save', form.is_valid(), request.POST)
 
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_active = True
             user.employee_type = Profile.EMPLOYEE_TYPE_OWNER
             return render(request, 'account/register_save.html', ctx)
         else:
             print(form.errors)
     else:
-        form = RegisterForm()
+        return render(request, 'account/register.html', ctx)
 
     return render(request, 'account/register.html', ctx)  # Add this line
 
@@ -107,6 +105,10 @@ def dashboard(request):
 
 
 class LoginResView(LoginView):
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('home')
+        return super().get(request, *args, **kwargs)
 
     def post(self, form):
 
@@ -114,7 +116,9 @@ class LoginResView(LoginView):
         Handle POST requests: instantiate a form instance with the passed
         POST variables and then check if it's valid.
         """
+        print('LoginResView', self.request.POST)
         if self.request.user.is_authenticated:
+            print('You are already logged in')
             messages.warning(self.request, 'You are already logged in')
             return redirect('home')
         form = self.get_form()
@@ -127,6 +131,7 @@ class LoginResView(LoginView):
                 return self.form_invalid(form)
 
         if form.is_valid():
+            messages.success(self.request, 'You are now logged in')
             self.request.session['member_last_login'] = True if user and user.last_login else False
             return self.form_valid(form)
         return self.form_invalid(form)
@@ -209,20 +214,56 @@ def check_role_employee(user):
         raise PermissionDenied
 
 
-@login_required(redirect_field_name='next', login_url='login')
+@login_required(redirect_field_name='next', login_url='_login')
 def middleware_account(request):
     user_type = request.user
     redirect_url = detect_usertype(user_type)
     return redirect(redirect_url)
 
 
-@login_required(redirect_field_name='next', login_url='login')
-@user_passes_test(check_role_vendor, login_url='login')
+@login_required(redirect_field_name='next', login_url='_login')
+@user_passes_test(check_role_vendor, login_url='_login')
 def owner_dashboard(request):
     return render(request, 'owner.html')
 
 
-@login_required(redirect_field_name='next', login_url='login')
-@user_passes_test(check_role_employee, login_url='login')
+@login_required(redirect_field_name='next', login_url='_login')
+@user_passes_test(check_role_employee, login_url='_login')
 def customer_dashboard(request):
     return render(request, 'customer.html')
+
+
+def activate(request, uidb64, token):
+    args = {
+
+    }
+
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = Profile.objects.get(pk=uid)
+        args['user'] = user
+    except(TypeError, ValueError, OverflowError, Profile.DoesNotExist):
+        user = None
+        messages.error(request, 'Activation link is invalid')
+    print('activate', user.employeeprofile.email_is_confirmed)
+    if user is not None and default_token_generator.check_token(user, token):
+        if not user.employeeprofile.email_is_confirmed:
+            user.is_active = True
+            user.save()
+
+            emprf = user.employeeprofile
+            emprf.email_is_confirmed = True
+            emprf.save()
+
+            # send email
+            send_verification_email(request, user)
+            # user_activate_mail(request, user)
+            login(request, user)
+            messages.success(request, 'Account has been activated')
+            return redirect('home')
+        else:
+            messages.success(request, 'Account is already activated')
+            return redirect('login')
+    else:
+        messages.error(request, 'Activation link is invalid')
+        return redirect('login')

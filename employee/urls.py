@@ -10,7 +10,10 @@ urlpatterns = [
     path('password-reset/', views.PasswordReset.as_view(), name='ep_password_reset'),
     path('password_reset/done/', views.PasswordResetDoneView.as_view(), name='ep_password_reset_done'),
     path('password-reset/complete/', views.PasswordResetComplete.as_view(), name='ep_password_reset_complete'),
-    path('password-reset/confirm/<uidb64>/<token>/', views.PasswordResetConfirm.as_view(), name='ep_password_reset_confirm'),
+    path('password-reset/confirm/<uidb64>/<token>/', views.PasswordResetConfirm.as_view(),
+         name='ep_password_reset_confirm'),
+
+    path('activate/<slug:uidb64>/<slug:token>/', views.activate, name='activate'),
 
     path('middleware_account/', views.middleware_account, name='middleware_account'),
     path('owner/', views.owner_dashboard, name='owner_dashboard'),
