@@ -21,3 +21,12 @@ def send_verification_email(request, user):
         mail_subject, message, to=[to_email]
     )
     email.send()
+
+
+def send_mail(subject, mail_template, context):
+    message = render_to_string(mail_template, context)
+    to_email = context['user'].email
+    email = EmailMessage(
+        subject, message, to=[to_email]
+    )
+    email.send()

@@ -267,3 +267,7 @@ def activate(request, uidb64, token):
     else:
         messages.error(request, 'Activation link is invalid')
         return redirect('login')
+
+
+def history(request):
+    return render(request, 'history.html')

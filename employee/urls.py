@@ -3,7 +3,9 @@ from . import views
 from .views import LoginResView, PasswordReset
 
 urlpatterns = [
+    path('', views.customer_dashboard),
     path('home/', views.home, name='home'),
+    path('history/', views.history, name='history'),
     path('register/', views.register_user, name='register_user'),
     path('register/register_confirm/', views.register_user_confirm, name='register_confirm'),
     path('register/register_save/', views.register_user_save, name='register_save'),

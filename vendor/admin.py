@@ -10,3 +10,4 @@ class VendorAdmin(admin.ModelAdmin):
     search_fields = ('vendor_name', 'vendor_description')
     list_filter = ('is_approved', 'create_at', 'updated_at')
     date_hierarchy = 'create_at'
+    list_editable = ('is_approved',)

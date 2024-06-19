@@ -1,5 +1,6 @@
 from django.db import models
 
+from employee.mails import send_mail
 from employee.models import Profile, EmployeeProfile
 
 
@@ -35,6 +36,24 @@ class Vendor(models.Model):
 
     def __str__(self):
         return self.vendor_name
+
+    def save(self, *args, **kwargs):
+        self.vendor_name = self.vendor_name.upper()
+        if self.pk is not None:
+            old = Vendor.objects.get(pk=self.pk)
+            if old.is_approved != self.is_approved:
+                context = {
+                    'vendor': self,
+                    'approved': self.is_approved
+                }
+                if self.is_approved:
+                    mail_sj = 'Congratulation '  # send mail to vendor
+                    send_mail(mail_sj, 'mails/approved.html', context)
+                else:
+                    # send mail to vendor
+                    mail_sj = 'Sorry'
+                    send_mail(mail_sj, 'mails/approved.html', context)
+        return super(Vendor, self).save(*args, **kwargs)
 
     class Meta:
         db_table = 'vendor'
