@@ -25,6 +25,13 @@ def upload_file(file_name):
     return None
 
 
+def render_file_img(request, file_name):
+    if file_name:
+        file_url = settings.MEDIA_URL + file_name.name
+        return file_url
+    return None
+
+
 def get_type_vendor():
     vendor_type = Vendor.VENDOR_TYPE_CHOICES
     return vendor_type
@@ -120,7 +127,7 @@ def register_vendor(request):
     if request.method == 'POST':
         next_action = request.POST.get('next', '')
         if next_action == 'confirm':
-            return handle_confirm(request, form, vendor_form, upload_file_url )
+            return handle_confirm(request, form, vendor_form, upload_file_url)
         elif next_action == 'back':
             return handle_back(request, form, vendor_form)
         elif next_action == 'next_payment':

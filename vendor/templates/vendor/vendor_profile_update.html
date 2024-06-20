@@ -5,6 +5,12 @@
     <link rel="stylesheet" type="text/css" href="{% static 'employee/css/daterangepicker.css' %}">
 
 {% endblock %}
+{% block script %}
+    <script src="{% static 'js/lightslider.js' %}"></script>
+    <script src="{% static 'js/functions_vendor.js' %}"></script>
+
+
+{% endblock %}
 {% block content %}
     <div class="main-section">
         {% include 'includes/cover.html' %}
@@ -37,13 +43,18 @@
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                         <div class="restaurant-info">
                                                             <div class="img-holder">
-                                                                <ul class="foodbakery-gallery-holder">
+                                                                <ul class="foodbakery-gallery-holder" id="imageGallery">
                                                                     <li class="gal-img">
                                                                         <div class="drag-list">
                                                                             <div class="item-thumb">
-                                                                                <img class="thumbnail"
-                                                                                     src="{{ img_profile }}"
-                                                                                     alt="profile_picture">
+                                                                                <a href="{{ img_logo }}"
+                                                                                   data-src="{{ img_logo }}"
+                                                                                   data-sub-html="<h4>Restaurant Demo</h4>">
+                                                                                    <img class="thumbnail"
+                                                                                         src="{{ img_logo }}"
+                                                                                         id="imagePreview" onclick=""
+                                                                                         alt="profile_picture">
+                                                                                </a>
                                                                             </div>
                                                                             <div class="item-assts">
                                                                                 <ul class="list-inline pull-right">
@@ -59,11 +70,11 @@
                                                             <div class="text-holder">
                                                                 <strong>Restaurant Demo</strong>
                                                                 <div class="upload-gallery">
-                                                                    <input class="foodbakery-dev-gallery-uploader"
-                                                                           style="display:none;" type="file">
-                                                                    <a href=""
-                                                                       class="upload-btn foodbakery-dev-featured-upload-btn">Upload
-                                                                        Logo</a>
+                                                                    <label>Update Logo</label>
+                                                                    {{ emp_forms.profile_picture }}
+                                                                    {#                                                                    <a href=""#}
+                                                                    {#                                                                       class="upload-btn foodbakery-dev-featured-upload-btn">Upload#}
+                                                                    {#                                                                        Logo</a>#}
                                                                 </div>
                                                                 <span>Update your avatar manually, If the not set the default Gravatar will be the same as your login email/user account. Max Upload Size: 1MB,</span>
                                                             </div>
@@ -77,8 +88,8 @@
                                                                         <div class="drag-list">
                                                                             <div class="item-thumb">
                                                                                 <img class="thumbnail"
-                                                                                     src="assets/extra-images/cover-photo01.jpg"
-                                                                                     alt="{{ emp_forms.cover_photo }}">
+                                                                                     src="{{ img_cover }}"
+                                                                                     alt="Upload Cover">
                                                                             </div>
                                                                             <div class="item-assts">
                                                                                 <ul class="list-inline pull-right">

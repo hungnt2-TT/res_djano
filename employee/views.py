@@ -20,7 +20,7 @@ from django.utils.translation import gettext_lazy as _
 
 from vendor.forms import VendorForm
 from vendor.models import Vendor
-from vendor.views import upload_file
+from vendor.views import upload_file, render_file_img
 from wallet.decorators import verified
 from wallet.models import Wallet
 from .forms import UserCreationForm, RegisterForm, MyPasswordResetForm, MySetPasswordForm, EmployeeProfileForm
@@ -298,23 +298,24 @@ class PasswordChangeDone(PasswordChangeDoneView):
 
 
 def vendor_profile_update(request):
-    #get data instance to form
+    # get data instance to form
     profile = get_object_or_404(EmployeeProfile, user=request.user)
-    print('request.user', request.user)
-    data  = Vendor.objects.filter(user=request.user)
-    img = upload_file(profile.profile_picture)
-    img = upload_file(profile.cover_photo)
-
-    print('img', img)
+    profile = get_object_or_404(EmployeeProfile, user=request.user)
     vendor = get_object_or_404(Vendor, user=request.user)
+
+    vendor_forms = VendorForm(instance=vendor)
+
+    print('request.user', request.user)
+    img_logo = render_file_img(request, profile.profile_picture)
+    img_cover = render_file_img(request, profile.cover_photo)
 
     print('vendor_profile_update', profile)
     print('vendor_profile_update', vendor)
-    vendor_forms = VendorForm(instance=vendor)
     emp_forms = EmployeeProfileForm(instance=profile)
     ctx = {
         'vendor_forms': vendor_forms,
         'emp_forms': emp_forms,
-        'img_profile': img,
+        'img_cover': img_cover,
+        'img_logo': img_logo,
     }
     return render(request, 'vendor/vendor_profile_update.html', ctx)
