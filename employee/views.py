@@ -1,11 +1,14 @@
+from time import sleep
+
 from django.contrib import auth, messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordContextMixin, PasswordResetCompleteView, \
-    PasswordResetConfirmView
+    PasswordResetConfirmView, PasswordChangeView, PasswordChangeDoneView
 from django.core.exceptions import PermissionDenied
 from django.core.mail import message
+from django.http import HttpResponseNotAllowed
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from django.urls import reverse, reverse_lazy
@@ -15,11 +18,14 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic import TemplateView
 from django.utils.translation import gettext_lazy as _
 
+from vendor.forms import VendorForm
+from vendor.models import Vendor
+from vendor.views import upload_file
 from wallet.decorators import verified
 from wallet.models import Wallet
-from .forms import UserCreationForm, RegisterForm, MyPasswordResetForm, MySetPasswordForm
+from .forms import UserCreationForm, RegisterForm, MyPasswordResetForm, MySetPasswordForm, EmployeeProfileForm
 from .mails import send_verification_email
-from .models import Profile
+from .models import Profile, EmployeeProfile
 from .utils import detect_usertype
 
 
@@ -271,3 +277,44 @@ def activate(request, uidb64, token):
 
 def history(request):
     return render(request, 'history.html')
+
+
+class PasswordChange(PasswordChangeView):
+    form_class = MySetPasswordForm
+    template_name = 'password_change.html'
+    success_url = reverse_lazy('p_password_change_done')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if 'data' in kwargs:
+            profile = self.request.user.employeeprofile
+            profile.password = kwargs['data']['new_password1']
+            profile.save()
+        return kwargs
+
+
+class PasswordChangeDone(PasswordChangeDoneView):
+    template_name = 'password_change_done.html'
+
+
+def vendor_profile_update(request):
+    #get data instance to form
+    profile = get_object_or_404(EmployeeProfile, user=request.user)
+    print('request.user', request.user)
+    data  = Vendor.objects.filter(user=request.user)
+    img = upload_file(profile.profile_picture)
+    img = upload_file(profile.cover_photo)
+
+    print('img', img)
+    vendor = get_object_or_404(Vendor, user=request.user)
+
+    print('vendor_profile_update', profile)
+    print('vendor_profile_update', vendor)
+    vendor_forms = VendorForm(instance=vendor)
+    emp_forms = EmployeeProfileForm(instance=profile)
+    ctx = {
+        'vendor_forms': vendor_forms,
+        'emp_forms': emp_forms,
+        'img_profile': img,
+    }
+    return render(request, 'vendor/vendor_profile_update.html', ctx)

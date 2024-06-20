@@ -39,7 +39,7 @@ class RegisterForm(UserCreationForm):
 #         self.fields['state'].widget.attrs['placeholder'] = 'State'
 #         self.fields['city'].widget.attrs['placeholder'] = 'City'
 #         self.fields['address_line_1'].widget.attrs['placeholder'] = 'Address '
-    # def __init__(self, *args, **kwargs):
+# def __init__(self, *args, **kwargs):
 
 class MyPasswordResetForm(PasswordResetForm):
     def __init__(self, *args, **kwargs):
@@ -55,13 +55,13 @@ class MyPasswordResetForm(PasswordResetForm):
         return email
 
     def send_mail(
-        self,
-        subject_template_name,
-        email_template_name,
-        context,
-        from_email,
-        to_email,
-        html_email_template_name=None,
+            self,
+            subject_template_name,
+            email_template_name,
+            context,
+            from_email,
+            to_email,
+            html_email_template_name=None,
     ):
         """
         Send a django.core.mail.EmailMultiAlternatives to `to_email`.
@@ -91,3 +91,17 @@ class MySetPasswordForm(SetPasswordForm):
             field.widget.attrs['class'] = 'form-control'
             field.help_text = None
             field.widget.attrs['placeholder'] = field.label
+
+
+class EmployeeProfileForm(forms.ModelForm):
+    class Meta:
+        model = EmployeeProfile
+        fields = ['profile_picture', 'cover_photo', 'email_is_confirmed']
+
+    def __int__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+        self.fields['profile_picture'].widget.attrs['placeholder'] = 'Profile Picture'
+        self.fields['cover_photo'].widget.attrs['placeholder'] = 'Cover Photo'
+        self.fields['email_is_confirmed'].widget.attrs['placeholder'] = 'Email is Confirmed'

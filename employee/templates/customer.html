@@ -1,39 +1,13 @@
 {% extends 'base.html' %}
 {% load static %}
+    <script src="{% static 'js/daterangepicker.js' %}"></script>
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/daterangepicker.css' %}">
+
+{% endblock %}
 {% block content %}
     <div class="main-section">
-        <div class="page-section restaurant-detail-image-section"
-             style=" background: url(assets/extra-images/cover-photo01.jpg) no-repeat scroll 0 0 / cover;">
-            <!-- Container Start -->
-            <div class="container">
-                <!-- Row Start -->
-                <div class="row">
-                    <!-- Column Start -->
-                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                        <div class="company-info-detail">
-                            <div class="company-info">
-                                <div class="img-holder">
-                                    <figure>
-                                        <img src="assets/extra-images/listing-logo18.png" alt="">
-                                    </figure>
-                                </div>
-
-                                <div class="text-holder">
-                                    <span class="restaurant-title">Restaurant Demo</span>
-                                    <div class="text">
-                                        <i class="icon-location"></i>
-                                        <p>Mark ricardo road, lane 27, Austin, Texas, USA.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Column End -->
-                </div>
-                <!-- Row End -->
-            </div>
-            <!-- Container End -->
-        </div>
+        {% include 'includes/cover.html' %}
         <div class="page-section account-header buyer-logged-in">
             <div class="container">
                 <div class="row">
@@ -60,7 +34,21 @@
                                                         </select>
                                                     </div>
                                                 </div>
-
+                                                <div class="col-lg-6 col-md-6 col-xs-6">
+                                                    <div class="input-field">
+                                                        <i class="icon-angle-down"></i>
+                                                        <input type="text" data-id="daterange223" id="daterange"
+                                                               value="" placeholder="Select Date Range">
+                                                        <script>
+                                                            $(function () {
+                                                                console.log('daterange')
+                                                                $('input[data-id="daterange223"]').daterangepicker({
+                                                                    opens: 'left'
+                                                                });
+                                                            });
+                                                        </script>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
