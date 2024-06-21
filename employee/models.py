@@ -57,7 +57,7 @@ class Profile(AbstractBaseUser):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     employee_type = models.IntegerField(choices=EMPLOYEE_TYPE_CHOICES, default=EMPLOYEE_TYPE_OWNER)
     nickname = models.CharField(max_length=50, blank=True, null=True)
-
+    email_contact = models.CharField(max_length=50, blank=True, null=True, default='email')
     data_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)

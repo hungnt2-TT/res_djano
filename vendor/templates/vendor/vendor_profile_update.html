@@ -1,16 +1,14 @@
 {% extends 'base.html' %}
 {% load static %}
+{{ block.super }}
+
 <script src="{% static 'js/daterangepicker.js' %}"></script>
+<script src="{% static 'js/upload_prof_vendor.js' %}"></script>
 {% block css %}
     <link rel="stylesheet" type="text/css" href="{% static 'employee/css/daterangepicker.css' %}">
 
 {% endblock %}
-{% block script %}
-    <script src="{% static 'js/lightslider.js' %}"></script>
-    <script src="{% static 'js/functions_vendor.js' %}"></script>
 
-
-{% endblock %}
 {% block content %}
     <div class="main-section">
         {% include 'includes/cover.html' %}
@@ -47,7 +45,7 @@
                                                                     <li class="gal-img">
                                                                         <div class="drag-list">
                                                                             <div class="item-thumb">
-                                                                                <a href="{{ img_logo }}"
+                                                                                <a href="{{ img_logo }}" id="slider_up"
                                                                                    data-src="{{ img_logo }}"
                                                                                    data-sub-html="<h4>Restaurant Demo</h4>">
                                                                                     <img class="thumbnail"
@@ -71,10 +69,17 @@
                                                                 <strong>Restaurant Demo</strong>
                                                                 <div class="upload-gallery">
                                                                     <label>Update Logo</label>
-                                                                    {{ emp_forms.profile_picture }}
-                                                                    {#                                                                    <a href=""#}
-                                                                    {#                                                                       class="upload-btn foodbakery-dev-featured-upload-btn">Upload#}
-                                                                    {#                                                                        Logo</a>#}
+                                                                    {#                                                                    {{ emp_forms.profile_picture }}#}
+                                                                    <div class="upload-gallery">
+                                                                        <input type="file"
+
+                                                                               class="btn btn-info"
+                                                                               id="imageUpload"
+                                                                               name="img_logo">
+                                                                        <label for="imageUpload"></label>
+
+                                                                        {#                                                                                    {{ vendor_form.vendor_license }}#}
+                                                                    </div>
                                                                 </div>
                                                                 <span>Update your avatar manually, If the not set the default Gravatar will be the same as your login email/user account. Max Upload Size: 1MB,</span>
                                                             </div>
@@ -83,13 +88,18 @@
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                         <div class="restaurant-info">
                                                             <div class="img-holder">
-                                                                <ul class="foodbakery-gallery-holder">
+                                                                <ul class="foodbakery-gallery-holder" id="imageGallery">
                                                                     <li class="gal-img">
                                                                         <div class="drag-list">
                                                                             <div class="item-thumb">
-                                                                                <img class="thumbnail"
-                                                                                     src="{{ img_cover }}"
-                                                                                     alt="Upload Cover">
+                                                                                <a href="{{ img_cover }}" id="slider_up"
+                                                                                   data-src="{{ img_cover }}"
+                                                                                   data-sub-html="<h4>Restaurant Demo</h4>">
+                                                                                    <img class="thumbnail"
+                                                                                         src="{{ img_cover }}"
+                                                                                         id="imagePreview" onclick=""
+                                                                                         alt="profile_picture">
+                                                                                </a>
                                                                             </div>
                                                                             <div class="item-assts">
                                                                                 <ul class="list-inline pull-right">
@@ -104,11 +114,18 @@
                                                             </div>
                                                             <div class="text-holder">
                                                                 <div class="upload-gallery">
-                                                                    <input class="foodbakery-dev-gallery-uploader"
-                                                                           style="display:none;" type="file">
-                                                                    <a href="#"
-                                                                       class="upload-btn foodbakery-dev-cover-upload-btn">Upload
-                                                                        Cover Image</a>
+                                                                    <label>Update Cover</label>
+                                                                    {#                                                                    {{ emp_forms.profile_picture }}#}
+                                                                    <div class="upload-gallery">
+                                                                        <input type="file"
+
+                                                                               class="btn btn-info"
+                                                                               id="imageUpload"
+                                                                               name="img_cover">
+                                                                        <label for="imageUpload"></label>
+
+                                                                        {#                                                                                    {{ vendor_form.vendor_license }}#}
+                                                                    </div>
                                                                 </div>
                                                                 <span>Update your cover image manually, If the not set the default cover image will be showing on your restaurant detail page. Max Upload Size: 1MB,</span>
                                                             </div>
@@ -117,44 +134,58 @@
                                                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                                         <div class="field-holder">
                                                             <label>Restaurant name *</label>
-                                                            <input type="text" placeholder="i.e Pizza Hut"
-                                                                   class="foodbakery-dev-req-field">
+                                                            {{ vendor_forms.vendor_name }}
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                                         <div class="field-holder">
                                                             <label>Restaurant phone</label>
-                                                            <input type="text" placeholder="i.e +1 321 828 6662">
+                                                            {{ vendor_forms.fax_number }}
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                                         <div class="field-holder">
                                                             <label>Manager Name</label>
-                                                            <input type="text" placeholder="i.e Alard Willaim">
+                                                            {{ user.username }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                        <div class="field-holder">
+                                                            <label>First Name</label>
+                                                            {{ user.first_name }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                        <div class="field-holder">
+                                                            <label>Last Name</label>
+                                                            {{ user.last_name }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                        <div class="field-holder">
+                                                            <label>Email </label>
+                                                            {{ user.email }}
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                                         <div class="field-holder">
                                                             <label>Manager Contact phone</label>
-                                                            <input type="text" placeholder="i.e +1 321 828 6662">
+                                                            {{ user.phone_number }}
                                                         </div>
                                                     </div>
+
                                                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                                         <div class="field-holder">
                                                             <label>Contact Email</label>
-                                                            <input type="text" placeholder="i.e alard@example.com ">
+                                                            {{ user.email_contact }}
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                         <div class="field-holder">
                                                             <label>Information *</label>
                                                             <div class="foodbakery_editor1">
-                                                                <textarea></textarea>
-                                                                <script>
-                                                                    jQuery(document).ready(function () {
-                                                                        jQuery(".foodbakery_editor1 textarea").jqte();
-                                                                    });
-                                                                </script>
+                                                                {{ vendor_forms.vendor_description }}
+
                                                             </div>
                                                         </div>
                                                     </div>
@@ -299,14 +330,7 @@
                                                         <div class="element-title">
                                                             <h4>Tags Clouds</h4>
                                                         </div>
-                                                        <script>
-                                                            jQuery(document).ready(function () {
-                                                                jQuery('#foodbakery-tags').tagit({
-                                                                    allowSpaces: true,
-                                                                    fieldName: 'foodbakery_tags[]'
-                                                                });
-                                                            });
-                                                        </script>
+
                                                         <ul id="foodbakery-tags" class="tagit">
                                                             <li class="tagit-choice">
                                                                 <span class="tagit-label">applejuice</span>
@@ -358,6 +382,16 @@
                                                 </div>
                                             </li>
                                         </ul>
+                                        <ul class="errors">
+                                            {% for fields in form %}
+                                                {% if fields.errors %}
+                                                    {% for error in fields.errors %}
+                                                        <li style="color: red; font-size:12px">{{ error }}</li>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endfor %}
+                                            <li style="color: red">{{ form.non_field_errors }}</li>
+                                        </ul>
                                         <div>
                                             <div class="field-holder">
                                                 <div class="payment-holder input-button-loader">
@@ -379,3 +413,12 @@
         </div>
     </div>
 {% endblock %}
+{##}
+{#{% block script %}#}
+{#    {{ block.super }}#}
+{##}
+{#    <script src="{% static 'js/lightslider.js' %}"></script>#}
+{#    <script src="{% static 'js/upload_prof_vendor.js' %}"></script>#}
+{##}
+{##}
+{#{% endblock %}#}

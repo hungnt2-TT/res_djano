@@ -18,12 +18,13 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic import TemplateView
 from django.utils.translation import gettext_lazy as _
 
-from vendor.forms import VendorForm
+from vendor.forms import VendorForm, VendorUpdateForm
 from vendor.models import Vendor
 from vendor.views import upload_file, render_file_img
 from wallet.decorators import verified
 from wallet.models import Wallet
-from .forms import UserCreationForm, RegisterForm, MyPasswordResetForm, MySetPasswordForm, EmployeeProfileForm
+from .forms import UserCreationForm, RegisterForm, MyPasswordResetForm, MySetPasswordForm, EmployeeProfileForm, \
+    ProfileUpdateForm
 from .mails import send_verification_email
 from .models import Profile, EmployeeProfile
 from .utils import detect_usertype
@@ -241,9 +242,7 @@ def customer_dashboard(request):
 
 def activate(request, uidb64, token):
     args = {
-
     }
-
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
         user = Profile.objects.get(pk=uid)
@@ -300,22 +299,66 @@ class PasswordChangeDone(PasswordChangeDoneView):
 def vendor_profile_update(request):
     # get data instance to form
     profile = get_object_or_404(EmployeeProfile, user=request.user)
-    profile = get_object_or_404(EmployeeProfile, user=request.user)
     vendor = get_object_or_404(Vendor, user=request.user)
+    if profile.profile_picture and profile.cover_photo:
+        img_logo = render_file_img(request, profile.profile_picture)
+        img_cover = render_file_img(request, profile.cover_photo)
+    else:
+        img_logo = None
+        img_cover = None
 
-    vendor_forms = VendorForm(instance=vendor)
-
-    print('request.user', request.user)
-    img_logo = render_file_img(request, profile.profile_picture)
-    img_cover = render_file_img(request, profile.cover_photo)
-
-    print('vendor_profile_update', profile)
-    print('vendor_profile_update', vendor)
+    print('vendor_profile_update', profile, vendor, img_logo, img_cover)
+    vendor_forms = VendorUpdateForm(instance=vendor)
     emp_forms = EmployeeProfileForm(instance=profile)
+    user = ProfileUpdateForm(instance=request.user)
+
     ctx = {
         'vendor_forms': vendor_forms,
         'emp_forms': emp_forms,
         'img_cover': img_cover,
         'img_logo': img_logo,
+        'user': user
     }
+    if request.method == 'POST':
+        vendor_forms = VendorUpdateForm(request.POST, instance=vendor)
+        emp_forms = EmployeeProfileForm(request.POST, request.FILES, instance=profile)
+        user = ProfileUpdateForm(request.POST, instance=request.user)
+        fields = request.POST.getlist('img_cover', 'img_logo')
+        images = request.FILES.getlist('img_logo')
+
+        if len(images) != len(fields):
+            print('Error when saving user:', 'Images and fields are not equal')
+
+        print('fields', fields)
+        print('request.FILES', images)
+        if len(request.FILES) > 1:
+            img_logo_values = request.FILES.getlist('img_logo')
+        elif request.FILES:
+            img = request.FILES.get('img_logo')
+
+
+        else:
+            img_logo_values = [profile.profile_picture, profile.cover_photo]
+        if vendor_forms.is_valid() and emp_forms.is_valid() and user.is_valid():
+            vendor = vendor_forms.save(commit=False)
+            vendor.save()
+
+            try:
+                print('-------------------')
+                emp = EmployeeProfile.objects.get(user=request.user)
+                print('emp:', emp)
+                emp.profile_picture = img_logo_values[0] if img_logo_values else emp.profile_picture
+                emp.cover_photo = img_logo_values[1]
+                emp.save()
+
+            except Exception as e:
+                print('Error when saving user:', e)
+            user.save()
+
+            # user = user.save(commit=False)
+            # user.employeeprofile.profile_picture = upload_file_logo
+            # user.employeeprofile.cover_photo = upload_file_cover
+            # user.save()
+
+            return redirect('profile')
     return render(request, 'vendor/vendor_profile_update.html', ctx)

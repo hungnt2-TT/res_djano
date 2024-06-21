@@ -32,3 +32,20 @@ class VendorForm(forms.ModelForm):
         self.fields['state'].widget.attrs['placeholder'] = 'State'
         self.fields['city'].widget.attrs['placeholder'] = 'City'
         self.fields['address_line_1'].widget.attrs['placeholder'] = 'Address '
+
+
+class VendorUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Vendor
+        fields = ['vendor_name', 'fax_number', 'state', 'city', 'longitude', 'latitude', 'address_line_1', 'vendor_description']
+
+    def __int__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+        self.fields['state'].widget.attrs['placeholder'] = 'State'
+        self.fields['city'].widget.attrs['placeholder'] = 'City'
+        self.fields['address_line_1'].widget.attrs['placeholder'] = 'Address '
+        self.fields['vendor_name'].widget.attrs['placeholder'] = 'Vendor Name'
+        self.fields['fax_number'].widget.attrs['placeholder'] = 'Fax Number'
+        self.fields['email'].widget.attrs['placeholder'] = 'Requires entering correct email structure'

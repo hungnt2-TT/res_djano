@@ -96,7 +96,7 @@ class MySetPasswordForm(SetPasswordForm):
 class EmployeeProfileForm(forms.ModelForm):
     class Meta:
         model = EmployeeProfile
-        fields = ['profile_picture', 'cover_photo', 'email_is_confirmed']
+        fields = ['profile_picture', 'cover_photo', 'email_is_confirmed', 'user']
 
     def __int__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -105,3 +105,17 @@ class EmployeeProfileForm(forms.ModelForm):
         self.fields['profile_picture'].widget.attrs['placeholder'] = 'Profile Picture'
         self.fields['cover_photo'].widget.attrs['placeholder'] = 'Cover Photo'
         self.fields['email_is_confirmed'].widget.attrs['placeholder'] = 'Email is Confirmed'
+
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['first_name', 'last_name', 'email', 'phone_number', 'nickname', 'username', 'email_contact']
+
+    def __init__(self, *args, **kwargs):
+        super(ProfileUpdateForm, self).__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+            field.help_text = None
+            field.widget.attrs['placeholder'] = field.label
+        self.fields['email'].widget.attrs['readonly'] = True
+        self.fields['email'].widget.attrs['placeholder'] = 'Email'
