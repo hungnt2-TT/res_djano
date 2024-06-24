@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+{{ block.super }}
+
+<script src="{% static 'js/daterangepicker.js' %}"></script>
+<script src="{% static 'js/upload_prof_vendor.js' %}"></script>
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/daterangepicker.css' %}">
+
+{% endblock %}
+
+{% block content %}
+    <div class="main-section">
+        {% include 'includes/cover.html' %}
+        <div class="page-section account-header buyer-logged-in">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        {% include 'includes/v_sidebar.html' %}
+                    </div>
+                    <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                        <div class="user-dashboard loader-holder">
+                            <div class="user-holder">
+                                <form action="{% url 'profile' %}" method="POST" enctype="multipart/form-data">
+                                    <ul class="restaurant-settings-nav progressbar-nav">
+                                        <li class="active cond-restaurant-settings processing">
+                                            <a href="{% url 'profile' %}">Restaurant Settings</a>
+                                        </li>
+                                        <li class="cond-restaurant-settings  active processing">
+                                            <a href="{% url 'vendor_map' %}">Location/Map</a>
+                                        </li>
+                                        <li class="cond-restaurant-settings">
+                                            <a href="restaurant-open-close.html">Restaurant Open/Close</a>
+                                        </li>
+                                    </ul>
+
+                                    <div class="form-fields-set">
+                                        <ul>
+                                            <li>
+                                                <div class="row">
+                                                    <ul>
+
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                            <div class="element-title">
+                                                                <h4>Location</h4>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+                                                            <div class="opt-conts">
+                                                                <div class="row">
+                                                                    <div class="ccol-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>Address</label>
+                                                                            {#                                                                {{ profile_form.address_line_1 }}#}
+
+
+                                                                            <input id="my-input-searchbox" type="text"
+                                                                                   name="address_line_1"
+                                                                                   placeholder="SearchBox Widget" style="">
+                                                                            <div style="padding: 20px"></div>
+                                                                            <div id="map_" style="height: 400px"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>State</label>
+                                                                            {{ vendor_form.state }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>City</label>
+                                                                            {{ vendor_form.city }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>Latitude</label>
+                                                                            {{ vendor_form.latitude }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>Longitude</label>
+                                                                            {{ vendor_form.longitude }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <input type="hidden"
+                                                                               id="foodbakery__loc_bounds_rest"
+                                                                               name="foodbakery_loc_bounds_rest_restaurant"
+                                                                               value=""><input type="hidden"
+                                                                                               id="foodbakery_add_new_loc"
+                                                                                               class="gllpSearchField"
+                                                                                               style="margin-bottom:10px;"
+                                                                                               name="foodbakery_add_new_loc_restaurant"
+                                                                                               value=""><input
+                                                                            type="hidden"
+                                                                            id="foodbakery_post_loc_zoom"
+                                                                            class="gllpZoom"
+                                                                            name="foodbakery_post_loc_zoom_restaurant"
+                                                                            value="9">
+
+                                                                    </div>
+                                                                    <div class="field-holder">
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                        <ul class="errors">
+                                            {% for fields in form %}
+                                                {% if fields.errors %}
+                                                    {% for error in fields.errors %}
+                                                        <li style="color: red; font-size:12px">{{ error }}</li>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endfor %}
+                                            <li style="color: red">{{ form.non_field_errors }}</li>
+                                        </ul>
+                                        <div>
+                                            <div class="field-holder">
+                                                <div class="payment-holder input-button-loader">
+                                                    <input class="update-restaurant" type="submit"
+                                                           value="update"
+                                                    >
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {% csrf_token %}
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+{% block extra_scripts %}
+        <script src="{% static 'js/map_update.js' %}"></script>
+{#    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&callback=initSearchBox" async#}
+{#            defer></script>#}
+{% endblock %}
