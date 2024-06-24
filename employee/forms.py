@@ -9,6 +9,7 @@ from django.template.loader import render_to_string
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm, UserCreationForm, PasswordChangeForm
 
 from employee.models import CustomProfile, Profile, EmployeeProfile
+from employee.validators import validator_file_upload
 
 
 class RegisterForm(UserCreationForm):
@@ -94,17 +95,23 @@ class MySetPasswordForm(SetPasswordForm):
 
 
 class EmployeeProfileForm(forms.ModelForm):
+    profile_picture = forms.FileField(
+        widget=forms.FileInput(attrs={'class': 'form-control', 'placeholder': 'Profile Picture'}),
+        validators=[validator_file_upload])
+    cover_photo = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control', 'placeholder': 'Cover Photo'}),
+                                  validators=[validator_file_upload])
+
     class Meta:
         model = EmployeeProfile
         fields = ['profile_picture', 'cover_photo', 'email_is_confirmed', 'user']
 
     def __int__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        print('self.fields', self.fields)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
-        self.fields['profile_picture'].widget.attrs['placeholder'] = 'Profile Picture'
-        self.fields['cover_photo'].widget.attrs['placeholder'] = 'Cover Photo'
         self.fields['email_is_confirmed'].widget.attrs['placeholder'] = 'Email is Confirmed'
+
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:

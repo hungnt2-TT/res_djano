@@ -27,7 +27,7 @@
                                             <a href="restaurant-restaurant.html">Restaurant Settings</a>
                                         </li>
                                         <li class="cond-restaurant-settings">
-                                            <a href="restaurant-location.html">Location/Map</a>
+                                            <a href="{% url 'vendor_map' %}">Location/Map</a>
                                         </li>
                                         <li class="cond-restaurant-settings">
                                             <a href="restaurant-open-close.html">Restaurant Open/Close</a>
@@ -76,9 +76,9 @@
                                                                                class="btn btn-info"
                                                                                id="imageUpload"
                                                                                name="img_logo">
-                                                                        <label for="imageUpload"></label>
+                                                                        <label for="imageUpload"
+                                                                               class="text-danger">{{ img_logo.errors }}</label>
 
-                                                                        {#                                                                                    {{ vendor_form.vendor_license }}#}
                                                                     </div>
                                                                 </div>
                                                                 <span>Update your avatar manually, If the not set the default Gravatar will be the same as your login email/user account. Max Upload Size: 1MB,</span>
@@ -92,12 +92,13 @@
                                                                     <li class="gal-img">
                                                                         <div class="drag-list">
                                                                             <div class="item-thumb">
-                                                                                <a href="{{ img_cover }}" id="slider_up"
+                                                                                <a href="{{ img_cover }}"
+                                                                                   id="slider_up_cover"
                                                                                    data-src="{{ img_cover }}"
                                                                                    data-sub-html="<h4>Restaurant Demo</h4>">
                                                                                     <img class="thumbnail"
                                                                                          src="{{ img_cover }}"
-                                                                                         id="imagePreview" onclick=""
+                                                                                         id="imagePreviewCover" onclick=""
                                                                                          alt="profile_picture">
                                                                                 </a>
                                                                             </div>
@@ -120,9 +121,10 @@
                                                                         <input type="file"
 
                                                                                class="btn btn-info"
-                                                                               id="imageUpload"
+                                                                               id="imageUploadCover"
                                                                                name="img_cover">
-                                                                        <label for="imageUpload"></label>
+                                                                        <label for="imageUploadCover"
+                                                                               class="text-danger">{{ img_cover.errors }}</label>
 
                                                                         {#                                                                                    {{ vendor_form.vendor_license }}#}
                                                                     </div>
@@ -402,6 +404,7 @@
                                             </div>
                                         </div>
                                     </div>
+
                                     {% csrf_token %}
                                 </form>
                             </div>
@@ -409,7 +412,9 @@
                     </div>
 
                 </div>
+
             </div>
+
         </div>
     </div>
 {% endblock %}

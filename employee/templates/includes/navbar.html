@@ -106,7 +106,7 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
                                         <form method="post" action="{% url 'logout' %}">
                                             {% csrf_token %}
                                             <button type="submit" class="get-start-btn btn-logout"
-                                                    >
+                                            >
                                                 <i class="icon-log-out"></i>Logout
                                             </button>
                                         </form>
@@ -135,6 +135,8 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
                     {% endif %}
                 </div>
             </div>
+            {% include 'includes/alerts.html' %}
+
         </div>
     </div>
 </header>

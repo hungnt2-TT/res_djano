@@ -300,14 +300,13 @@ def vendor_profile_update(request):
     # get data instance to form
     profile = get_object_or_404(EmployeeProfile, user=request.user)
     vendor = get_object_or_404(Vendor, user=request.user)
-    if profile.profile_picture and profile.cover_photo:
+    if profile.profile_picture or profile.cover_photo:
         img_logo = render_file_img(request, profile.profile_picture)
         img_cover = render_file_img(request, profile.cover_photo)
     else:
         img_logo = None
         img_cover = None
 
-    print('vendor_profile_update', profile, vendor, img_logo, img_cover)
     vendor_forms = VendorUpdateForm(instance=vendor)
     emp_forms = EmployeeProfileForm(instance=profile)
     user = ProfileUpdateForm(instance=request.user)
@@ -320,45 +319,25 @@ def vendor_profile_update(request):
         'user': user
     }
     if request.method == 'POST':
+        print('request.POST', request.POST, request.FILES)
         vendor_forms = VendorUpdateForm(request.POST, instance=vendor)
         emp_forms = EmployeeProfileForm(request.POST, request.FILES, instance=profile)
+        print('emp_forms', emp_forms.errors)
         user = ProfileUpdateForm(request.POST, instance=request.user)
-        fields = request.POST.getlist('img_cover', 'img_logo')
-        images = request.FILES.getlist('img_logo')
-
-        if len(images) != len(fields):
-            print('Error when saving user:', 'Images and fields are not equal')
-
-        print('fields', fields)
-        print('request.FILES', images)
-        if len(request.FILES) > 1:
-            img_logo_values = request.FILES.getlist('img_logo')
-        elif request.FILES:
-            img = request.FILES.get('img_logo')
-
-
-        else:
-            img_logo_values = [profile.profile_picture, profile.cover_photo]
         if vendor_forms.is_valid() and emp_forms.is_valid() and user.is_valid():
             vendor = vendor_forms.save(commit=False)
             vendor.save()
-
             try:
-                print('-------------------')
                 emp = EmployeeProfile.objects.get(user=request.user)
-                print('emp:', emp)
-                emp.profile_picture = img_logo_values[0] if img_logo_values else emp.profile_picture
-                emp.cover_photo = img_logo_values[1]
+                emp.profile_picture = request.FILES.get('img_logo') if request.FILES.get(
+                    'img_logo') else emp.profile_picture
+                emp.cover_photo = request.FILES.get('img_cover') if request.FILES.get('img_cover') else emp.cover_photo
                 emp.save()
 
             except Exception as e:
                 print('Error when saving user:', e)
             user.save()
-
-            # user = user.save(commit=False)
-            # user.employeeprofile.profile_picture = upload_file_logo
-            # user.employeeprofile.cover_photo = upload_file_cover
-            # user.save()
+            messages.success(request, 'Profile updated successfully')
 
             return redirect('profile')
     return render(request, 'vendor/vendor_profile_update.html', ctx)

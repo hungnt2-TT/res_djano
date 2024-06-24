@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-^+g23c#3qlv2m6kq4lz6(t7gi$xsr%dt_bcz3fcr()ys%r=9aw
 
 # SECURITY WARNING: don't run with debug turned on in production!
 import dotenv
-
+from django.contrib.messages import constants as messages
 ALLOWED_HOSTS = ['*']
 
 DEBUG = os.getenv('DEBUG', 'False')
@@ -190,3 +190,7 @@ EMAIL_USE_SSL = False
 EMAIL_PORT = 587
 EMAIL_HOST_USER = str(os.getenv('EMAIL_USER'))
 EMAIL_HOST_PASSWORD = str(os.getenv('EMAIL_PASSWORD'))
+
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+}

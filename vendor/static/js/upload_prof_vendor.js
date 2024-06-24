@@ -1,17 +1,3 @@
-function readURL(input) {
-    if (input.files && input.files[0]) {
-        var reader = new FileReader();
-        reader.onload = function (e) {
-            $('#imagePreview').attr('src', e.target.result);
-            $('#slider_up').attr('img_logo', e.target.result);
-
-            initLightSlider();
-        }
-        console.log("reader", reader)
-        reader.readAsDataURL(input.files[0]);
-    }
-}
-
 function initLightSlider() {
     var slider = $('#slider_up').data('lightSlider')
     console.log("slider", slider)
@@ -46,7 +32,20 @@ function initLightSlider() {
 }
 
 $(document).ready(function () {
-    $("#imageUpload").change(function () {
-        readURL(this);
+    $("#imageUpload, #imageUploadCover").change(function () {
+        readerFunction(this);
     });
 });
+
+function readerFunction(input) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+        var previewId = input.id === "imageUpload" ? '#imagePreview' : '#imagePreviewCover';
+        var sliderId = input.id === "imageUpload" ? '#slider_up' : '#slider_up_cover';
+        $(previewId).attr('src', e.target.result);
+        $(sliderId).attr('img_logo', e.target.result);
+        initLightSlider();
+    }
+    console.log("reader", reader)
+    reader.readAsDataURL(input.files[0]);
+}

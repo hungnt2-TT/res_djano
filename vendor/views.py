@@ -1,9 +1,9 @@
 from django.contrib import messages
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 from employee.forms import RegisterForm
 from employee.models import EmployeeProfile, Profile
-from vendor.forms import VendorForm
+from vendor.forms import VendorForm, VendorUpdateForm
 from django.conf import settings
 import os
 
@@ -188,7 +188,15 @@ def register_vendor(request):
 #                 return render(request, 'vendor/register_save.html', ctx)
 #
 #     return render(request, 'vendor/register_vendor.html', ctx)
+def vendor_map(request):
+    vendor = get_object_or_404(Vendor, user=request.user)
+    vendor_form = VendorUpdateForm(instance=vendor)
 
+    ctx = {
+        'vendor_form': vendor_form,
+        'initSearchBox':'initSearchBox'
+    }
+    return render(request, 'vendor/vendor_map_update.html', ctx)
 
 def get_google_api(request):
     return {'GOOGLE_API_KEY': settings.GOOGLE_API_KEY}

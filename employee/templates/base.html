@@ -32,6 +32,7 @@
     <link href="{% static 'css/iconmoon.css' %}" rel="stylesheet">
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
     <link href="{% static 'css/cs-foodbakery-plugin.css' %}" rel="stylesheet">
+    <link href="{% static 'employee/css/custom-noti.css' %}" rel="stylesheet">
 
     {#    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/form_register.css' %}">#}
 
@@ -39,6 +40,7 @@
     <link href="{% static 'css/bootstrap-slider.css' %}" rel="stylesheet">
     <!-- Add the following line to the base.html file -->
     {% block css %}
+
     {% endblock %}
     <!-- JAVASCRIPT -->
     {#    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>#}
@@ -57,15 +59,14 @@
 
     <script src="{% static 'js/init_google_map_plf.js' %}"></script>
     <script src="{% static 'js/daterangepicker.js' %}"></script>
-
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places" async
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&callback={{ initSearchBox }}" async
             defer></script>
     <script>
         window.onload = function () {
             initAutocomplete();
         };
     </script>
-
+    {% block extra_scripts %}{% endblock %}
     <style>
         body, .main-section p, .mce-content-body p {
             font: Normal 14px/24px "Open Sans", sans-serif;
