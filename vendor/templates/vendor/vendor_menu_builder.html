@@ -33,7 +33,7 @@
                                             <th>Menu Name</th>
                                             <th>Menu Price</th>
                                             <th>Menu Description</th>
-                                            <th>Menu Image</th>
+{#                                            <th>Menu Image</th>#}
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -43,16 +43,17 @@
                                                 <th scope="row" class="text-left">{{ forloop.counter }}</th>
                                                 <td class="text-left"><a href=""><p class="mb-0 font-weight-bold">
                                                     {{ menu }}
-                                                    <small>{{ menu.description }}</small>
+                                                    <small><br>
+                                                        {{ menu.description }}</small>
                                                 </p>
 
                                                 </a></td>
                                                 <td>{{ menu.price }}</td>
                                                 <td>{{ menu.description }}</td>
-                                                <td><img src="{{ menu.image }}" alt="{{ menu.name }}" style="width: 100px; height: 100px;"></td>
+{#                                                <td><img src="{{ foods.image }}" alt="{{ foods.category_name }}" style="width: 100px; height: 100px;"></td>#}
                                                 <td>
-                                                    <a href="{% url 'menu_edit' menu.id %}" class="btn btn-primary">Edit</a>
-                                                    <a href="{% url 'menu_delete' menu.id %}" class="btn btn-danger">Delete</a>
+                                                    <a href="{% url 'menu_edit' menu.id %}" class="icon-edit2"></a>
+                                                    <a href="{% url 'menu_delete' menu.id %}" class="icon-delete"></a>
                                                 </td>
                                             </tr>
                                         {% endfor %}

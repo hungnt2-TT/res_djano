@@ -48,7 +48,6 @@ class VendorUpdateForm(forms.ModelForm):
         self.fields['address_line_1'].widget.attrs['placeholder'] = 'Address '
         self.fields['vendor_name'].widget.attrs['placeholder'] = 'Vendor Name'
         self.fields['fax_number'].widget.attrs['placeholder'] = 'Fax Number'
-        self.fields['email'].widget.attrs['placeholder'] = 'Requires entering correct email structure'
 
 
 class VendorUpdateMapForm(forms.ModelForm):

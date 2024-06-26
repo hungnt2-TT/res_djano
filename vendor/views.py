@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from employee.forms import RegisterForm
 from employee.models import EmployeeProfile, Profile
-from menu.models import Category
+from menu.models import Category, FoodItem
 from vendor.forms import VendorForm, VendorUpdateForm, VendorUpdateMapForm
 from django.conf import settings
 import os
@@ -168,9 +168,15 @@ def vendor_map(request):
 def menu_builder(request):
     vendor = Vendor.objects.get(user=request.user)
     menu = Category.objects.filter(vendor=vendor)
-    print('menu= ==', menu)
+    food = FoodItem.objects.filter(category__vendor=vendor)
+    print('category_name', menu)
+    for food_item in food:
+        print(food_item.image.url)
+
+    print('category_name', menu)
     ctx = {
-        'menus': menu
+        'menus': menu,
+        'foods': food,
     }
     return render(request, 'vendor/vendor_menu_builder.html', ctx)
 
