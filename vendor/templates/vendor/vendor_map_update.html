@@ -21,7 +21,7 @@
                     <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
                         <div class="user-dashboard loader-holder">
                             <div class="user-holder">
-                                <form action="{% url 'profile' %}" method="POST" enctype="multipart/form-data">
+                                <form action="{% url 'vendor_map' %}" method="POST" enctype="multipart/form-data">
                                     <ul class="restaurant-settings-nav progressbar-nav">
                                         <li class="active cond-restaurant-settings processing">
                                             <a href="{% url 'profile' %}">Restaurant Settings</a>
@@ -64,6 +64,18 @@
                                                                     </div>
                                                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                                                         <div class="field-holder">
+                                                                            <label>Street Number</label>
+                                                                            {{ vendor_form.street_number }}
+                                                                        </div>
+                                                                    </div>
+                                                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>Address Line</label>
+                                                                            {{ vendor_form.address_line_1 }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
                                                                             <label>State</label>
                                                                             {{ vendor_form.state }}
                                                                         </div>
@@ -72,6 +84,18 @@
                                                                         <div class="field-holder">
                                                                             <label>City</label>
                                                                             {{ vendor_form.city }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>Pin code</label>
+                                                                            {{ vendor_form.pin_code }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>Location</label>
+                                                                            {{ vendor_form.location }}
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">

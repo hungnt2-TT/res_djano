@@ -1,9 +1,11 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
 
 from employee.forms import RegisterForm
 from employee.models import EmployeeProfile, Profile
-from vendor.forms import VendorForm, VendorUpdateForm
+from menu.models import Category
+from vendor.forms import VendorForm, VendorUpdateForm, VendorUpdateMapForm
 from django.conf import settings
 import os
 
@@ -142,61 +144,52 @@ def register_vendor(request):
     })
 
 
-# Create your views here.
-# def register_vendor(request):
-#     print('(request)', request)
-#     if 'vendor_license' in request.FILES:
-#         upload_file_url = upload_file(request.FILES['vendor_license'])
-#     else:
-#         upload_file_url = None
-#     print('register_user333333', request.POST, request.FILES)
-#     profile_form = RegisterEmployeeProfile(request.POST or None)
-#     form = RegisterForm(request.POST or None)
-#     vendor_form = VendorForm(request.POST or None)
-#
-#     ctx = {
-#         "form": form,
-#         "vendor_form": vendor_form,
-#         "profile_form": profile_form
-#     }
-#
-#     ctx['upload_file_url'] = upload_file_url
-#     print('fomr.errors', form.errors, vendor_form.errors, profile_form.errors)
-#     if request.method == 'POST':
-#         if request.POST.get('next', '') == 'confirm':
-#             if form.is_valid() and vendor_form.is_valid():
-#                 request.session['form_data'] = request.POST
-#
-#                 vendor_type = get_type_vendor()
-#                 ctx['vendor_type'] = vendor_type
-#                 return render(request, 'vendor/register_vendor_package.html', ctx)
-#         if request.POST.get('next', '') == 'back':
-#             return render(request, 'vendor/register_vendor.html', ctx)
-#         if request.POST.get('next', '') == 'next_payment':
-#             form_data = request.session.get('form_data', {})
-#             form_data.update(request.POST)
-#             if form.is_valid() and vendor_form.is_valid():
-#                 user = form.save(commit=False)
-#                 user.is_active = True
-#                 user.employee_type = 2
-#                 user.save()
-#                 vendor = vendor_form.save(commit=False)
-#                 vendor.user = user
-#                 user_profile = user.profile
-#                 vendor.user_profile = user_profile
-#                 vendor.save()
-#                 return render(request, 'vendor/register_save.html', ctx)
-#
-#     return render(request, 'vendor/register_vendor.html', ctx)
+@login_required
 def vendor_map(request):
     vendor = get_object_or_404(Vendor, user=request.user)
-    vendor_form = VendorUpdateForm(instance=vendor)
+    vendor_form = VendorUpdateMapForm(instance=vendor)
 
     ctx = {
         'vendor_form': vendor_form,
-        'initSearchBox':'initSearchBox'
+        'initSearchBox': 'initSearchBox'
     }
+    if request.method == 'POST':
+        vendor_form = VendorUpdateMapForm(request.POST, request.FILES, instance=vendor)
+        if vendor_form.is_valid():
+            vendor = vendor_form.save()
+            if vendor:
+                messages.success(request, 'Vendor updated successfully')
+                return redirect('vendor_map')
+            messages.error(request, 'Vendor not updated')
+            return redirect('vendor_map')
     return render(request, 'vendor/vendor_map_update.html', ctx)
+
+
+def menu_builder(request):
+    vendor = Vendor.objects.get(user=request.user)
+    menu = Category.objects.filter(vendor=vendor)
+    print('menu= ==', menu)
+    ctx = {
+        'menus': menu
+    }
+    return render(request, 'vendor/vendor_menu_builder.html', ctx)
+
+
+def menu_edit_detail(request, pk):
+    menu = get_object_or_404(Category, pk=pk)
+    ctx = {
+        'menu': menu
+    }
+    return render(request, 'vendor/vendor_menu_edit_detail.html', ctx)
+
+
+def menu_delete_detail(request, pk):
+    menu = get_object_or_404(Category, pk=pk)
+    ctx = {
+        'menu': menu
+    }
+    return render(request, 'vendor/vendor_menu_delete_detail.html', ctx)
+
 
 def get_google_api(request):
     return {'GOOGLE_API_KEY': settings.GOOGLE_API_KEY}

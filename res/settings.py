@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     "restaurant",
     "vendor",
     "wallet",
-    "widget_tweaks"
+    "widget_tweaks",
+    "menu"
 ]
 
 MIDDLEWARE = [

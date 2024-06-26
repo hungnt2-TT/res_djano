@@ -163,6 +163,7 @@ function updateBounds(place, bounds) {
 }
 function updateFormFields(places) {
   console.log("places=>", places)
+
   if (places[0].address_components.length > 3){
     document.getElementById('id_state').value = places[0].address_components[2].long_name;
     document.getElementById('id_city').value = places[0].address_components[3].long_name;

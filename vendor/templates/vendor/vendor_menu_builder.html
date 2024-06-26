@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+{{ block.super }}
+
+<script src="{% static 'js/daterangepicker.js' %}"></script>
+<script src="{% static 'js/upload_prof_vendor.js' %}"></script>
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/daterangepicker.css' %}">
+
+{% endblock %}
+
+{% block content %}
+    <div class="main-section">
+        {% include 'includes/cover.html' %}
+        <div class="page-section account-header buyer-logged-in">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        {% include 'includes/v_sidebar.html' %}
+                    </div>
+                    <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                        <div class="user-dashboard loader-holder">
+                            <div class="user-holder">
+                                <h5 class="text-uppercase">Build Your Food Menu</h5>
+                            <hr>
+                                <h6 class="text-uppercase">Menu Builder</h6>
+                            <a href="{% url 'menu_builder' %}" class="btn btn-primary float-right m-1">Add Menu</a>
+                            <a href="{% url 'menu_builder' %}" class="btn btn-info float-right m-1">Update Map</a>
+                                     <table class="table table-bordered table-borderless">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Menu Name</th>
+                                            <th>Menu Price</th>
+                                            <th>Menu Description</th>
+                                            <th>Menu Image</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for menu in menus %}
+                                            <tr>
+                                                <th scope="row" class="text-left">{{ forloop.counter }}</th>
+                                                <td class="text-left"><a href=""><p class="mb-0 font-weight-bold">
+                                                    {{ menu }}
+                                                    <small>{{ menu.description }}</small>
+                                                </p>
+
+                                                </a></td>
+                                                <td>{{ menu.price }}</td>
+                                                <td>{{ menu.description }}</td>
+                                                <td><img src="{{ menu.image }}" alt="{{ menu.name }}" style="width: 100px; height: 100px;"></td>
+                                                <td>
+                                                    <a href="{% url 'menu_edit' menu.id %}" class="btn btn-primary">Edit</a>
+                                                    <a href="{% url 'menu_delete' menu.id %}" class="btn btn-danger">Delete</a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                     </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

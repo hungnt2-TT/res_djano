@@ -39,7 +39,7 @@ class VendorUpdateForm(forms.ModelForm):
         model = Vendor
         fields = ['vendor_name', 'fax_number', 'state', 'city', 'longitude', 'latitude', 'address_line_1', 'vendor_description']
 
-    def __int__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
@@ -49,3 +49,26 @@ class VendorUpdateForm(forms.ModelForm):
         self.fields['vendor_name'].widget.attrs['placeholder'] = 'Vendor Name'
         self.fields['fax_number'].widget.attrs['placeholder'] = 'Fax Number'
         self.fields['email'].widget.attrs['placeholder'] = 'Requires entering correct email structure'
+
+
+class VendorUpdateMapForm(forms.ModelForm):
+    class Meta:
+        model = Vendor
+        fields = ['fax_number', 'state', 'city', 'longitude', 'latitude', 'address_line_1', 'pin_code', 'location', 'street_number']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+        self.fields['state'].widget.attrs['placeholder'] = 'State'
+        self.fields['state'].widget.attrs['id'] = 'administrative_area_level_2'
+        self.fields['city'].widget.attrs['placeholder'] = 'City'
+        self.fields['city'].widget.attrs['id'] = 'administrative_area_level_1'
+        self.fields['address_line_1'].widget.attrs['placeholder'] = 'Address '
+        self.fields['address_line_1'].widget.attrs['id'] = 'route'
+        self.fields['fax_number'].widget.attrs['placeholder'] = 'Fax Number'
+        self.fields['pin_code'].widget.attrs['placeholder'] = 'Pin Code'
+        self.fields['pin_code'].widget.attrs['id'] = 'postal_code'
+        self.fields['location'].widget.attrs['placeholder'] = 'Location'
+        self.fields['street_number'].widget.attrs['placeholder'] = 'Street number'
+        self.fields['street_number'].widget.attrs['id'] = 'street_number'

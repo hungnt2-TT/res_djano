@@ -1,5 +1,12 @@
+var componentForm = {
+    street_number: 'long_name',
+    route: 'long_name',
+    administrative_area_level_2: 'long_name',
+    administrative_area_level_1: 'long_name',
+    postal_code: 'long_name',
+};
+
 function createMarker(place, map) {
-    console.log("place=>", place)
     return new google.maps.Marker({
         map: map, position: place.geometry.location
     });
@@ -14,22 +21,29 @@ function updateBounds(place, bounds) {
     return bounds;
 }
 
-function updateFormFields(places) {
+function fillInAddress(places) {
     console.log("places=>", places)
-    console.log("places[0].address_components=>", places[0].address_components)
-    console.log("document.getElementById('id_state').value", document.getElementById('id_state').value)
-
-    if (places[0].address_components.length > 3) {
-        document.getElementById('id_state').value = places[0].address_components[2].long_name;
-        document.getElementById('id_city').value = places[0].address_components[3].long_name;
-    } else {
-        document.getElementById('id_state').value = places[0].address_components[1].long_name;
-        document.getElementById('id_city').value = places[0].address_components[2].long_name;
+    for (var component in componentForm) {
+        document.getElementById(component).value = '';
+        document.getElementById(component).disabled = false;
     }
-    console.log("document.getElementById('id_state').value", document.getElementById('id_state').value)
-    console.log("places[0].geometry.location", places[0].geometry.location)
-    document.getElementById('loc_latitude').value = places[0].geometry.location.lat();
-    document.getElementById('loc_longitude').value = places[0].geometry.location.lng();
+    for (var i = 0; i < places[0].address_components.length; i++) {
+        var addressType = places[0].address_components[i].types[0];
+        var val;
+        if (componentForm[addressType]) {
+            val = places[0].address_components[i][componentForm[addressType]];
+            document.getElementById(addressType).value = val;
+        } else if (addressType !== 'postal_code') {
+            document.getElementById('postal_code').value = '100000';
+        }
+    }
+    $('#id_location').val(places[0].formatted_address);
+    $('#id_latitude').val(places[0].geometry.location.lat());
+    $('#id_longitude').val(places[0].geometry.location.lng());
+}
+
+function updateFormFields(places) {
+    fillInAddress(places);
 }
 
 function initSearchBox() {
@@ -38,8 +52,7 @@ function initSearchBox() {
     const vendor_loc = new google.maps.LatLng(id_latitude, id_longitude);
 
     const map = new google.maps.Map(document.getElementById('map_'), {
-        center: vendor_loc, zoom: 15,
-        mapTypeId: 'roadmap', types: ['geocode', 'establishment', 'address', 'food'],
+        center: vendor_loc, zoom: 15, mapTypeId: 'roadmap', types: ['geocode', 'establishment', 'address', 'food'],
     });
     const input = document.getElementById('my-input-searchbox');
     const searchBox = new google.maps.places.SearchBox(input, {
@@ -47,13 +60,13 @@ function initSearchBox() {
             'country': ['vn']
         }
     });
+
     var newPlace = {
         geometry: {
-            location: new google.maps.LatLng(id_latitude, id_longitude)
+            location: vendor_loc
         }
     };
 
-    createMarker(newPlace, map);
     setTimeout(function () {
         map.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
     }, 1000);
@@ -63,25 +76,21 @@ function initSearchBox() {
     });
 
     let markers = [];
-
+    markers.push(createMarker(newPlace, map))
     searchBox.addListener('places_changed', function () {
-        console.log("searchBox=>")
         const places = searchBox.getPlaces();
-        console.log("places====", places)
         if (places.length == 0) {
             return;
         }
 
         markers.forEach(marker => marker.setMap(null));
         markers = [];
-
         let bounds = new google.maps.LatLngBounds();
         places.forEach(place => {
             if (!place.geometry) {
                 console.log("Returned place contains no geometry");
                 return;
             }
-            console.log("place=>", place)
             markers.push(createMarker(place, map));
             bounds = updateBounds(place, bounds);
         });
