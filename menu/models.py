@@ -1,6 +1,7 @@
 from django.db import models
 
 from vendor.models import Vendor
+from django.template.defaultfilters import slugify
 
 
 # Create your models here.
@@ -18,6 +19,12 @@ class Category(models.Model):
     def __str__(self):
         return self.category_name
 
+    def save(
+        self, *args, **kwargs
+    ):
+        self.slug = slugify(self.category_name)
+        super(Category, self).save(*args, **kwargs)
+
 
 class FoodItem(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
@@ -33,3 +40,9 @@ class FoodItem(models.Model):
 
     def __str__(self):
         return self.food_name
+
+    def save(
+        self, *args, **kwargs
+    ):
+        self.slug = slugify(self.food_name)
+        super(FoodItem, self).save(*args, **kwargs)

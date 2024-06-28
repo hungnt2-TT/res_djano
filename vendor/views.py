@@ -1,9 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
 from employee.forms import RegisterForm
 from employee.models import EmployeeProfile, Profile
+from menu.forms import CategoryForm
 from menu.models import Category, FoodItem
 from vendor.forms import VendorForm, VendorUpdateForm, VendorUpdateMapForm
 from django.conf import settings
@@ -166,22 +168,57 @@ def vendor_map(request):
 
 
 def menu_builder(request):
-    vendor = Vendor.objects.get(user=request.user)
-    menu = Category.objects.filter(vendor=vendor)
-    food = FoodItem.objects.filter(category__vendor=vendor)
-    print('category_name', menu)
-    for food_item in food:
-        print(food_item.image.url)
 
-    print('category_name', menu)
-    ctx = {
-        'menus': menu,
-        'foods': food,
-    }
-    return render(request, 'vendor/vendor_menu_builder.html', ctx)
+    if request.method == 'POST':
+        next_action = request.POST.get('category', '')
+        if next_action == 'Update Category':
+            menu_edit_detail(request, request.POST.get('menu_id'))
+        elif next_action == 'Delete Category':
+            menu_delete_detail(request, request.POST.get('menu_id'))
+        category_form = CategoryForm(request.POST or None)
+        if category_form.is_valid():
+            category = category_form.save(commit=False)
+            category.vendor = Vendor.objects.get(user=request.user)
+            category.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'message': 'Category added successfully!', 'alert': 'success'}, status=200)
+            messages.success(request, 'Category added successfully')
+            return redirect('menu_builder')
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'errors': category_form.errors, 'message': 'Category name already exists!', 'alert': 'danger'}, status=400)
+        messages.error(request, 'Category not added')
+        return redirect('menu_builder')
+    else:
+        category_form = CategoryForm()
+        vendor = Vendor.objects.get(user=request.user)
+        menu = Category.objects.filter(vendor=vendor)
+        food = FoodItem.objects.filter(category__vendor=vendor)
+        list_category = CategoryForm(instance=menu.first())
+        ctx = {
+            'menus': menu,
+            'foods': food,
+            'category_form': category_form,
+            'list_category': list_category,
+        }
+        print('category_form', category_form)
+        return render(request, 'vendor/vendor_menu_builder.html', ctx)
 
 
 def menu_edit_detail(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    form = CategoryForm(request.POST or None, instance=category)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Category updated successfully')
+            return redirect('menu_builder')
+        messages.error(request, 'Category not updated')
+        return redirect('menu_builder')
+    return JsonResponse({'message': 'Category updated successfully!', 'alert': 'success'}, status=200)
+
+
+def menu_edit(request, pk):
     menu = get_object_or_404(Category, pk=pk)
     ctx = {
         'menu': menu
@@ -190,11 +227,13 @@ def menu_edit_detail(request, pk):
 
 
 def menu_delete_detail(request, pk):
-    menu = get_object_or_404(Category, pk=pk)
-    ctx = {
-        'menu': menu
-    }
-    return render(request, 'vendor/vendor_menu_delete_detail.html', ctx)
+    if request.method == 'DELETE':
+        category = Category.objects.get(pk=pk)
+        category.delete()
+        messages.success(request, 'Category deleted successfully')
+    return JsonResponse({'message': 'Category deleted successfully!', 'alert': 'success'}, status=200)
+
+
 
 
 def get_google_api(request):
