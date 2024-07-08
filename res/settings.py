@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     "vendor",
     "wallet",
     "widget_tweaks",
-    "menu"
+    "menu",
+    "marketplace",
 ]
 
 MIDDLEWARE = [

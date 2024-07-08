@@ -34,7 +34,9 @@ from .utils import detect_usertype
 
 
 def home(request):
-    return render(request, 'home.html')
+    vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)[:8]
+    print('vendors', vendors)
+    return render(request, 'home.html', context={'vendors': vendors})
 
 
 def register(request):
