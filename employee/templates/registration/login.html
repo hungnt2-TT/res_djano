@@ -15,9 +15,9 @@
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                         <div class="user-dashboard loader-holder" style="width: 100%; min-width: auto">
                             <div class="user-holder">
-{#                                <h4 class="text-center" style="margin-bottom: 0;">SIGN IN</h4>#}
-{#                                <p class="text-center">Order food from your favorite restaurants</p>#}
-{#                                <hr>#}
+                                {#                                <h4 class="text-center" style="margin-bottom: 0;">SIGN IN</h4>#}
+                                {#                                <p class="text-center">Order food from your favorite restaurants</p>#}
+                                {#                                <hr>#}
                                 <div class="box-form">
                                     <div class="left">
                                         <div class="overlay">
@@ -31,18 +31,34 @@
    class="social_login_login_facebook facebook"><span
         class="social-mess-top fb-social-login" style="display:none">Please set API key</span><i
         class="icon-facebook"></i>Sign In With Facebook</a>		
-                                                <a href="#" rel="nofollow" title="google-plus"
-                                                   data-original-title="google+"
-                                                   class="social_login_login_google gplus"><span
-                                                        class="social-mess-top gplus-social-login" style="display:none">Please set API key</span><i
-                                                        class="icon-google4"></i>Sign In With Google</a>
-		</span>
+{#                                                <a href="#" rel="nofollow" title="google-plus"#}
+{#                                                   data-original-title="google+"#}
+{#                                                   class="social_login_login_google gplus"><span#}
+{#                                                        class="social-mess-top gplus-social-login" style="display:none">Please set API key</span><i#}
+{#                                                        class="icon-google4"></i>Sign In With Google</a>#}
+                                            <div id="g_id_onload"
+                                                 data-client_id="15793022601-j6jpjs760iaa3561m7aljtk0m6kmfn6f.apps.googleusercontent.com"
+                                                 data-context="signin"
+                                                 data-ux_mode="popup"
+                                                 data-login_uri="http://localhost:3000/employee/auth-receiver"
+                                                 data-nonce=""
+                                                 data-itp_support="true">
+                                    </div>
+                                    
+                                    <div class="g_id_signin"
+                                         data-type="standard"
+                                         data-shape="rectangular"
+                                         data-theme="outline"
+                                         data-text="signin_with"
+                                         data-size="large"
+                                         data-logo_alignment="left">
+                                    </div>
+		                                    </span>
                                         </div>
                                     </div>
-
-
                                     <div class="right">
-                                        <p>Don't have an account? <a href="{% url 'register_user' %}">Creat Your Account</a> it takes less than
+                                        <p>Don't have an account? <a href="{% url 'register_user' %}">Creat Your
+                                            Account</a> it takes less than
                                             a minute</p>
                                         <form class="form-fields-set foodbakery-dev-restaurant-form" method="post">
                                             <ul class="register-add-restaurant-tab-container restaurant-information-tab-container">
@@ -109,16 +125,12 @@
                                                 </ul>
                                             </ul>
                                         </form>
-
                                         <br><br>
-
                                         <div class="remember-me--forget-password">
-                                            <!-- Angular -->
                                             <label>
                                                 <input type="checkbox" name="item" checked/>
                                                 <span class="text-checkbox">Remember me</span>
                                             </label>
-                                            <p>forget password?</p>
                                         </div>
 
                                         <br>
@@ -134,4 +146,9 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="https://accounts.google.com/gsi/client" async></script>
+
 {% endblock %}

@@ -1,33 +1,37 @@
-from time import sleep
+import os
 
-from django.contrib import auth, messages
+from django.contrib import messages
+from django.contrib.auth import login, authenticate
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordContextMixin, PasswordResetCompleteView, \
     PasswordResetConfirmView, PasswordChangeView, PasswordChangeDoneView
 from django.core.exceptions import PermissionDenied
-from django.core.mail import message
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponse
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, authenticate
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from django.utils.http import urlsafe_base64_decode
-from django.views.decorators.http import require_POST, require_GET
+from django.utils.translation import gettext_lazy as _
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.views.generic import TemplateView
-from django.utils.translation import gettext_lazy as _
+from google.auth.transport import requests
+from google.oauth2 import id_token
 
-from vendor.forms import VendorForm, VendorUpdateForm
+from vendor.forms import VendorUpdateForm
 from vendor.models import Vendor
-from vendor.views import upload_file, render_file_img
+from vendor.views import render_file_img
 from wallet.decorators import verified
 from wallet.models import Wallet
-from .forms import UserCreationForm, RegisterForm, MyPasswordResetForm, MySetPasswordForm, EmployeeProfileForm, \
-    ProfileUpdateForm
+from .forms import RegisterForm, MyPasswordResetForm, MySetPasswordForm, EmployeeProfileForm, \
+    ProfileUpdateForm, RegisterFormByEmail
 from .mails import send_verification_email
 from .models import Profile, EmployeeProfile
 from .utils import detect_usertype
+
+from twilio.rest import Client
 
 
 # Create your views here.
@@ -39,6 +43,61 @@ def home(request):
 
 def register(request):
     return render(request, 'account/register.html')
+
+
+def broadcast_sms(phone_number):
+    phone_number_vn = '+84' + phone_number
+    try:
+
+        client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+        verification = client.verify.v2.services(settings.SECRET_KEY_TWILIO).verifications.create(to=phone_number_vn,
+                                                                                              channel='sms')
+
+        print('verification_check', verification)
+    except Exception as e:
+        print(f'Error verification: {e}')
+        verification = None
+    return verification
+
+
+def verification_checks(request, phone_number):
+    phone_number = '+84' + phone_number
+    code_list = request.POST.getlist('code')
+    code = ''.join(code_list)
+    print('code', code)
+    client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+    try:
+        verification_check = client.verify.v2.services(settings.SECRET_KEY_TWILIO).verification_checks.create(
+            to=phone_number, code=code)
+        print('verification_check', verification_check.status)
+    except Exception as e:
+        print(f'Error verification check coded: {e}')
+        verification_check = None
+    return verification_check
+
+
+# def twilio_send_sms():
+
+
+# def send_sms_view(request):
+#     phone_number_vn = '+84' + phone_number
+#
+#     if request.method == 'POST':
+#         print('request.POST', request.POST)
+#         code_list = request.POST.getlist('code')
+#         code = ''.join(code_list)
+#         print('code', code)
+#         phone_number = request.POST.get('phone_number')
+#         verification_checks(phone_number)
+#
+#     sms_sid = broadcast_sms(phone_number, code)
+#     if sms_sid.status == 'pending':
+#         if sms_sid.valid == 'false':
+#             messages.error(request, 'Invalid phone number')
+#             return 'Invalid phone number'
+#         elif sms_sid.status == 'approved' and sms_sid.valid == 'true':
+#             return render(request, 'error.html')
+#     return render(request, 'send_sms_form.html')
 
 
 def register_user(request):
@@ -114,6 +173,7 @@ def dashboard(request):
 class LoginResView(LoginView):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
+            print('You are already logged in')
             return redirect('home')
         return super().get(request, *args, **kwargs)
 
@@ -144,6 +204,15 @@ class LoginResView(LoginView):
         return self.form_invalid(form)
     # def get_success_url(self):
     #     return reverse('home')
+
+
+def convert_email_to_username(type):
+    print('convert_email_to_username', type)
+    if type.split('@')[0]:
+        user_name = get_object_or_404(Profile, email=type).username
+        print('user', user_name)
+        return user_name
+    return type
 
 
 @require_http_methods(["GET", "POST"])
@@ -224,6 +293,7 @@ def check_role_employee(user):
 @login_required(redirect_field_name='next', login_url='_login')
 def middleware_account(request):
     user_type = request.user
+    print('middleware_account', user_type)
     redirect_url = detect_usertype(user_type)
     return redirect(redirect_url)
 
@@ -250,7 +320,6 @@ def activate(request, uidb64, token):
     except(TypeError, ValueError, OverflowError, Profile.DoesNotExist):
         user = None
         messages.error(request, 'Activation link is invalid')
-    print('activate', user.employeeprofile.email_is_confirmed)
     if user is not None and default_token_generator.check_token(user, token):
         if not user.employeeprofile.email_is_confirmed:
             user.is_active = True
@@ -341,3 +410,79 @@ def vendor_profile_update(request):
 
             return redirect('profile')
     return render(request, 'vendor/vendor_profile_update.html', ctx)
+
+
+@csrf_exempt
+def auth_receiver(request):
+    """
+    Google calls this URL after the user has signed in with their Google account.
+    """
+    print('auth_receiver', request.user)
+    token = request.POST['credential']
+
+    try:
+        user_data = id_token.verify_oauth2_token(
+            token, requests.Request(), os.getenv('GOOGLE_CLIENT_ID')
+        )
+        print('user_data', user_data)
+        user = Profile.objects.filter(email=user_data['email']).first()
+        request.session['user_data'] = user_data
+        if user:
+            messages.success(request, 'You are now logged in')
+            login(request, user)
+            return redirect('home')
+        else:
+            return redirect('login_by_email')
+
+    except ValueError:
+        return HttpResponse(status=403)
+
+
+def register_by_email(request):
+    user_data = request.session.get('user_data', None)
+    initial_data = {}
+    if user_data:
+        initial_data = {'email': user_data['email'],
+                        'first_name': user_data['given_name'],
+                        'last_name': user_data['family_name'],
+                        'email_verified': user_data['email_verified'],
+                        'username': user_data['name'],
+                        'verified': user_data['email_verified'],
+                        }
+    form = RegisterFormByEmail(request.POST or None, initial=initial_data)
+    form.full_clean()
+    if request.method == 'POST':
+        if 'send_code' in request.POST:
+            if form.is_valid():
+                request.session['form_data'] = request.POST.dict()
+                phone_number = form.cleaned_data.get('phone_number')
+                send_code = broadcast_sms(phone_number)
+                if send_code.status == 'pending':
+                    messages.success(request, 'Code has been sent. Please check your phone.')
+                    return render(request, 'send_sms_form.html', {'phone_number': phone_number})
+                else:
+                    messages.error(request, 'Failed to send code.')
+            else:
+                messages.error(request, 'Form is not valid.')
+        elif 'verify' in request.POST:
+            form_data = request.session.get('form_data', {})
+            form = RegisterFormByEmail(form_data or None)
+            phone_number = form_data.get('phone_number')
+            verify = verification_checks(request, phone_number)
+            if verify.status == 'approved' or verify.valid == 'true':
+                user = form.save(commit=False)
+                user.is_active = True
+                user.verified = True
+                user.save()
+                del request.session['form_data']
+                return render(request, 'account/register_save.html')
+            else:
+                messages.error(request, 'Invalid code.')
+                return render(request, 'send_sms_form.html', {'form': form})
+
+    context = {'form': form}
+    return render(request, 'account/register_by_email.html', context)
+
+# def sign_out(request):
+#     del request.session['user_data']
+#     return redirect('sign_in')
