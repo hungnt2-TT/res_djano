@@ -36,3 +36,5 @@ django-geoposition==0.3.0
 django-utils-six
 Pillow==10.3.0
 django_widget_tweaks==1.5.0
+pyjwt~=2.8.0
+google~=3.0.0

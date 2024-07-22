@@ -117,7 +117,6 @@
 }
 
 .box-form .right button {
-    float: right;
     color: #fff;
     font-size: 16px;
     padding: 12px 35px;
@@ -128,45 +127,3 @@
     box-shadow: 0px 4px 20px 0px #49c628a6;
     background-image: linear-gradient(135deg, #70F570 10%, #49C628 100%);
 }
-
-/*label {*/
-/*    display: block;*/
-/*    position: relative;*/
-/*    margin-left: 30px;*/
-/*}*/
-
-/*label::before {*/
-/*    content: ' \f00c';*/
-/*    position: absolute;*/
-/*    font-family: FontAwesome;*/
-/*    background: transparent;*/
-/*    border: 3px solid #70F570;*/
-/*    border-radius: 4px;*/
-/*    color: transparent;*/
-/*    left: -30px;*/
-/*    transition: all 0.2s linear;*/
-/*}*/
-
-/*label:hover::before {*/
-/*    font-family: FontAwesome;*/
-/*    content: ' \f00c';*/
-/*    color: #fff;*/
-/*    cursor: pointer;*/
-/*    background: #70F570;*/
-/*}*/
-
-/*label:hover::before .text-checkbox {*/
-/*    background: #70F570;*/
-/*}*/
-
-/*label span.text-checkbox {*/
-/*    display: inline-block;*/
-/*    height: auto;*/
-/*    position: relative;*/
-/*    cursor: pointer;*/
-/*    transition: all 0.2s linear;*/
-/*}*/
-
-/*label input[type="checkbox"] {*/
-/*    display: none;*/
-/*}*/

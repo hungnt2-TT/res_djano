@@ -21,4 +21,7 @@ urlpatterns = [
     path('middleware_account/', views.middleware_account, name='middleware_account'),
     path('owner/', views.owner_dashboard, name='owner_dashboard'),
     path('customer/', views.customer_dashboard, name='customer_dashboard'),
+    path('auth-receiver', views.auth_receiver, name='auth_receiver'),
+    path('login_by_email/', views.register_by_email, name='login_by_email'),
+    # path('send_sms_view/', views.send_sms_view, name='send_sms_view'),
 ]
