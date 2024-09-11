@@ -390,10 +390,8 @@ def vendor_profile_update(request):
         'user': user
     }
     if request.method == 'POST':
-        print('request.POST', request.POST, request.FILES)
         vendor_forms = VendorUpdateForm(request.POST, instance=vendor)
         emp_forms = EmployeeProfileForm(request.POST, request.FILES, instance=profile)
-        print('emp_forms', emp_forms.errors)
         user = ProfileUpdateForm(request.POST, instance=request.user)
         if vendor_forms.is_valid() and emp_forms.is_valid() and user.is_valid():
             vendor = vendor_forms.save(commit=False)
@@ -419,16 +417,13 @@ def auth_receiver(request):
     """
     Google calls this URL after the user has signed in with their Google account.
     """
-    print('auth_receiver', request.user)
     token = request.POST['credential']
 
     try:
         user_data = id_token.verify_oauth2_token(
             token, requests.Request(), os.getenv('GOOGLE_CLIENT_ID')
         )
-        print('user_data', user_data)
         user = Profile.objects.filter(email=user_data['email']).first()
-        request.session['user_data'] = user_data
         if user:
             messages.success(request, 'You are now logged in')
             login(request, user)
@@ -485,6 +480,3 @@ def register_by_email(request):
     context = {'form': form}
     return render(request, 'account/register_by_email.html', context)
 
-# def sign_out(request):
-#     del request.session['user_data']
-#     return redirect('sign_in')

@@ -1,0 +1,15 @@
+.container .list-group-item[aria-expanded="false"] ::after {
+    content: " \f0d7";
+    font-family: FontAwesome;
+    display: inline;
+    text-align: right;
+    padding-left: 10px;
+}
+
+.container .row .list-group-item[aria-expanded="true"] ::after {
+    content: " \f0da";
+    font-family: FontAwesome;
+    display: inline;
+    text-align: right;
+    padding-left: 10px;
+}

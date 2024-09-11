@@ -6,7 +6,7 @@
             <li class="{% if 'profile' in request.path  or 'vendor_map' in request.path%}
             	active
             {% endif %} "><a href="{% url 'profile' %}"><i class="icon-building"></i>My Restaurant</a></li>
-            <li class="{% if 'menu_build' in request.path %}active  {% endif %}"><a href="{% url 'menu_builder' %}"><i
+            <li class="{% if 'menu_build' in request.path or 'food_menu' in request.path %}active  {% endif %}"><a href="{% url 'menu_builder' %}"><i
                     class="icon-menu5"></i>Menu Builder</a></li>
             <li><a href="restaurant-orders.html"><i class="icon-add_shopping_cart"></i>Orders</a></li>
             <li><a href="restaurant-earnings.html"><i class="icon-money"></i>Earnings</a></li>

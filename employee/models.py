@@ -92,6 +92,9 @@ class Profile(AbstractBaseUser):
             user_role = 'cancel'
         return user_role
 
+    def is_user(self):
+        return self.employee_type == 2
+
 
 class EmployeeProfile(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE, blank=True, null=True)

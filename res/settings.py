@@ -22,15 +22,49 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-^+g23c#3qlv2m6kq4lz6(t7gi$xsr%dt_bcz3fcr()ys%r=9aw"
+SECRET_KEY = os.getenv('SECRET_KEY', '1234567890')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 import dotenv
 from django.contrib.messages import constants as messages
 ALLOWED_HOSTS = ['*']
 
+# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False')
 # Application definition
+ENVIRONMENT = os.getenv('ENVIRONMENT', 'local')
+
+if ENVIRONMENT == 'production':
+    ALLOWED_HOSTS = [
+            '*'
+    ]
+    SITE_ID = 4
+
+    # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    # SECURE_SSL_REDIRECT = True
+
+elif ENVIRONMENT == 'staging':
+    ALLOWED_HOSTS = [
+        '127.0.0.1',
+        'localhost',
+    ]
+
+    SITE_ID = 3
+elif ENVIRONMENT == 'development':
+    ALLOWED_HOSTS = [
+        '127.0.0.1',
+        'localhost',
+    ]
+
+    SITE_ID = 2
+else:
+    ALLOWED_HOSTS = [
+        '127.0.0.1',
+        'localhost',
+    ]
+
+    SITE_ID = 1
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -46,6 +80,8 @@ INSTALLED_APPS = [
     "vendor",
     "wallet",
     "widget_tweaks",
+    "menu",
+    "django_ckeditor_5",
     "menu",
     "marketplace",
 ]
@@ -84,24 +120,25 @@ WSGI_APPLICATION = "res.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('RDS_DB_NAME'),
-        'USER': os.getenv('RDS_USERNAME'),
-        'PASSWORD': os.getenv('RDS_PASSWORD'),
-        'HOST': os.getenv('RDS_HOSTNAME'),
-        'PORT': os.getenv('RDS_PORT'),
+if 'RDS_DB_NAME' in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('RDS_DB_NAME'),
+            'USER': os.getenv('RDS_USERNAME'),
+            'PASSWORD': os.getenv('RDS_PASSWORD'),
+            'HOST': os.getenv('RDS_HOSTNAME'),
+            'PORT': os.getenv('RDS_PORT'),
+        }
     }
-}
+else:  # Local SQlite not used anymore for local dev
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+
 
 AUTH_USER_MODEL = 'employee.Profile'
 # Password validation
@@ -198,6 +235,7 @@ MESSAGE_TAGS = {
 }
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
 
+
 TWILIO_ACCOUNT_SID = os.getenv("MY_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_NUMBER = os.getenv("MY_TWILIO_NUMBER")
@@ -206,3 +244,100 @@ SMS_BROADCAST_TO_NUMBERS = [
     "+23XXXXXXXXXXX",
     "+23XXXXXXXXXXX",  # use the format +1XXXXXXXXXX
 ]
+CK_EDITOR_5_UPLOAD_FILE_VIEW_NAME = 'custom_upload_file'
+
+CKEDITOR_5_UPLOADS_ROOT = 'uploads/'
+CKEDITOR_5_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+customColorPalette = [
+    {
+        'color': 'hsl(4, 90%, 58%)',
+        'label': 'Red'
+    },
+    {
+        'color': 'hsl(340, 82%, 52%)',
+        'label': 'Pink'
+    },
+    {
+        'color': 'hsl(291, 64%, 42%)',
+        'label': 'Purple'
+    },
+    {
+        'color': 'hsl(262, 52%, 47%)',
+        'label': 'Deep Purple'
+    },
+    {
+        'color': 'hsl(231, 48%, 48%)',
+        'label': 'Indigo'
+    },
+    {
+        'color': 'hsl(207, 90%, 54%)',
+        'label': 'Blue'
+    },
+]
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': ['heading', '|', 'bold', 'italic', 'link',
+                    'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', ],
+
+    },
+    'extends': {
+        'blockToolbar': [
+            'paragraph', 'heading1', 'heading2', 'heading3',
+            '|',
+            'bulletedList', 'numberedList',
+            '|',
+            'blockQuote',
+        ],
+        'toolbar': ['heading', '|', 'outdent', 'indent', '|', 'bold', 'italic', 'link', 'underline', 'strikethrough',
+                    'code', 'subscript', 'superscript', 'highlight', '|', 'codeBlock', 'sourceEditing', 'insertImage',
+                    'bulletedList', 'numberedList', 'todoList', '|', 'blockQuote', 'imageUpload', '|',
+                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'mediaEmbed', 'removeFormat',
+                    'insertTable', ],
+        'image': {
+            'toolbar': ['imageTextAlternative', '|', 'imageStyle:alignLeft',
+                        'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side', '|'],
+            'styles': [
+                'full',
+                'side',
+                'alignLeft',
+                'alignRight',
+                'alignCenter',
+            ]
+
+        },
+        'table': {
+            'contentToolbar': ['tableColumn', 'tableRow', 'mergeTableCells',
+                               'tableProperties', 'tableCellProperties'],
+            'tableProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette
+            },
+            'tableCellProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette
+            }
+        },
+        'heading': {
+            'options': [
+                {'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph'},
+                {'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1'},
+                {'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2'},
+                {'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3'}
+            ]
+        }
+    },
+    'list': {
+        'properties': {
+            'styles': 'true',
+            'startIndex': 'true',
+            'reversed': 'true',
+        }
+    }
+}
+
+# COOKIE SETTINGS
+# SESSION_COOKIE_AGE = 60 * 60 * 24 * 7
+# SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+# SESSION_CACHE_ALIAS = 'default'
+# PASSWORD RESET SETTINGS
+PASSWORD_RESET_TIMEOUT_DAYS = 1

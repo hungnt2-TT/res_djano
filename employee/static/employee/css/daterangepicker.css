@@ -275,9 +275,8 @@
     cursor: pointer;
     background-color: #f8f8f8;
     border-radius: 4px;
-    width: 103%;
+  width: 103%;
 }
-
-.menu-sidebar {
-    padding: 7px 40px;
+.menu-sidebar{
+  padding: 7px 40px;
 }

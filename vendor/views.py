@@ -2,10 +2,17 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+import json
+from django.db.models import F
 
+from employee import consts
+from employee.consts import PAGE
 from employee.forms import RegisterForm
 from employee.models import EmployeeProfile, Profile
-from menu.forms import CategoryForm
+from employee.paginations import paginate_data
+from menu.forms import CategoryForm, FoodItemForm
 from menu.models import Category, FoodItem
 from vendor.forms import VendorForm, VendorUpdateForm, VendorUpdateMapForm
 from django.conf import settings
@@ -167,15 +174,44 @@ def vendor_map(request):
     return render(request, 'vendor/vendor_map_update.html', ctx)
 
 
-def menu_builder(request):
+def get_menu(request, form=None, type_data=None, *args, **kwargs):
+    vendor = Vendor.objects.get(user=request.user)
+    list_category = Category.objects.filter(vendor=vendor)
 
+    page = request.GET.get('page', PAGE)
+    page_size = request.GET.get('page_size', consts.PAGE_SIZE)
+    if type_data == 'food':
+        food_items = FoodItem.objects.filter(category__id=F('category_id'),
+                                             vendor__id=F('category__vendor__id')).select_related('category')
+        category_ids = food_items.values_list('category_id', flat=True).distinct()
+        categories = Category.objects.filter(vendor=vendor, id__in=category_ids)
+        menus_pagination = paginate_data(categories, page_size, page)
+        print('categories', categories, 'menus_pagination', menus_pagination, 'food_items', food_items,
+              'menus_pagination', menus_pagination)
+
+        context = {
+            'categories': list_category,
+            'menus_pagination': menus_pagination,
+            'food_form': form,
+            'foods': food_items,
+            'category_food': categories,
+        }
+        return context
+    else:
+        menus_pagination = paginate_data(list_category, page_size, page)
+        context = {
+            'categories': list_category,
+            'menus_pagination': menus_pagination,
+            'category_form': form,
+        }
+    return context
+
+
+@csrf_exempt
+@login_required
+def menu_builder(request):
     if request.method == 'POST':
-        next_action = request.POST.get('category', '')
-        if next_action == 'Update Category':
-            menu_edit_detail(request, request.POST.get('menu_id'))
-        elif next_action == 'Delete Category':
-            menu_delete_detail(request, request.POST.get('menu_id'))
-        category_form = CategoryForm(request.POST or None)
+        category_form = CategoryForm(request.POST)
         if category_form.is_valid():
             category = category_form.save(commit=False)
             category.vendor = Vendor.objects.get(user=request.user)
@@ -186,36 +222,61 @@ def menu_builder(request):
             return redirect('menu_builder')
         else:
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({'errors': category_form.errors, 'message': 'Category name already exists!', 'alert': 'danger'}, status=400)
-        messages.error(request, 'Category not added')
-        return redirect('menu_builder')
+                return JsonResponse(
+                    {'errors': category_form.errors, 'message': 'Category name already exists!', 'alert': 'danger'},
+                    status=400)
+            messages.error(request, 'Category not added')
+            return redirect('menu_builder')
     else:
         category_form = CategoryForm()
         vendor = Vendor.objects.get(user=request.user)
-        menu = Category.objects.filter(vendor=vendor)
-        food = FoodItem.objects.filter(category__vendor=vendor)
-        list_category = CategoryForm(instance=menu.first())
-        ctx = {
-            'menus': menu,
-            'foods': food,
-            'category_form': category_form,
-            'list_category': list_category,
-        }
-        print('category_form', category_form)
-        return render(request, 'vendor/vendor_menu_builder.html', ctx)
+        categories = Category.objects.filter(vendor=vendor)
+        context = get_menu(request, category_form)
+        return render(request, 'vendor/vendor_menu_builder.html', context)
 
 
-def menu_edit_detail(request, pk):
-    category = get_object_or_404(Category, pk=pk)
-    form = CategoryForm(request.POST or None, instance=category)
+@csrf_exempt
+@login_required
+def food_menu(request):
     if request.method == 'POST':
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Category updated successfully')
-            return redirect('menu_builder')
-        messages.error(request, 'Category not updated')
-        return redirect('menu_builder')
-    return JsonResponse({'message': 'Category updated successfully!', 'alert': 'success'}, status=200)
+        print('request.POST', request.POST, request.FILES)
+        food_form = FoodItemForm(request.POST or None, request.FILES)
+        if food_form.is_valid():
+            food = food_form.save(commit=False)
+            food.category = Category.objects.get(pk=request.POST.get('category'))
+            food.vendor = Vendor.objects.get(user=request.user)
+            food.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'message': 'Food added successfully!', 'alert': 'success'}, status=200)
+            messages.success(request, 'Food added successfully')
+            return redirect('food_menu')
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse(
+                    {'errors': food_form.errors, 'message': 'Food name already exists!', 'alert': 'danger'},
+                    status=400)
+            messages.error(request, 'Food not added')
+            return redirect('food_menu')
+    else:
+        food_form = FoodItemForm()
+        context = get_menu(request, food_form, 'food')
+        context['ckeditor_config'] = settings.CKEDITOR_5_CONFIGS['extends']
+        return render(request, 'vendor/vendor_food.html', context)
+
+
+@csrf_exempt
+@login_required
+@require_http_methods(["PATCH"])
+def menu_edit_detail(request, pk):
+    try:
+        category = Category.objects.get(pk=pk)
+        data = json.loads(request.body)
+        category.category_name = data.get('category_name')
+        category.description = data.get('description')
+        category.save()
+        return JsonResponse({'message': 'Category updated successfully!', 'alert': 'success'}, status=200)
+    except Category.DoesNotExist:
+        return JsonResponse({'message': 'Category not found!', 'alert': 'danger'}, status=404)
 
 
 def menu_edit(request, pk):
@@ -226,6 +287,8 @@ def menu_edit(request, pk):
     return render(request, 'vendor/vendor_menu_edit_detail.html', ctx)
 
 
+@csrf_exempt
+@login_required
 def menu_delete_detail(request, pk):
     if request.method == 'DELETE':
         category = Category.objects.get(pk=pk)
@@ -234,6 +297,30 @@ def menu_delete_detail(request, pk):
     return JsonResponse({'message': 'Category deleted successfully!', 'alert': 'success'}, status=200)
 
 
+@csrf_exempt
+@login_required
+@require_http_methods(["PATCH"])
+def food_item_detail(request, pk):
+    try:
+        food = FoodItem.objects.get(pk=pk)
+        data = json.loads(request.body)
+        food.food_name = data.get('food_name')
+        food.description = data.get('description')
+        food.price = data.get('price')
+        food.save()
+        return JsonResponse({'message': 'Food updated successfully!', 'alert': 'success'}, status=200)
+    except FoodItem.DoesNotExist:
+        return JsonResponse({'message': 'Food not found!', 'alert': 'danger'}, status=404)
+
+
+@csrf_exempt
+@login_required
+def food_item_delete(request, pk):
+    if request.method == 'DELETE':
+        food = FoodItem.objects.get(pk=pk)
+        food.delete()
+        messages.success(request, 'Food deleted successfully')
+    return JsonResponse({'message': 'Food deleted successfully!', 'alert': 'success'}, status=200)
 
 
 def get_google_api(request):
