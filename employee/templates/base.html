@@ -6,12 +6,13 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="referrer" content="strict-origin-when-cross-origin"/>
 
     <title>{% block title %}FoodOnline{% endblock %}</title>
     <!-- Google Font Family Link Start -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Montserrat:400,700">
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,800">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- jQuery 2.2.4 CDN -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <!-- jQuery UI CDN (required for tag-it) -->
@@ -26,6 +27,7 @@
 
     <!-- Other scripts -->
     <script src="{% static 'js/modernizr.js' %}"></script>
+    <script src="{% static 'employee/js/list.js' %}"></script>
 
     <!-- Google Font Family Link End -->
     <script src="{% static 'js/upload_prof_vendor.js' %}"></script>
@@ -68,14 +70,16 @@
 
     <script src="{% static 'js/init_google_map_plf.js' %}"></script>
     <script src="{% static 'js/daterangepicker.js' %}"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&callback={{ initSearchBox }}"
-            async
-            defer></script>
-    <script>
-        window.onload = function () {
-            initAutocomplete();
-        };
-    </script>
+    {#    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&callback={{ initSearchBox }}"#}
+    {#            async#}
+    {#            defer></script>#}
+    {#    <script>#}
+    {#        window.onload = function () {#}
+    {#            initAutocomplete();#}
+    {#        };#}
+    {#    </script>#}
+    {% block header %}{% endblock %}
+
     {% block extra_scripts %}{% endblock %}
     <style>
         body, .main-section p, .mce-content-body p {

@@ -20,6 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from employee.views import LoginResView
+from menu.views import custom_upload_file
 
 urlpatterns = [
                   path("admin/", admin.site.urls),
@@ -27,4 +28,10 @@ urlpatterns = [
                   path("vendor/", include("vendor.urls")),
                   path('accounts/', include('django.contrib.auth.urls')),
                   path('', LoginResView.as_view(), name='_login'),
+                  path('ckeditor5/', include('django_ckeditor_5.urls')),
+                  path('upload/', custom_upload_file, name='custom_upload_file'),
+
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
