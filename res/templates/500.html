@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} 500 Error | {{ block.super }} {% endblock %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/404.css' %}">
+{% endblock %}
+{% block content %}
+    <div class="main-section">
+        <!-- 500 Page Start -->
+        <div class="page-section nopadding cs-nomargin">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="page-not-found">
+                            <div class="cs-text">
+                                <span class="cs-error">500</span>
+                                <br>
+
+                                <span>Internal Server Error</span>
+                                <p>Due to a server problem, we are unable to display the page you are looking for.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 500 Page End -->
+    </div>
+{% endblock %}

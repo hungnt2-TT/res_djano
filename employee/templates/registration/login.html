@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Login User | {{ block.super }} {% endblock %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/form_register.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/login.css' %}">
+
+{% endblock %}
+{% block content %}
+    <div class="main-section">
+        <div class="page-section nopadding cs-nomargin"
+             style="margin-top: 0px;padding-top: 60px;padding-bottom: 60px;margin-bottom: 0px;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                        <div class="user-dashboard loader-holder" style="width: 100%; min-width: auto">
+                            <div class="user-holder">
+                                {#                                <h4 class="text-center" style="margin-bottom: 0;">SIGN IN</h4>#}
+                                {#                                <p class="text-center">Order food from your favorite restaurants</p>#}
+                                {#                                <hr>#}
+                                <div class="box-form">
+                                    <div class="left">
+                                        <div class="overlay">
+                                            <h1>SIGN IN</h1>
+                                            <p>Order food from your favorite restaurants
+
+                                            </p>
+                                            <span>
+			<p>Login with social media</p>
+<a href="#" title="Facebook" data-original-title="Facebook"
+   class="social_login_login_facebook facebook"><span
+        class="social-mess-top fb-social-login" style="display:none">Please set API key</span><i
+        class="icon-facebook"></i>Sign In With Facebook</a>		
+{#                                                <a href="#" rel="nofollow" title="google-plus"#}
+{#                                                   data-original-title="google+"#}
+{#                                                   class="social_login_login_google gplus"><span#}
+{#                                                        class="social-mess-top gplus-social-login" style="display:none">Please set API key</span><i#}
+{#                                                        class="icon-google4"></i>Sign In With Google</a>#}
+                                            <div id="g_id_onload"
+                                                 data-client_id="15793022601-j6jpjs760iaa3561m7aljtk0m6kmfn6f.apps.googleusercontent.com"
+                                                 data-context="signin"
+                                                 data-ux_mode="popup"
+                                                 data-login_uri="http://localhost:3000/employee/auth-receiver"
+                                                 data-nonce=""
+                                                 data-itp_support="true">
+                                    </div>
+                                    
+                                    <div class="g_id_signin"
+                                         data-type="standard"
+                                         data-shape="rectangular"
+                                         data-theme="outline"
+                                         data-text="signin_with"
+                                         data-size="large"
+                                         data-logo_alignment="left">
+                                    </div>
+		                                    </span>
+                                        </div>
+                                    </div>
+                                    <div class="right">
+                                        <p>Don't have an account? <a href="{% url 'register_user' %}">Creat Your
+                                            Account</a> it takes less than
+                                            a minute</p>
+                                        <form class="form-fields-set foodbakery-dev-restaurant-form" method="post">
+                                            <ul class="register-add-restaurant-tab-container restaurant-information-tab-container">
+                                                <div class="row">
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="row">
+
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                <div class="field-holder">
+                                                                    <label>Email Address</label>
+                                                                    <label>
+                                                                        <input type="email" name="username"
+                                                                               placeholder="Enter your email address">
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                <div class="field-holder">
+                                                                    <label>Password</label>
+                                                                    <label>
+                                                                        <input type="password" name="password"
+                                                                               placeholder="Enter your password">
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                <div class="field-holder">
+                                                                    <div class="forget-password">
+                                                                        <a href="{% url 'ep_password_reset' %}"
+                                                                           class="cs-forgot-switch forgot-switch">Forgot
+                                                                            Password?</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <ul class="errors">
+                                                    {% for fields in form %}
+                                                        {% if fields.errors %}
+                                                            {% for error in fields.errors %}
+                                                                <li style="color: red; font-size:12px">{{ error }}</li>
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    <ul class="errors">
+                                                        <li style="color: red">{{ form.non_field_errors }}</li>
+                                                    </ul>
+
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                            <div class="field-holder">
+                                                                <div class="payment-holder ">
+                                                                    <div class="btnArea">
+                                                                        <button type="submit" class="btn-primary key"
+                                                                                name="send" value="send">Login
+                                                                        </button>
+                                                                    </div>
+                                                                    {% csrf_token %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </ul>
+                                            </ul>
+                                        </form>
+                                        <br><br>
+                                        <div class="remember-me--forget-password">
+                                            <label>
+                                                <input type="checkbox" name="item" checked/>
+                                                <span class="text-checkbox">Remember me</span>
+                                            </label>
+                                        </div>
+
+                                        <br>
+                                        {#            <button>Login</button>#}
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="https://accounts.google.com/gsi/client" async></script>
+
+{% endblock %}

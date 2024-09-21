@@ -2,8 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 
 # Create your models here.
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, AbstractUser
 
+from django.utils.translation import gettext_lazy as _
 
 class UserManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email, password=None):
@@ -21,6 +22,7 @@ class UserManager(BaseUserManager):
         )
 
         user.set_password(password)
+        user.is_active = True
         user.save(using=self._db)
         return user
 
@@ -56,7 +58,7 @@ class Profile(AbstractBaseUser):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     employee_type = models.IntegerField(choices=EMPLOYEE_TYPE_CHOICES, default=EMPLOYEE_TYPE_OWNER)
     nickname = models.CharField(max_length=50, blank=True, null=True)
-
+    email_contact = models.CharField(max_length=50, blank=True, null=True, default='email')
     data_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -65,6 +67,7 @@ class Profile(AbstractBaseUser):
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    verified = models.BooleanField(_("verified"), default=False)
 
     objects = UserManager()
 
@@ -80,22 +83,34 @@ class Profile(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
 
+    def get_role(self):
+        if self.employee_type == 1:
+            user_role = 'owner'
+        elif self.employee_type == 2:
+            user_role = 'customer'
+        else:
+            user_role = 'cancel'
+        return user_role
+
+    def is_user(self):
+        return self.employee_type == 2
+
 
 class EmployeeProfile(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE, blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pictures', blank=True, null=True)
     cover_photo = models.ImageField(upload_to='cover_photos', blank=True, null=True)
-    address_line_1 = models.CharField(max_length=50, blank=True, null=True)
-    address_line_2 = models.CharField(max_length=50, blank=True, null=True)
-    country = models.CharField(max_length=50, blank=True, null=True)
-    state = models.CharField(max_length=50, blank=True, null=True)
-    city = models.CharField(max_length=50, blank=True, null=True)
-    pin_code = models.CharField(max_length=10, blank=True, null=True)
-    longitude = models.CharField(max_length=50, blank=True, null=True)
-    latitude = models.CharField(max_length=50, blank=True, null=True)
+    address_line_2 = models.CharField(max_length=255, blank=True, null=True)
+    success_privacy_policy = models.BooleanField(default=False)
+    email_is_confirmed = models.BooleanField(default=False)
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
     modified_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.user.email
+
+
+class CustomProfile(AbstractUser):
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    nickname = models.CharField(max_length=50, blank=True, null=True)

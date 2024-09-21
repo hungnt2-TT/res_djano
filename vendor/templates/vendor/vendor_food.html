@@ -1,0 +1,443 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{{ block.super }}
+
+<script src="{% static 'js/daterangepicker.js' %}"></script>
+{#<script src="{% static 'js/upload_prof_vendor.js' %}"></script>#}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/daterangepicker.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/lightslider.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/lightgallery.css' %}">
+{% endblock %}
+{% block header %}
+    {{ food_form.media }}
+{% endblock %}
+{% block content %}
+    <div class="main-section">
+        {% include 'includes/cover.html' %}
+        <div class="page-section account-header buyer-logged-in">
+            <div class="container-field">
+                <div class="row px-5">
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        {% include 'includes/v_sidebar.html' %}
+                    </div>
+                    <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                        <div class="user-dashboard loader-holder w-100 p-3">
+                            <div class="user-holder">
+                                <form action="{% url 'food_menu' %}" method="POST" id="menuForm"
+                                      enctype="multipart/form-data" novalidate>
+                                    {% csrf_token %}
+                                    <ul class="restaurant-menu-nav nav nav-tabs">
+                                        <li class=" nav-item"><a style="padding: 7px 40px;"
+                                                                 href="{% url 'menu_builder' %}"
+                                        >Menu Categories</a></li>
+                                        <li class=" active nav-item"><a data-toggle="tab" class="menu-sidebar"
+                                                                        href="#menu-list-items"
+                                                                        aria-expanded="true">Food Items</a></li>
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div id="menu-list-items" class="">
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                    <div class="element-title">
+                                                        <h5>Food Items</h5>
+                                                        <div id="menu-item-loader-87340687"
+                                                             class="restaurant-loader"></div>
+                                                        <a href="#add_menu_item_cart_from" data-toggle="collapse"
+                                                           class="add-menu-item collapsed">Add Menu Item</a>
+                                                    </div>
+                                                    <div id="add_menu_item_cart_from" class="collapse">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                            <a href="#add_menu_item_cart_from" data-toggle="collapse"
+                                                               class="close-menu-item" aria-expanded="true"><i
+                                                                    class="icon-close2"></i></a>
+                                                            <div class="row">
+                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                    <div class="field-holder">
+                                                                        <label>Restaurant Menu *</label>
+                                                                        <div class="restaurants-menu">
+                                                                            <select name="category" id="category">
+                                                                                {% for category in categories %}
+                                                                                    <option value="{{ category.id }}">{{ category.category_name }}</option>
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                                                    <div class="field-holder">
+                                                                        <label>Title *</label>
+                                                                        {{ food_form.food_name }}
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                                                    <div class="field-holder">
+                                                                        <label>Price * (VND)</label>
+                                                                        {{ food_form.price }}
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                                                    <div class="field-holder checkbox-wrapper">
+                                                                        <label>Is Available</label>
+                                                                        <label class="switch">
+                                                                            {{ food_form.is_available }}
+                                                                            <span class="slider" id="is_available"></span>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                    <div class="row">
+                                                                        <ul>
+                                                                            <li>
+                                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                                    <div class="restaurant-info">
+                                                                                        <div class="img-holder">
+                                                                                            <ul class="foodbakery-gallery-holder"
+                                                                                                id="imageGallery">
+                                                                                                <li class="gal-img">
+                                                                                                    <div class="drag-list">
+                                                                                                        <div class="item-thumb">
+                                                                                                            <img class="thumbnail"
+                                                                                                                 id="imagePreview"
+                                                                                                                 onclick=""
+                                                                                                                 src=""
+                                                                                                                 alt="">
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </li>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                        <div class="text-holder">
+                                                                                            <label>Food Image</label>
+                                                                                            <div class="upload-gallery">
+                                                                                                {{ food_form.image }}
+                                                                                                {#                                                                                                {<input type="file"#}
+                                                                                                {##}
+                                                                                                {#                                                                                                        class="btn btn-info"#}
+                                                                                                {#                                                                                                        id="imageUpload"#}
+                                                                                                {#                                                                                                        name="image">}#}
+                                                                                                <label for="imageUpload"></label>
+                                                                                            </div>
+                                                                                            <div id="browse-img-sec-295979393"
+                                                                                                 class="browse-image-sec"
+                                                                                                 style="display: none !important;">
+                                                                                                <div class="icon-img-holder">
+                                                                                                    <a href="#"
+                                                                                                       data-id="295979393"
+                                                                                                       class="remove-icon"><i
+                                                                                                            class="icon-close2"></i></a>
+                                                                                                    <img id="img-val-base-295979393"
+                                                                                                         src="#"
+                                                                                                         alt="">
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                    <div class="field-holder">
+                                                                        <label>Description</label>
+
+                                                                        {{ food_form.description }}
+
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                    <div class="field-holder">
+                                                                        <div class="field-holder">
+                                                                            <div id="update-menu-items-holder "
+                                                                                 class="payment-holder input-button-loader float-right">
+                                                                                <input
+                                                                                        class=" redirect-button-click update-menu-items"
+                                                                                        name="submit_button"
+                                                                                        value="Add Food Item"
+                                                                                        type="submit"
+                                                                                        style="background-color: #62d773">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                    <div class="field-holder">
+                                                        <div class="service-list">
+                                                            <ul id="restaurant_menu_items-list-87340687"
+                                                                class="restaurant_menu_items_cat_list panel-group ui-sortable">
+                                                                {% for category in category_food %}
+                                                                    <li id="menu-pizzas2" class="panel panel-default">
+                                                                        <div class="element-title panel-heading">
+                                                                        <span class="drag-option ui-sortable-handle"><i
+                                                                                class="icon-bars"></i></span>
+                                                                            <a data-toggle="collapse"
+                                                                               data-parent="#restaurant_menu_items-list-87340687"
+                                                                               href="#collapse-{{ forloop.counter }}"
+                                                                               aria-expanded="false"
+                                                                               class="collapsed">{{ category.category_name }}</a>
+                                                                        </div>
+                                                                        <div id="collapse-{{ forloop.counter }}"
+                                                                             class="panel-collapse collapse in"
+                                                                             aria-expanded="true" role="tabpanel">
+                                                                            <ul class="menu-items-list ui-sortable">
+                                                                                {% for food in foods %}
+                                                                                    {% if food.category.id == category.id %}
+                                                                                        <li>
+                                                                                            <div class="drag-list">
+                                                                                            <span class="drag-option ui-sortable-handle"><i
+                                                                                                    class="icon-bars"></i></span>
+                                                                                                <div class="icon-holder">
+                                                                                                    <img
+                                                                                                            src="{{ food.image.url }}"
+                                                                                                            alt="">
+                                                                                                </div>
+                                                                                                <div class="list-title">
+                                                                                                    <h6>{{ food.food_name }}</h6>
+                                                                                                    <p>{{ food.slug }}.</p>
+                                                                                                </div>
+                                                                                                <div class="list-price">
+                                                                                                    <span><b>£</b><b>{{ food.price }}</b></span>
+                                                                                                </div>
+                                                                                                <div class="list-option">
+                                                                                                    <a data-toggle="collapse"
+                                                                                                       href="#restaurant_menu_items_list{{ forloop.counter }}"
+                                                                                                       class="edit-menu-item edit-link"><i
+                                                                                                            class="icon-mode_edit"></i></a>
+                                                                                                    <a href="#"
+                                                                                                       class="remove-menu-item delete-link"><i
+                                                                                                            class="icon-close2"></i></a>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div id="restaurant_menu_items_list{{ forloop.counter }}"
+                                                                                                 class="collapse in">
+                                                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                                                    <a data-toggle="collapse"
+                                                                                                       href="#restaurant_menu_items_list{{ forloop.counter }}"
+                                                                                                       class="close-menu-item"><i
+                                                                                                            class="icon-close2"></i></a>
+                                                                                                    <div class="row">
+                                                                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                                                            <div class="field-holder">
+                                                                                                                <label>Restaurant
+                                                                                                                    Menu
+                                                                                                                    *</label>
+                                                                                                                <div class="restaurants-menu">
+                                                                                                                    <select name="category"
+                                                                                                                            id="category">
+                                                                                                                        {% for category in categories %}
+                                                                                                                            <option value="{{ category.id }}"
+                                                                                                                                    {% if category.id == food.category.id %}selected{% endif %}>
+                                                                                                                                {{ category.category_name }}
+                                                                                                                            </option>
+                                                                                                                        {% endfor %}
+                                                                                                                    </select>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                                                                                            <div class="field-holder">
+                                                                                                                <label>Title
+                                                                                                                    *</label>
+                                                                                                                <input class="menu-item-title"
+                                                                                                                       value="{{ food.food_name }}"
+                                                                                                                       type="text"
+                                                                                                                       id="food_name{{ food.id }}"
+                                                                                                                       placeholder="Menu Item Title">
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                                                                                            <div class="field-holder">
+                                                                                                                <label>Price
+                                                                                                                    *
+                                                                                                                    (VND)</label><input
+                                                                                                                    class="menu-item-price"
+                                                                                                                    type="text"
+                                                                                                                    id="price{{ food.id }}"
+                                                                                                                    value="{{ food.price }}"
+                                                                                                                    placeholder="Menu Item Price">
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                                                                                            <div class="field-holder checkbox-wrapper">
+                                                                                                                <label>Is
+                                                                                                                    Available</label>
+                                                                                                                <label class="switch">
+                                                                                                                    <input type="checkbox"
+                                                                                                                           id="is_available{{ food.id }}"
+                                                                                                                           class="menu-item-available"
+                                                                                                                    >
+                                                                                                                    <span class="slider"></span>
+                                                                                                                </label>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                                                            <div class="restaurant-info">
+                                                                                                                <div class="img-holder">
+                                                                                                                    <ul class="foodbakery-gallery-holder"
+                                                                                                                        id="imageGallery">
+                                                                                                                        <li class="gal-img">
+                                                                                                                            <div class="drag-list">
+                                                                                                                                <div class="item-thumb">
+                                                                                                                                    <a href="{{ img_cover }}"
+                                                                                                                                       id="slider_up{{ food.id }}"
+                                                                                                                                       data-src="{{ img_cover }}"
+                                                                                                                                       data-sub-html="<h4>Restaurant Demo</h4>">
+                                                                                                                                        <img class="thumbnail"
+                                                                                                                                             src="{{ food.image.url }}"
+                                                                                                                                             id="imagePreviewCover{{ food.id }}"
+                                                                                                                                             onclick=""
+                                                                                                                                             alt="profile_picture">
+                                                                                                                                    </a>
+                                                                                                                                </div>
+                                                                                                                                <div class="item-assts">
+                                                                                                                                    <ul class="list-inline pull-right">
+                                                                                                                                        <li class="close-btn">
+                                                                                                                                            <a href="#"><i
+                                                                                                                                                    class="icon-cross-out"></i></a>
+                                                                                                                                        </li>
+                                                                                                                                    </ul>
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                        </li>
+                                                                                                                    </ul>
+                                                                                                                </div>
+                                                                                                                <div class="text-holder">
+                                                                                                                    <div class="upload-gallery">
+                                                                                                                        <label>Update
+                                                                                                                            Image
+                                                                                                                            Food</label>
+                                                                                                                        {#                                                                    {{ emp_forms.profile_picture }}#}
+                                                                                                                        <div class="upload-gallery">
+                                                                                                                            <input type="file"
+                                                                                                                                   class="btn btn-info"
+                                                                                                                                   id="imageUploadCover{{ food.id }}"
+                                                                                                                                   name="img_cover">
+                                                                                                                            <label for="imagePreviewCover{{ food.id }}"
+                                                                                                                                   class="text-danger">{{ img_cover.errors }}</label>
+
+                                                                                                                            {#                                                                                    {{ vendor_form.vendor_license }}#}
+                                                                                                                        </div>
+                                                                                                                    </div>
+                                                                                                                    <span>Update your cover image manually, If the not set the default cover image will be showing on your restaurant detail page. Max Upload Size: 1MB,</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                                                            <div class="field-holder">
+                                                                                                                <label>Description</label>
+                                                                                                                <textarea
+                                                                                                                        class="menu-item-desc"
+                                                                                                                        id="description{{ food.id }}"
+                                                                                                                        placeholder="Menu Item Description">{{ food.description }}</textarea>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <ul id="menu-item-extra-list-681849489"
+                                                                                                            class="menu-item-extra-list">
+                                                                                                            <li class="menu-item-extra-681849489">
+                                                                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                                                                    <div class="row">
+                                                                                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                                                                            <div class="field-holder">
+                                                                                                                                <label>Heading</label>
+                                                                                                                                <input class="menu-item-extra-heading"
+                                                                                                                                       value=""
+                                                                                                                                       type="text"
+                                                                                                                                       placeholder="Heading">
+                                                                                                                            </div>
+                                                                                                                        </div>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            </li>
+                                                                                                        </ul>
+                                                                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                                                            <div class="field-holder">
+                                                                                                                <div id="update-menu-items-holder "
+                                                                                                                     class="payment-holder input-button-loader float-right btn-update">
+                                                                                                                    <input
+                                                                                                                            class=" redirect-button-click update-menu-items"
+                                                                                                                            name="food"
+                                                                                                                            value="Update Food"
+                                                                                                                            type="submit"
+                                                                                                                    >
+
+
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                        </li>
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+
+                                                                    </li>
+                                                                    </ul>
+                                                                    </div>
+                                                                    </li>
+                                                                {% endfor %}
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                            </form>
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="field-holder">
+                                        <div id="update-menu-items-holder"
+                                             class="payment-holder input-button-loader">
+                                            <section id="menu-list" class="scrolllayout ">
+                                                <section class="content_subtit">
+                                                    <div class="date latest-update"></div>
+                                                    <div class="txt_right note">
+                                                        {% include "vendor/pagination.html" %}
+                                                    </div>
+                                                </section>
+                                            </section>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+{% endblock %}
+{% block extra_scripts %}
+    <script src="{% static 'js/food_order.js' %}"></script>
+
+    <script src="https://cdn.ckeditor.com/ckeditor5/35.0.1/classic/ckeditor.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const checkboxes = document.querySelector('.slider #is_available');
+
+            console.log('checkboxes = ', checkboxes);
+            checkboxes.forEach(function (checkbox) {
+                checkbox.checked = checkbox.getAttribute('data-checked') === 'true';
+            });
+            var ckeditorConfig = {{ ckeditor_config|safe }};
+            document.querySelectorAll('.menu-item-desc').forEach(function (textarea) {
+                ClassicEditor
+                    .create(textarea, ckeditorConfig)
+                    .catch(error => {
+                        console.error(error);
+                    });
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/form_register.css' %}">
+{% endblock %}
+{% block title %} Register User Confirm | {{ block.super }} {% endblock %}
+
+{% block content %}
+    <div class="main-section">
+        <div class="page-section nopadding cs-nomargin"
+             style="margin-top: 0px;padding-top: 60px;padding-bottom: 60px;margin-bottom: 0px;">
+            <div class="container">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                    <div class="user-dashboard loader-holder">
+                        <div class="user-holder">
+                            <h4 class="text-center" style="margin-bottom: 0;">Confirm Register User</h4>
+                            <p class="text-center">Please double check your information before creating a user
+                                account! </p>
+                            <hr>
+                            <ul class="restaurant-settings-nav progressbar-nav">
+                                <li class="active processing"><a href="register-restaurant.html"
+                                                                 class="cond-restaurant-settings1">Information</a>
+                                </li>
+                                <li class="active processing"><a href="" class="cond-restaurant-settings1">Select
+                                    Package</a></li>
+                                <li class="active processing"><a href="register-payment-info.html "
+                                                                 class="cond-restaurant-settings1">Payment
+                                    Information</a></li>
+                                <li><a href="register-activation.html"
+                                       class="cond-restaurant-settings1">Activation</a></li>
+                            </ul>
+                            <div id="restaurant-sets-holder">
+                                {#                                    {% csrf_token %}#}
+                                <form class="form-fields-set foodbakery-dev-restaurant-form" method="POST"
+                                      enctype="multipart/form-data">
+                                    <ul class="register-add-restaurant-tab-container restaurant-information-tab-container">
+                                        <li>
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                    <div class="row" style="display: contents">
+                                                        {#                                                        <ul>#}
+                                                        {#                                                            <li>#}
+                                                        {#                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">#}
+                                                        {#                                                                    <div class="field-holder">#}
+                                                        {#                                                                        <label>First name</label>#}
+                                                        {#                                                                        {{ form.first_name.value }}#}
+                                                        {##}
+                                                        {#                                                                    </div>#}
+                                                        {#                                                                </div>#}
+                                                        {#                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">#}
+                                                        {#                                                                    <div class="field-holder">#}
+                                                        {#                                                                        <label>Last name</label>#}
+                                                        {#                                                                        {{ form.last_name.value }}#}
+                                                        {#                                                                    </div>#}
+                                                        {#                                                                </div>#}
+                                                        {#                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">#}
+                                                        {#                                                                    <div class="field-holder">#}
+                                                        {#                                                                        <label>Email Address</label>#}
+                                                        {#                                                                        {{ form.email.value }}#}
+                                                        {#                                                                    </div>#}
+                                                        {#                                                                </div>#}
+                                                        {#                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">#}
+                                                        {#                                                                    <div class="field-holder">#}
+                                                        {#                                                                        <label>Username</label>#}
+                                                        {#                                                                        {{ form.username.value }}#}
+                                                        {#                                                                    </div>#}
+                                                        {#                                                                </div>#}
+                                                        {#                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">#}
+                                                        {#                                                                    <div class="field-holder">#}
+                                                        {#                                                                        <label>Vendor name</label>#}
+                                                        {#                                                                        {{ vendor_form.vendor_name.value }}#}
+                                                        {#                                                                    </div>#}
+                                                        {#                                                                </div>#}
+                                                        {#                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">#}
+                                                        {#                                                                    <div class="field-holder">#}
+                                                        {#                                                                        <label>Vendor License</label>#}
+                                                        {#                                                                        <img src="{{ upload_file_url }}"#}
+                                                        {#                                                                             alt="Vendor License">#}
+                                                        {##}
+                                                        {##}
+                                                        {#                                                                    </div>#}
+                                                        {#                                                                </div>#}
+                                                        {#                                                            </li>#}
+                                                        {##}
+                                                        {#                                                            <li>#}
+                                                        {#                                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">#}
+                                                        {#                                                                    <div class="field-holder">#}
+                                                        {#                                                                        <label>Password</label>#}
+                                                        {#                                                                        {{ form.password1.value }}#}
+                                                        {#                                                                    </div>#}
+                                                        {#                                                                </div>#}
+                                                        {#                                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">#}
+                                                        {#                                                                    <div class="field-holder">#}
+                                                        {#                                                                        <label>Confirm Password</label>#}
+                                                        {#                                                                        {{ form.password2.value }}#}
+                                                        {#                                                                    </div>#}
+                                                        {#                                                                </div>#}
+                                                        {#                                                            </li>#}
+                                                        {#                                                        </ul>#}
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                            <div class="element-title">
+                                                                <h4>Payment Methods</h4>
+                                                                <span class="element-slogan">(Click one of
+																					the
+																					options
+																					below)</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                            <div class="field-holder">
+                                                                <div class="payment-holder">
+                                                                    <div class="payment-section">
+                                                                        <ul class="payment-list row">
+                                                                            <li class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                                                <div class="payment-box">
+                                                                                    <input type="radio"
+                                                                                           id="foodbakery_paypal_gateway_7284823"
+                                                                                           checked="checked"
+                                                                                           name="foodbakery_restaurant_gateway"
+                                                                                           value="FOODBAKERY_PAYPAL_GATEWAY">
+                                                                                    <label for="foodbakery_paypal_gateway_7284823"><img
+                                                                                            alt=""
+                                                                                           src="{% static 'img/vnpay-logo.jpg'%}"></label>
+                                                                                    <span>Pay with
+																										VnPay</span>
+                                                                                </div>
+                                                                            </li>
+                                                                            <li class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                                                <div class="payment-box">
+                                                                                    <input type="radio"
+                                                                                           id="foodbakery_authorizedotnet_gateway_8257993"
+                                                                                           name="foodbakery_restaurant_gateway"
+                                                                                           value="FOODBAKERY_AUTHORIZEDOTNET_GATEWAY">
+                                                                                    <label for="foodbakery_authorizedotnet_gateway_8257993"><img
+                                                                                            alt=""
+                                                                                            src="{% static 'img/momo.jpg'%}"></label>
+                                                                                    <span>Pay with
+																										Momo</span>
+                                                                                </div>
+                                                                            </li>
+                                                                            <li class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                                                <div class="payment-box">
+                                                                                    <input type="radio"
+                                                                                           id="foodbakery_pre_bank_transfer_9499784"
+                                                                                           name="foodbakery_restaurant_gateway"
+                                                                                           value="FOODBAKERY_PRE_BANK_TRANSFER">
+                                                                                    <label for="foodbakery_pre_bank_transfer_9499784"><img
+                                                                                            alt=""
+                                                                                           src="{% static 'img/zalo.png'%}"></label>
+                                                                                    <span>Pay with
+																										ZaloPay</span>
+                                                                                </div>
+                                                                            </li>
+                                                                            <li class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                                                <div class="payment-box">
+                                                                                    <input type="radio"
+                                                                                           id="foodbakery_skrill_gateway_8930496"
+                                                                                           name="foodbakery_restaurant_gateway"
+                                                                                           value="FOODBAKERY_SKRILL_GATEWAY">
+                                                                                    <label for="foodbakery_skrill_gateway_8930496"><img
+                                                                                            alt=""
+                                                                                            src={% static 'img/Introducing Wallet Pay.png'%}></label>
+                                                                                    <span>Pay with
+																										Wallet</span>
+                                                                                </div>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li style="margin-top: 110px">
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                    <div class="field-holder">
+                                                        <div class="payment-holder">
+                                                            <div class="btnArea button-container">
+                                                                <button type="submit" class="btn-secondary " name="next"
+                                                                        value="back">Back
+                                                                </button>
+                                                                <button type="submit" class="btn-primary key"
+                                                                        name="next" value="send"
+                                                                        data-action="send">Send
+                                                                </button>
+                                                            </div>
+                                                            {% csrf_token %}
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block script %}
+    {{ block.super }}
+    <script>(function (b, f, d, a, c) {
+        var e = b.createElement(f);
+        e.src = c + "/" + a + "/atm.js";
+        e.id = d;
+        e.async = true;
+        b.getElementsByTagName(f)[0].parentElement.appendChild(e)
+    })(document, "script", "__cribnotesTagMgrCmd", "074f87a7-d6a9-4f50-bba5-843350148546", "https://tag.cribnotes.jp/container_manager");</script>
+    <script>
+        window.history.pushState(null, null, '');
+    </script>
+{% endblock %}

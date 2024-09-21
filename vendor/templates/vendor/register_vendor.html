@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/form_register.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/lightslider.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/lightgallery.css' %}">
+
+{% endblock %}
+{% block script %}
+    <script src="{% static 'js/lightslider.js' %}"></script>
+
+    <script src="{% static 'js/functions_vendor.js' %}"></script>
+
+{% endblock %}
+{% block title %} Register Vendor | {{ block.super }} {% endblock %}
+{% block content %}
+    <div class="main-section">
+        <div class="page-section nopadding cs-nomargin"
+             style="margin-top: 0px;padding-top: 60px;padding-bottom: 60px;margin-bottom: 0px;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                        <div class="user-dashboard loader-holder">
+                            <div class="user-holder">
+                                <h4 class="text-center" style="margin-bottom: 0;">PARTNER WITH FOOD ONLINE</h4>
+                                <p class="text-center">Register your restaurant with foodOnline marketplace and get more
+                                    customers.</p>
+                                <hr>
+                                {% include 'vendor/process_regis.html' %}
+                                <div id="restaurant-sets-holder">
+                                    <form class="form-fields-set foodbakery-dev-restaurant-form" method="post"
+                                          enctype="multipart/form-data">
+                                        <ul class="register-add-restaurant-tab-container restaurant-information-tab-container">
+                                            <li>
+                                                <div class="row">
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="row">
+                                                            <ul>
+                                                                <li>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+
+                                                                        <div class="field-holder">
+                                                                            <label>Restaurant name</label>
+                                                                            {{ vendor_form.vendor_name }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>Restaurant phone</label>
+                                                                            {{ vendor_form.fax_number }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>Manager Contact Email </label>
+                                                                            {{ form.email }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>Manager Name</label>
+                                                                            {{ form.username }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                        <div class="restaurant-info">
+                                                                            <div class="img-holder">
+                                                                                <ul class="foodbakery-gallery-holder"
+                                                                                    id="imageGallery">
+                                                                                    <li class="gal-img">
+                                                                                        <div class="drag-list">
+                                                                                            <div class="item-thumb">
+                                                                                                <img class="thumbnail"
+                                                                                                     id="imagePreview"
+                                                                                                     onclick=""
+                                                                                                     src=""
+                                                                                                     alt="">
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                            <div class="text-holder">
+                                                                                <label>Update License</label>
+                                                                                <div class="upload-gallery">
+                                                                                    <input type="file"
+
+                                                                                           class="btn btn-info"
+                                                                                           id="imageUpload"
+                                                                                           name="vendor_license">
+                                                                                    <label for="imageUpload"></label>
+
+                                                                                    {#                                                                                    {{ vendor_form.vendor_license }}#}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                            </ul>
+                                                        </div>
+
+
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li>
+                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                    <div class="field-holder">
+                                                        <label>Password</label>
+                                                        {{ form.password1 }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                    <div class="field-holder">
+                                                        <label>Confirm Password</label>
+                                                        {{ form.password2 }}
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+
+                                        <ul>
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <div class="element-title">
+                                                    <h4>Location</h4>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+                                                <div class="opt-conts">
+                                                    <div class="row">
+                                                        <div class="ccol-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                            <div class="field-holder">
+                                                                <label>Address</label>
+                                                                {#                                                                {{ profile_form.address_line_1 }}#}
+
+
+                                                                <input id="my-input-searchbox" type="text"
+                                                                       name="address_line_1"
+                                                                       placeholder="SearchBox Widget">
+                                                                <div id="map" style="height: 400px"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                            <div class="field-holder">
+                                                                <label>State</label>
+                                                                {{ vendor_form.state }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                            <div class="field-holder">
+                                                                <label>City</label>
+                                                                {{ vendor_form.city }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                            <div class="field-holder">
+                                                                <label>Latitude</label>
+                                                                <input type="text" placeholder="Latitude"
+                                                                       class="form-control gllpLatitude"
+                                                                       id="loc_latitude"
+                                                                       name="foodbakery_post_loc_latitude_restaurant"
+                                                                >
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                            <div class="field-holder">
+                                                                <label>Longitude</label>
+                                                                <input type="text" placeholder="Longitude"
+                                                                       class="form-control gllpLongitude"
+                                                                       id="loc_longitude"
+                                                                       name="foodbakery_post_loc_longitude_restaurant"
+                                                                       value="">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                            <input type="hidden" id="foodbakery__loc_bounds_rest"
+                                                                   name="foodbakery_loc_bounds_rest_restaurant"
+                                                                   value=""><input type="hidden"
+                                                                                   id="foodbakery_add_new_loc"
+                                                                                   class="gllpSearchField"
+                                                                                   style="margin-bottom:10px;"
+                                                                                   name="foodbakery_add_new_loc_restaurant"
+                                                                                   value=""><input type="hidden"
+                                                                                                   id="foodbakery_post_loc_zoom"
+                                                                                                   class="gllpZoom"
+                                                                                                   name="foodbakery_post_loc_zoom_restaurant"
+                                                                                                   value="9">
+
+                                                        </div>
+                                                        <div class="field-holder">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </ul>
+                                        <ul>
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                    <div class="field-holder">
+                                                        <div class="payment-holder">
+                                                            <div class="checkbox-area" aria-required="true">
+                                                                <input type="checkbox" id="terms-59054637"
+                                                                       name="terms-59054637"
+                                                                       class="foodbakery-dev-req-field">
+                                                                <label for="terms-59054637">
+                                                                    By Registering You Confirm That You Accept The
+                                                                    <a target="_blank" href="contact-us.html">Terms
+                                                                        &amp; conditions </a>
+                                                                    And <a target="_blank" href="price-plans.html">Privacy
+                                                                    Policy </a>
+                                                                </label>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ul>
+                                        <ul>
+                                            <ul class="errors">
+                                                {% for fields in form %}
+                                                    {% if fields.errors %}
+                                                        {% for error in fields.errors %}
+                                                            <li style="color: red; font-size:12px">{{ error }}</li>
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <li style="color: red">{{ form.non_field_errors }}</li>
+                                            </ul>
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                    <div class="field-holder">
+                                                        <div class="payment-holder ">
+                                                            <div class="btnArea">
+                                                                <button type="submit" class="btn-primary key"
+                                                                        name="next" value="confirm">Next
+                                                                </button>
+                                                            </div>
+                                                            {% csrf_token %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ul>
+                                        </ul>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block extra_scripts %}
+        <script src="{% static 'js/init_google_map_plf.js' %}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&callback={{ initAutocomplete }}"
+            async
+            defer></script>
+{% endblock %}

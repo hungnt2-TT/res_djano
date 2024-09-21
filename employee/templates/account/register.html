@@ -1,97 +1,155 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/form_register.css' %}">
+{% endblock %}
+{% block title %}
+{% endblock %}
 {% block content %}
-		<!-- Main Section Start -->
-		<div class="main-section">
-			<div class="page-section nopadding cs-nomargin" style="margin-top: 0px;padding-top: 60px;padding-bottom: 60px;margin-bottom: 0px;">
-				<div class="container">
-					<div class="row">
-						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-							<div class="user-dashboard loader-holder">
-								<div class="user-holder">
-                            <h4 class="text-center" style="margin-bottom: 0;">WELCOME TO FOODONLINE</h4>
-                            <p class="text-center">Please fill this form to get yourself onboarded in the foodOnline marketplace.</p>
-                            <hr>
-                            <div id="restaurant-sets-holder">
-                                <form class="form-fields-set foodbakery-dev-restaurant-form" method="post" action="register-select-package.html">
-                                    <ul class="register-add-restaurant-tab-container restaurant-information-tab-container">
-                                        <li>
-                                            <div class="row">
-                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                    <div class="row">
-                                                        <ul >
-                                                            <li>
-                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                                    <div class="field-holder">
-                                                                        <label>First name</label><input type="text" class="foodbakery-dev-req-field" id="foodbakery_restaurant_title_59054637" name="foodbakery_restaurant_title">
+    <!-- Main Section Start -->
+    <div class="main-section">
+        <div class="page-section nopadding cs-nomargin"
+             style="margin-top: 0px;padding-top: 60px;padding-bottom: 60px;margin-bottom: 0px;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                        <div class="user-dashboard loader-holder">
+                            <div class="user-holder">
+                                <h4 class="text-center" style="margin-bottom: 0;">WELCOME TO FOODONLINE</h4>
+                                <p class="text-center">Please fill this form to get yourself onboarded in the foodOnline
+                                    marketplace.</p>
+                                <hr>
+                                <div id="restaurant-sets-holder">
+                                    {% csrf_token %}
+                                    <form class="form-fields-set foodbakery-dev-restaurant-form" method="post">
+                                        <ul class="register-add-restaurant-tab-container restaurant-information-tab-container">
+                                            <li>
+                                                <div class="row">
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="row">
+                                                            <ul>
+                                                                <li>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+
+                                                                        <div class="field-holder">
+                                                                            <label>First name</label>
+                                                                            {{ form.first_name }}
+{#                                                                            {{ form.first_name.errors }}#}
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                                    <div class="field-holder">
-                                                                        <label>Last name</label><input type="text" id="foodbakery_restaurant_phone_59054637" name="foodbakery_restaurant_contact_phone">
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>Last name</label>
+                                                                            {{ form.last_name }}
+{#                                                                            {{ form.last_name.errors }}#}
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                                    <div class="field-holder">
-                                                                        <label>Restaurant name </label><input type="text" class="foodbakery-dev-req-field" id="foodbakery_restaurant_title_59054637" name="foodbakery_restaurant_title">
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>Email Address</label>
+                                                                            {{ form.email }}
+{#                                                                            {{ form.email.errors }}#}
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                                    <div class="field-holder">
-                                                                        <label>Restaurant phone</label><input type="text" id="foodbakery_restaurant_phone_59054637" name="foodbakery_restaurant_contact_phone">
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>Username</label>
+                                                                            {{ form.username }}
+{#                                                                            {{ form.username.errors }}#}
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                                    <div class="field-holder">
-                                                                        <label>Email Address</label><input type="text" id="foodbakery_restaurant_contact_email_59054637" name="foodbakery_restaurant_contact_email">
+                                                                </li>
+
+                                                                <li>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>Password</label>
+                                                                            {{ form.password1 }}
+{#                                                                            {{ form.password1.errors }}#}
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                                    <div class="field-holder">
-                                                                        <label>Username</label><input type="text" id="foodbakery_restaurant_contact_email_59054637" name="foodbakery_restaurant_contact_email">
+                                                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>Confirm Password</label>
+                                                                            {{ form.password2 }}
+{#                                                                            {{ form.password1.errors }}#}
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                            </li>
-                                                            
-                                                            <li>
-                                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                                                                    <div class="field-holder">
-                                                                        <label>Password</label>
-                                                                        <input type="password" name="foodbakery_restaurant_username" class="foodbakery-dev-username foodbakery-dev-req-field">
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                                                                    <div class="field-holder">
-                                                                        <label>Confirm Password</label>
-                                                                        <input type="password" name="foodbakery_restaurant_user_email" class="foodbakery-dev-user-email foodbakery-dev-req-field">
-                                                                    </div>
-                                                                </div>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="row">
-                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                    <div class="field-holder">
-                                                        <div class="payment-holder">
-                                                            <input type="submit" value="Submit" id="btn-next-restaurant-information" class="bgcolor">
+                                                                </li>
+                                                            </ul>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </form>
+                                            </li>
+                                            <li>
+                                                <ul class="errors">
+                                                    {% for fields in form %}
+                                                        {% if fields.errors %}
+                                                            {% for error in fields.errors %}
+                                                                <li style="color: red; font-size:12px">{{ error }}</li>
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    <li style="color: red">{{ form.non_field_errors }}</li>
+                                                </ul>
+                                                <div class="row">
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="field-holder">
+                                                            <div class="payment-holder ">
+                                                                <div class="btnArea">
+                                                                    <button type="submit" class="btn-primary key"
+                                                                            name="next" value="confirm">Next
+                                                                    </button>
+                                                                </div>
+                                                                {% csrf_token %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- Main Section End -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Main Section End -->
+{% endblock %}
+{% block script %}
+    <script>
+        $(document).ready(function () {
+            let querySearch = location.search
+            let rightKey = 'regist_route'
+
+            // Check if string contain `regist_route`
+            if (!querySearch || querySearch.indexOf(rightKey) < 0) {
+                return false
+            }
+
+            if (querySearch[0] !== '?') return false
+
+            // Remove mark question
+            querySearch = querySearch.substr(1)
+
+            const keyValues = querySearch.split('&')
+
+            keyValues.forEach((value, index) => {
+                const a = value.split('=')
+                if (a[0] === rightKey && a[1]) {
+                    $('input[name="regist_route"]').val(a[1])
+                }
+            })
+        })
+    </script>
+    <script>(function (b, f, d, a, c) {
+        var e = b.createElement(f);
+        e.src = c + "/" + a + "/atm.js";
+        e.id = d;
+        e.async = true;
+        b.getElementsByTagName(f)[0].parentElement.appendChild(e)
+    })(document, "script", "__cribnotesTagMgrCmd", "074f87a7-d6a9-4f50-bba5-843350148546", "https://tag.cribnotes.jp/container_manager");</script>
 {% endblock %}

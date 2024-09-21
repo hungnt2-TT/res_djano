@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+<script src="{% static 'employee/js/history.js' %}"></script>
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/history.css' %}">
+
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="header">
+            <h2>ShopeeFood</h2>
+        </div>
+        <div class="order-history">
+            <h3>Lịch sử đơn hàng</h3>
+            <div class="filter">
+                <label for="status">Trạng thái</label>
+                <select id="status">
+                    <option value="all">All</option>
+                </select>
+                <label for="from-date">Từ ngày</label>
+                <input type="date" id="from-date">
+                <label for="to-date">Đến ngày</label>
+                <input type="date" id="to-date">
+                <button id="search">Tìm kiếm</button>
+            </div>
+            <table>
+                <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Mã đơn hàng</th>
+                    <th>Thời gian</th>
+                    <th>Địa điểm</th>
+                    <th>Nhân viên</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Chi tiết</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>17064-550465295</td>
+                    <td>Thời gian đặt: 17/06/2024<br>Thời gian giao: 17/06/2024 15:44</td>
+                    <td>Garden House - Rau Má Mix - Quan Nhân<br>4 Quan Nhân, P. Trung Hòa, Cầu Giấy, Hà Nội</td>
+                    <td>Vũ Anh Dũng 1315<br><a href="#">Đánh giá</a></td>
+                    <td>45.000đ<br>0 item<br>Tiền mặt</td>
+                    <td><span class="status complete">Complete</span><br>
+                        <button class="reorder">Re-order</button>
+                    </td>
+                    <td><a href="#" class="order-details" data-order-id="1">Chi tiết đơn hàng</a><br><a href="#">In biên
+                        lai</a></td>
+                </tr>
+                <!-- More rows as needed -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div id="order-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Đơn của bạn tại Garden House - Rau Má Mix - Quan Nhân</h2>
+            <table class="modal-table">
+                <thead>
+                <tr>
+                    <th>Thành viên</th>
+                    <th>Món</th>
+                    <th>Số lượng</th>
+                    <th>Giá</th>
+                    <th>Phí</th>
+                    <th>Giảm giá</th>
+                    <th>Tổng cộng</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><img src="user.png" alt="user"> user id : 11027...</td>
+                    <td>1 Rau Má Đậu Xanh Sữa Dừa<br>[100% đá, 100% đường, Size M]</td>
+                    <td>3 Items</td>
+                    <td>43.000đ</td>
+                    <td>22.000đ</td>
+                    <td>-20.000đ</td>
+                    <td>45.000đ</td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="modal-footer">
+                <button class="close-btn">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+{% static scr %}

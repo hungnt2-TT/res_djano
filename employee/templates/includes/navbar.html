@@ -1,4 +1,10 @@
 {% load static %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/profile.css' %}">
+    <link href="
+https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
+" rel="stylesheet">
+{% endblock %}
 <!-- Header Start -->
 <header id="header">
     <div class="main-header">
@@ -7,8 +13,8 @@
                 <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
                     <div class="logo">
                         <figure>
-                            <a href="index.html" class="light-logo">
-                                <img src="assets/extra-images/main-logo.png" alt="FoodBakery">
+                            <a href="{% url 'home' %}" class="light-logo">
+                                <img src="{% static 'employee/img/main-logo.png' %}" alt="FoodBakery">
                             </a>
                         </figure>
                     </div>
@@ -69,15 +75,68 @@
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                    <div class="login-option">
-                        <a class="cs-color cs-popup-joinus-btn login-popup" data-target="#sign-in" data-toggle="modal"
-                           href="#user-register">Login / Register</a><a class="get-start-btn"
-                                                                        href="register-restaurant.html">
-                        Register
-                        Restaurant </a>
-                    </div>
+                    {% if user.is_authenticated %}
+                        <div class="login-option">
+                            <div class="user-dashboard-menu">
+                                <ul>
+                                    <li class="user-dashboard-menu-children">
+                                        <a href="javascript:void(0);" class="">
+                                            <figure class="profile-image">
+                                                <img src="assets/extra-images/team-medium-img1.jpg" alt="">
+                                            </figure>
+                                            {{ user.username }}
+                                        </a>
+                                        <ul>
+                                            <li class="active"><a href="{% url 'middleware_account' %}"><i
+                                                    class="icon-dashboard3"></i>Dashboard</a></li>
+                                            <li><a href="buyer-bookings.html" class="btn-edit-profile"><i
+                                                    class="icon-file-text2"></i>My Bookings</a></li>
+                                            <li><a href="buyer-reviews.html" class="btn-edit-profile"><i
+                                                    class="icon-comment2"></i>My Reviews</a></li>
+                                            <li><a href="buyer-orders.html" class="btn-edit-profile"><i
+                                                    class="icon-add_shopping_cart"></i>My Orders</a></li>
+                                            <li><a href="buyer-shortlists.html"><i class="icon-heart"></i>Shortlists</a>
+                                            </li>
+                                            <li><a href="buyer-statement.html"><i class="icon-file-text22"></i>Statement</a>
+                                            </li>
+                                            <li><a href="buyer-account-setting.html"><i class="icon-build"></i>Account
+                                                Settings</a></li>
+                                    </li>
+                                    <li>
+                                        <form method="post" action="{% url 'logout' %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="get-start-btn btn-logout"
+                                            >
+                                                <i class="icon-log-out"></i>Logout
+                                            </button>
+                                        </form>
+                                    </li>
+
+                                </ul>
+                                </li>
+                                </ul>
+                            </div>
+                        </div>
+
+
+                    {% else %}
+                        <div class="login-option">
+                        <span>
+                            <a class="cs-color cs-popup-joinus-btn login-popup"
+
+                               href="{% url '_login' %}">Login</a> </span>/ <span>
+                            <a href="{% url 'register_user' %}"
+                               class="cs-color cs-popup-joinus-btn login-popup ml-0">Register</a></span><a
+                                class="get-start-btn"
+                                href="{% url 'register_vendor' %}">
+                            Register
+                            Restaurant </a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
+            {% include 'includes/alerts.html' %}
+
         </div>
     </div>
 </header>

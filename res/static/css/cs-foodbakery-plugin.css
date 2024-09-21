@@ -3,6 +3,7 @@
 .main-header .login-option a.login-popup { color: #333; font-size: 13px; font-weight: 700; margin: 0 0 0 15px; text-transform: uppercase; display: inline-block; margin-top: 22px; }
 .main-header .login-option a.get-start-btn { background-color: #c33332; border-radius: 3px; color: #fff; font-family: "Montserrat", sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0; line-height: normal; padding: 10px 15px; text-transform: uppercase; margin: 0 0 0 12px; }
 .modal-dialog { width: 400px; }
+
 #header.classic .main-header { padding-top: 15px; }
 #header.classic .main-header .wide { display: -webkit-box; display: -webkit-flex; display: -moz-box; display: -ms-flexbox; display: flex; -webkit-box-align: center; -webkit-align-items: center; -moz-box-align: center; -ms-flex-align: center; align-items: center; }
 #header.classic .main-header .login-option a.login-popup { margin: 0; display: inline-block; vertical-align: middle; color: #fff !important; font-size: 14px; font-weight: 600; letter-spacing: 1px; }
@@ -1000,8 +1001,8 @@ li.gal-img.ui-sortable-placeholder, li.ui-sortable-placeholder { background: #EE
 .payment-list { margin-bottom: 30px; padding: 0; }
 .payment-list .payment-box input[type="radio"] { display: none; }
 .payment-list .payment-box { position: relative; }
-.payment-list .payment-box label { border: 1px solid #f4f4f4; margin-bottom: 0; cursor: pointer; border-radius: 3px; display: block; width: 100%; }
-.payment-list .payment-box label img { margin: 0; width: 100%; }
+.payment-list .payment-box label { border: 1px solid #f4f4f4; margin-bottom: 0; cursor: pointer; border-radius: 3px; display: block; width: 172px; }
+.payment-list .payment-box label img { margin: 0; width: 100%; height: 95px}
 .payment-list .payment-box input[type="radio"]:checked + label:after { background: none; border-radius: 0; content: "\f058"; color: #f97456; right: -5px; font-weight: normal; position: absolute; top: -10px; font-size: 20px; font-family: "icomoon"; }
 .payment-box span { display: block; text-align: center; font-size: 13px; color: #a3a7ab; padding: 10px 0 0; line-height: normal; margin: 0; text-decoration: none; text-transform: none; }
 .payment-holder .checkbox-area input[type="checkbox"] { display: none; }
