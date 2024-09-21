@@ -55,6 +55,7 @@ def broadcast_sms(phone_number):
         verification = client.verify.v2.services(settings.SECRET_KEY_TWILIO).verifications.create(to=phone_number_vn,
                                                                                                   channel='sms')
 
+
         print('verification_check', verification)
     except Exception as e:
         print(f'Error verification: {e}')

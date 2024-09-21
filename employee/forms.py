@@ -35,7 +35,8 @@ class RegisterFormByEmail(UserCreationForm):
                                     max_length=10,
                                     required=False, label='Phone Number',
                                     error_messages={
-                                        'invalid': "※The phone number must start with 84 or 0[3|5|7|8|9]."
+
+                                        'invalid':"※The phone number must start with 84 or 0[3|5|7|8|9]."
                                     })
 
     class Meta:

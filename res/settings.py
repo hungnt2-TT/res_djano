@@ -27,7 +27,6 @@ SECRET_KEY = os.getenv('SECRET_KEY', '1234567890')
 # SECURITY WARNING: don't run with debug turned on in production!
 import dotenv
 from django.contrib.messages import constants as messages
-ALLOWED_HOSTS = ['*']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False')
@@ -181,7 +180,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = 'staticfiles/'
 
 STATICFILES_DIRS = [
-     BASE_DIR / 'static/'
+    BASE_DIR / 'static/'
 ]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
@@ -233,7 +232,6 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
-
 
 TWILIO_ACCOUNT_SID = os.getenv("MY_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
