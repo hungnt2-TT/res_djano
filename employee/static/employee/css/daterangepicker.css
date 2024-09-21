@@ -267,3 +267,17 @@
     float: right; }
   .daterangepicker .calendar.left {
     clear: none !important; } }
+
+.custom-image-input {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 4.5px 2px;
+    cursor: pointer;
+    background-color: #f8f8f8;
+    border-radius: 4px;
+    width: 103%;
+}
+
+.menu-sidebar {
+    padding: 7px 40px;
+}
