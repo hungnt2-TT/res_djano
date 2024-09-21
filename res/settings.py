@@ -29,8 +29,6 @@ import dotenv
 from django.contrib.messages import constants as messages
 ALLOWED_HOSTS = ['*']
 
-ALLOWED_HOSTS = ['*']
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False')
 # Application definition
@@ -84,10 +82,7 @@ INSTALLED_APPS = [
     "widget_tweaks",
     "menu",
     "marketplace",
-    "menu",
     "django_ckeditor_5",
-    "menu",
-    "marketplace",
 ]
 
 MIDDLEWARE = [
