@@ -400,22 +400,14 @@
 }
 
 @media (min-width: 730px) {
-    .daterangepicker .ranges {
-        width: auto;
-    }
-
-    .daterangepicker.ltr .ranges {
-        float: left;
-    }
-
-    .daterangepicker.rtl .ranges {
-        float: right;
-    }
-
-    .daterangepicker .calendar.left {
-        clear: none !important;
-    }
-}
+  .daterangepicker .ranges {
+    width: auto; }
+  .daterangepicker.ltr .ranges {
+    float: left; }
+  .daterangepicker.rtl .ranges {
+    float: right; }
+  .daterangepicker .calendar.left {
+    clear: none !important; } }
 
 .custom-image-input {
     border: 1px solid #ccc;
@@ -424,6 +416,13 @@
     cursor: pointer;
     background-color: #f8f8f8;
     border-radius: 4px;
+<<<<<<< HEAD
+  width: 103%;
+}
+
+.menu-sidebar {
+  padding: 7px 40px;
+=======
     width: 103%;
 }
 
@@ -506,4 +505,5 @@
 .checkbox-wrapper input:checked + .slider:before {
     transform: translateX(1.4em);
     background-color: #fff;
+>>>>>>> main
 }

@@ -8,7 +8,7 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
 <!-- Header Start -->
 <header id="header">
     <div class="main-header">
-        <div class="container">
+        <div class="container" style="max-width: 1550px">
             <div class="row">
                 <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
                     <div class="logo">
@@ -75,11 +75,14 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                    {% if user.is_authenticated %}
-                        <div class="login-option">
+                    <div class="login-option" style="padding-top: 9px">
+                        <a href="{% url 'marketplace' %}" class="btn btn-outline-danger text-uppercase font-weight-bold"
+                           style="margin-top: 14px">Marketplace</a>
+                        {% if user.is_authenticated %}
+
                             <div class="user-dashboard-menu">
                                 <ul>
-                                    <li class="user-dashboard-menu-children">
+                                    <li class="user-dashboard-menu-children" style="margin-left: 32px">
                                         <a href="javascript:void(0);" class="">
                                             <figure class="profile-image">
                                                 <img src="assets/extra-images/team-medium-img1.jpg" alt="">

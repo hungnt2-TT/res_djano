@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     "wallet",
     "widget_tweaks",
     "menu",
+    "marketplace",
     "django_ckeditor_5",
 ]
 

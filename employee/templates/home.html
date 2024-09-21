@@ -8,16 +8,16 @@
             <!-- Home Pages Elements Strat -->
             <!-- Main Search Start -->
             <div class="page-section nopadding cs-nomargin"
-                 style="padding-top: 200px; padding-bottom: 150px; margin-bottom: 0px; background: url(assets/extra-images/bg-image1.jpg) no-repeat center / cover;">
+                 style="padding-top: 570px; padding-bottom: 155px; margin-bottom: 0px; background: url('{% static 'employee/img/7377287.jpg' %}') no-repeat center / cover;">
                 <div class="container">
                     <div class="row">
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                             <div class="element-title">
-                                <h1 style="font-size: 40px; color: #505050; text-transform: uppercase; line-height: 50px; margin-bottom: 25px; text-align:center;">
-                                    We are in the business of food<br>our restaurants do</h1>
-                                <p style="font-size: 18px; letter-spacing: 1px; color: #505050; text-align:center;">
-                                    Ridiculus sociosqu
-                                    cursus neque cursus curae ante scelerisque vehicula.</p>
+                                {#                                <h1 style="font-size: 40px; color: #505050; text-transform: uppercase; line-height: 50px; margin-bottom: 25px; text-align:center;">#}
+                                {#                                    We are in the business of food<br>our restaurants do</h1>#}
+                                {#                                <p style="font-size: 18px; letter-spacing: 1px; color: #505050; text-align:center;">#}
+                                {#                                    Ridiculus sociosqu#}
+                                {#                                    cursus neque cursus curae ante scelerisque vehicula.</p>#}
                             </div>
                         </div>
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
@@ -125,55 +125,18 @@
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                             <div class="company-logo">
                                 <ul>
-                                    <li class="has-border">
-                                        <figure>
-                                            <a href="#"><img src="assets/extra-images/listing-logo18.png"
-                                                             class="attachment-full size-full wp-post-image" alt=""></a>
-                                        </figure>
-                                    </li>
-                                    <li class="has-border">
-                                        <figure>
-                                            <a href="#"><img src="assets/extra-images/fb-restaurant-02.jpg"
-                                                             class="attachment-full size-full wp-post-image" alt=""></a>
-                                        </figure>
-                                    </li>
-                                    <li class="has-border">
-                                        <figure>
-                                            <a href="#"><img src="assets/extra-images/fb-restaurant-04.jpg"
-                                                             class="attachment-full size-full wp-post-image" alt=""></a>
-                                        </figure>
-                                    </li>
-                                    <li class="has-border">
-                                        <figure>
-                                            <a href="#"><img src="assets/extra-images/fb-restaurant-06.jpg"
-                                                             class="attachment-full size-full wp-post-image" alt=""></a>
-                                        </figure>
-                                    </li>
-                                    <li class="has-border">
-                                        <figure>
-                                            <a href="#"><img
-                                                    src="assets/extra-images/xlisting-logo03.png.pagespeed.ic_.aT-o9LinEJ.png"
-                                                    class="attachment-full size-full wp-post-image" alt=""></a>
-                                        </figure>
-                                    </li>
-                                    <li class="has-border">
-                                        <figure>
-                                            <a href="#"><img src="assets/extra-images/listing-logo09.png"
-                                                             class="attachment-full size-full wp-post-image" alt=""></a>
-                                        </figure>
-                                    </li>
-                                    <li class="has-border">
-                                        <figure>
-                                            <a href="#"><img src="assets/extra-images/listing-logo18.png"
-                                                             class="attachment-full size-full wp-post-image" alt=""></a>
-                                        </figure>
-                                    </li>
-                                    <li class="has-border">
-                                        <figure>
-                                            <a href="#"><img src="assets/extra-images/fb-restaurant-09.png"
-                                                             class="attachment-full size-full wp-post-image" alt=""></a>
-                                        </figure>
-                                    </li>
+                                    {% for vendor in vendors %}
+                                        <li class="has-border">
+                                            <figure>
+                                                {% if vendor.user_profile.profile_picture %}
+                                                    <a href="#"><img src="{{ vendor.user_profile.profile_picture.url }}"
+                                                                     class="attachment-full size-full wp-post-image"
+                                                                     alt=""></a>{% else %}
+                                                    <a href="#"><img src="{% static 'employee/img/download.png' %}">
+                                                    </a>{% endif %}
+                                            </figure>
+                                        </li>
+                                    {% endfor %}
                                 </ul>
                             </div>
                         </div>
@@ -195,15 +158,26 @@
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                             <div class="listing fancy">
                                 <ul class="row">
+                                    {% for vendor in vendors %}
                                     <li class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                         <div class="list-post featured">
                                             <div class="img-holder">
-                                                <figure><a href="#"><img src="assets/extra-images/listing-logo18.png"
-                                                                         class="img-thumb wp-post-image" alt=""></a>
+                                                <figure>
+                                                    {% if vendor.user_profile.profile_picture %}
+                                                        <a href="#"><img
+                                                                src="{{ vendor.user_profile.profile_picture.url }}"
+                                                                class="img-thumb wp-post-image" alt=""></a>
+                                                    {% else %}
+                                                        <a href="#"><img src="{% static 'employee/img/download.png' %}">
+                                                        </a>{% endif %}
                                                 </figure>
+
                                                 <span class="restaurant-status close">
 													<em class="bookmarkRibbon"></em>Close
 												</span>
+                                                {#                                            <span class="restaurant-status open">#}
+                                                {#													<em class="bookmarkRibbon"></em>open#}
+                                                {#												</span>#}
                                             </div>
                                             <div class="text-holder">
                                                 <div class="list-rating">
@@ -214,48 +188,21 @@
                                                 </div>
                                                 <div class="post-title">
                                                     <h5>
-                                                        <a href="listing-detail.html">Restaurant Demo</a>
+                                                        <a href="listing-detail.html">{{ vendor }}</a>
                                                         <span class="sponsored text-color">Sponsored</span>
                                                     </h5>
                                                 </div>
-                                                <address><span>Type of food : </span> Apple Juice</address>
+                                                <address>
+                                                    {% if vendor.address_line_1 and vendor.state and vendor.city %}
+                                                        <span>Address:
+                                                    </span>{{ vendor.address_line_1 }},  {{ vendor.state }},
+                                                        {{ vendor.city }}
+                                                    {% endif %}</address>
                                             </div>
 
                                         </div>
                                     </li>
-
-
-                                    <li class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                        <div class="list-post featured">
-                                            <div class="img-holder">
-                                                <figure><a href="#"><img src="assets/extra-images/listing-logo09.png"
-                                                                         class="img-thumb wp-post-image" alt=""></a>
-                                                </figure>
-                                                <span class="restaurant-status open">
-													<em class="bookmarkRibbon"></em>open
-												</span>
-                                            </div>
-                                            <div class="text-holder">
-                                                <div class="list-rating">
-                                                    <div class="rating-star">
-                                                        <span class="rating-box" style="width: 100%;"></span>
-                                                    </div>
-                                                    <span class="reviews">(1)</span>
-                                                </div>
-                                                <div class="post-title">
-                                                    <h5>
-                                                        <a href="listing-detail.html">Classic Restaurant</a>
-                                                        <span class="sponsored text-color">Sponsored</span>
-                                                    </h5>
-                                                </div>
-                                                <address><span>Type of food : </span> Chicken Roast, Chines
-                                                    Soup, Cold
-                                                    Coffee, Cold Drink, Hot Dogs
-                                                </address>
-                                            </div>
-
-                                        </div>
-                                    </li>
+                                    {% endfor %}
                                 </ul>
                             </div>
                         </div>

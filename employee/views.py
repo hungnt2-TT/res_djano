@@ -38,7 +38,9 @@ from twilio.rest import Client
 
 
 def home(request):
-    return render(request, 'home.html')
+    vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)[:8]
+    print('vendors', vendors)
+    return render(request, 'home.html', context={'vendors': vendors})
 
 
 def register(request):
@@ -51,7 +53,8 @@ def broadcast_sms(phone_number):
 
         client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
         verification = client.verify.v2.services(settings.SECRET_KEY_TWILIO).verifications.create(to=phone_number_vn,
-                                                                                              channel='sms')
+                                                                                                  channel='sms')
+
 
         print('verification_check', verification)
     except Exception as e:

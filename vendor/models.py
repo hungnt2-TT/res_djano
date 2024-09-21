@@ -1,4 +1,5 @@
 from django.db import models
+from django.template.defaultfilters import slugify
 
 from employee.mails import send_mail
 from employee.models import Profile, EmployeeProfile
@@ -23,6 +24,7 @@ class Vendor(models.Model):
     vendor_type = models.IntegerField(choices=VENDOR_TYPE_CHOICES, default=VENDOR_TYPE_UNKNOWN)
     vendor_description = models.TextField()
     vendor_license = models.ImageField(upload_to='vendor/license', blank=True, null=True)
+    vendor_slug = models.SlugField(max_length=50, blank=True, null=True, unique=True)
     is_approved = models.BooleanField(default=False)
     street_number = models.CharField(max_length=50, blank=True, null=True)
     address_line_1 = models.CharField(max_length=255, blank=True, null=True)
@@ -40,6 +42,10 @@ class Vendor(models.Model):
 
     def save(self, *args, **kwargs):
         self.vendor_name = self.vendor_name.upper()
+        print('vendor_name ===', self.vendor_name)
+        print('slug ===', self.user.id)
+        self.vendor_slug = slugify(self.vendor_name) + '-' + str(self.user.id)
+        print('slug ===', self.vendor_slug)
         if self.pk is not None:
             old = Vendor.objects.get(pk=self.pk)
             if old.is_approved != self.is_approved:

@@ -27,9 +27,10 @@ urlpatterns = [
                   path("employee/", include("employee.urls"), name="employee"),
                   path("vendor/", include("vendor.urls")),
                   path('accounts/', include('django.contrib.auth.urls')),
-                  path('', LoginResView.as_view(), name='_login'),
                   path('ckeditor5/', include('django_ckeditor_5.urls')),
                   path('upload/', custom_upload_file, name='custom_upload_file'),
+                  path('login/', LoginResView.as_view(), name='_login'),
+                  path('marketplace/', include('marketplace.urls')),
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:
