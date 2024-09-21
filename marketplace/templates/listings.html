@@ -361,7 +361,9 @@
                                                     <a href="javascript:void(0);" class="shortlist-btn"
                                                        data-toggle="modal" data-target="#sign-in"><i
                                                             class="icon-heart4"></i> </a>
-                                                    <a href="#" class="viewmenu-btn text-color">View Menu</a>
+                                                    <a href="{% url 'vendor_detail' vendor.vendor_slug %}"
+                                                       class="viewmenu-btn text-color">View Menu</a>
+                                                    {{ vendor.vendor_slug }}
                                                 </div>
                                             </li>
                                         {% endfor %}
