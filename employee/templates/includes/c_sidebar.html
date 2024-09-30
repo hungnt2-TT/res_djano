@@ -1,10 +1,47 @@
 <div class="user-account-nav user-account-sidebar">
-    <div class="user-nav-list">
+    <div class="user-nav-list box">
         <ul>
-            <li class="active"><a href="{% url 'owner_dashboard' %}"><i class="icon-dashboard3"></i>Dashboard</a></li>
-            <li><a href="restaurant-restaurant.html"><i class="icon-add_shopping_cart"></i>My Orders</a></li>
-            <li><a href="restaurant-menu-builder.html"><i class="icon-build"></i>Profile Setting</a></li>
-            <li><a href="{% url 'p_password_change' %}"><i class="icon-unlock-alt"></i>Change password</a></li>
+            {{ request.path }}
+            <h4 class="box-label">Activity</h4>
+            <li class="{% if '/employee/customer/' == request.path %}active box-active{% endif %}"><a
+                    href="{% url 'customer_dashboard' %}"><i class="icon-dashboard3"></i>Dashboard</a></li>
+        <li class="{% if '/employee/customer/' == request.path %}active box-active{% endif %}"><a
+                    href="{% url 'customer_dashboard' %}"><i class="icon-file-text2"></i>My Bookings</a></li>
+        <li class="{% if '/employee/customer/' == request.path %}active box-active{% endif %}"><a
+                    href="{% url 'customer_dashboard' %}"><i class="icon-comment2"></i>My Reviews</a></li>
+            <li><a href="{% url 'cprofile' %}"><i class="icon-add_shopping_cart"></i>My Orders</a></li>
+        <li class="{% if '/employee/customer/' == request.path %}active box-active{% endif %}"><a
+                    href="{% url 'customer_dashboard' %}"><i class="icon-heart"></i>Shortlists</a></li>
+            <li class="{% if  '/customer/customer_setting/' == request.path %}active box-active{% endif %}"><a
+                    href="{% url 'customer_setting' %}"><i class="icon-build"></i>Profile Setting</a></li>
+            <li class="{% if  '/customer/setting/' == request.path %}active box-active{% endif %}"><a
+                    href="{% url 'cprofile' %}"><i class="icon-rate_review"></i>Recently viewed</a></li>
+            <li><a href="{% url 'p_password_change' %}"><i class="icon-bookmark"></i>Bookmarks</a></li>
+        </ul>
+    </div>
+    <div class="user-nav-list box">
+        <ul>
+            <h4 class="box-label">ONLINE ORDERING</h4>
+
+            <li class="{% if '/customers/customer/' == request.path %}active{% endif %}"><a
+                    href="{% url 'customer_dashboard' %}"><i class="icon-address"></i>My addresses</a></li>
+        </ul>
+    </div>
+    <div class="user-nav-list box">
+        <ul>
+            <h4 class="box-label">PAYMENTS</h4>
+
+            <li class="{% if '/customers/customer/' == request.path %}active{% endif %}"><a
+                    href="{% url 'customer_dashboard' %}"><i class="icon-wallet"></i>Wallet</a></li>
+            <li><a href="{% url 'cprofile' %}"><i class="icon-credit-card"></i>Cards</a></li>
+        </ul>
+    </div>
+<div class="user-nav-list box">
+        <ul>
+            <h4 class="box-label">ACCOUNT SETTINGS</h4>
+
+            <li class="{% if '/customers/customer/' == request.path %}active{% endif %}"><a
+                    href="{% url 'customer_dashboard' %}"><i class="icon-delete_forever"></i>Delete Account</a></li>
         </ul>
     </div>
 </div>
