@@ -31,8 +31,8 @@
         <ul>
             <h4 class="box-label">PAYMENTS</h4>
 
-            <li class="{% if '/customers/customer/' == request.path %}active{% endif %}"><a
-                    href="{% url 'customer_dashboard' %}"><i class="icon-wallet"></i>Wallet</a></li>
+            <li class="{% if '/wallet/setting_wallet/' == request.path %}active{% endif %}"><a
+                    href="{% url 'setting_wallet' %}"><i class="icon-wallet"></i>Wallet</a></li>
             <li><a href="{% url 'cprofile' %}"><i class="icon-credit-card"></i>Cards</a></li>
         </ul>
     </div>

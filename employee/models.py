@@ -45,11 +45,13 @@ class UserManager(BaseUserManager):
 class Profile(AbstractBaseUser):
     EMPLOYEE_TYPE_OWNER = 1
     EMPLOYEE_TYPE_CUSTOMER = 2
+    EMPLOYEE_TYPE_ADMIN = 3
     EMPLOYEE_TYPE_CANCEL = 4
     EMPLOYEE_TYPE_CHOICES = (
         (EMPLOYEE_TYPE_OWNER, 'owner'),
         (EMPLOYEE_TYPE_CUSTOMER, 'customer'),
-        (EMPLOYEE_TYPE_CANCEL, 'cancel')
+        (EMPLOYEE_TYPE_CANCEL, 'cancel'),
+        (EMPLOYEE_TYPE_ADMIN, 'admin'),
     )
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)

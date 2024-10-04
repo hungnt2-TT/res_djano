@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+    <link href="{% static 'css/wallet.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="main-section">
+        {% include 'includes/cover.html' %}
+        <div class="page-section account-header buyer-logged-in">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        {% include 'includes/c_sidebar.html' %}
+                    </div>
+                    <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                        <div class="user-dashboard loader-holder">
+
+                            {#                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">#}
+                            {#                                    <div class="row">#}
+                            {#                                        <div class="element-title has-border right-filters-row">#}
+                            {#                                            <h5>My Wallets</h5>#}
+                            {#                                            <div class="right-filters row pull-right">#}
+                            {#                                                <div class="col-lg-6 col-md-6 col-xs-6">#}
+                            {#                                                    <div class="input-field">#}
+                            {#                                                    </div>#}
+                            {#                                                </div>#}
+                            {##}
+                            {#                                            </div>#}
+                            {#                                        </div>#}
+                            {#                                    </div>#}
+                            {#                                </div>#}
+                            {#                                <div class="row">#}
+                            {#                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">#}
+                            {#                                        <div class="user-orders-list">#}
+                            {#                                            <div class="responsive-table">#}
+                            {#                                                <ul class="table-generic">#}
+                            {#                                                    <li class="order-heading-titles">#}
+                            {#                                                        <div>Order id</div>#}
+                            {#                                                        <div>Date</div>#}
+                            {#                                                        <div>Total Price</div>#}
+                            {#                                                        <div>Charges</div>#}
+                            {#                                                        <div>Received</div>#}
+                            {#                                                        <div>Status</div>#}
+                            {#                                                    </li>#}
+                            {#                                                    <li class="order-heading-titles">#}
+                            {#                                                        <div><a href="#" data-toggle="modal"#}
+                            {#                                                                data-target="#order-det-22606">order-22606</a></div>#}
+                            {#                                                        <div>Apr 9,2020</div>#}
+                            {#                                                        <div>£ 38.99</div>#}
+                            {#                                                        <div>£ 3.90</div>#}
+                            {#                                                        <div>£ 35.09</div>#}
+                            {#                                                        <div><span class="order-status"#}
+                            {#                                                                   style="background-color: #047a06;">Completed</span>#}
+                            {#                                                        </div>#}
+                            {#                                                    </li>#}
+                            {##}
+                            {##}
+                            {#                                                    <li class="order-heading-titles">#}
+                            {#                                                        <div><a href="#" data-toggle="modal"#}
+                            {#                                                                data-target="#order-det-22606">order-22583</a></div>#}
+                            {#                                                        <div>Apr 9,2020</div>#}
+                            {#                                                        <div>£ 26.22</div>#}
+                            {#                                                        <div>£ 2.62</div>#}
+                            {#                                                        <div>£ 23.60</div>#}
+                            {#                                                        <div><span class="order-status"#}
+                            {#                                                                   style="background-color: #1e73be;">Processing</span>#}
+                            {#                                                        </div>#}
+                            {#                                                    </li>#}
+                            {#                                                    <li class="order-heading-titles">#}
+                            {#                                                        <div><a href="#" data-toggle="modal"#}
+                            {#                                                                data-target="#order-det-22606">order-22493</a></div>#}
+                            {#                                                        <div>Apr 2,2020</div>#}
+                            {#                                                        <div>£ 28.24</div>#}
+                            {#                                                        <div>£ 2.82</div>#}
+                            {#                                                        <div>£ 25.42</div>#}
+                            {#                                                        <div><span class="order-status"#}
+                            {#                                                                   style="background-color: #047a06;">Completed</span>#}
+                            {#                                                        </div>#}
+                            {#                                                    </li>#}
+                            {#                                                </ul>#}
+                            {##}
+                            {#                                            </div>#}
+                            {#                                        </div>#}
+                            {#                                        <div class="cc-select">#}
+                            {#                                        </div>#}
+                            {#                                    </div>#}
+                            {#                                </div>#}
+                            <div class="col-lg-6 col-md-5 col-sm-12 col-xs-12">
+                                <div class="wallet">
+                                    <aside class="left-wallet">
+                                        <div class="wallet-head">
+                                            <h1 class="my_wallets"> My Wallets </h1> <a href="#"
+                                                                                        style="padding: 5px 0px 0px 43px;"
+                                                                                        class="add-wallet">
+                                            <icon
+                                                    class="icon-plus"></icon>
+                                        </a>
+                                            </a>
+                                        </div>
+                                        <div class="wallet-card">
+                                            <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png"
+                                                 alt="Visa Logo">
+                                            <div class="wallet-details">
+                                                <p>Username: {{ wallet.user.username }}</p>
+                                                <p>Date: {{ wallet.create_at }}</p>
+                                                <p>Cash: {{ wallet.balance_cash }}</p>
+                                                <p>Point: {{ wallet.balance_point }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="cc-select">
+                                            <h3 class="my_wallets">Daily attendance <i class="fa-solid fa-coins"></i>
+                                            </h3>
+                                            <table>
+                                                <thead>
+                                                <tr>
+                                                    <th>Ngày</th>
+                                                    <th>Trạng thái</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for item in checkin_status %}
+                                                    <tr>
+                                                        <td>{{ item.date }}</td>
+                                                        <td>
+                                                            {% if item.checked_in %}
+                                                                <span style="color:green;">Checked in <b>+100</b></span>
+                                                            {% else %}
+                                                                <span style="color:red;">Haven't checked in yet</span>
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                            <form action="{% url 'daily_check_in' %}" method="POST">
+                                                {% csrf_token %}
+                                                <button id="checkin-btn"
+                                                        class="checkin-btn" type="submit"
+                                                        {% if checkin_status.0.checked_in %} disabled="true" {% endif %}>
+                                                    <i class="fas fa-check-circle"></i> Check In
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </aside>
+
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-7 col-sm-12 col-xs-12">
+                                <ul class="restaurant-menu-nav nav nav-tabs">
+                                    <li class=" active nav-item"><a style="padding: 7px 40px;" data-toggle="tab"
+                                                                    class="menu-sidebar"
+                                                                    href="#infor-wallet" aria-expanded="false"
+                                    >Infor Wallet</a></li>
+                                    <li class="  nav-item"><a style="padding: 7px 40px;" data-toggle="tab"
+                                                              class="menu-sidebar"
+                                                              href="#history-wallet"
+                                                              aria-expanded="false">History Wallet</a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div id="infor-wallet" class="tab-pane fade active in">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <div class="right-trans " id="infor-wallet">
+                                                    <h4 id="balance"></h4>
+                                                    <div class="balance">
+                                                        <div class="balance-header">
+                                                            Information Wallet
+                                                        </div>
+                                                        <div class="transaction">
+                                                            <div>
+                                                                <div class="transaction-description">Username
+                                                                </div>
+
+                                                            </div>
+                                                            <div class="transaction-amount ">{{ wallet.user.username }}</div>
+                                                        </div>
+                                                        <div class="transaction">
+                                                            <div>
+                                                                <div class="transaction-description">Email:</div>
+
+                                                            </div>
+                                                            <div class="transaction-amount ">{{ wallet.user.email }}</div>
+                                                        </div>
+                                                        <div class="transaction">
+                                                            <div>
+                                                                <div class="transaction-description">Cash:</div>
+
+                                                            </div>
+                                                            <div class="transaction-amount ">{{ wallet.balance_cash }}</div>
+                                                        </div>
+                                                        <div class="transaction">
+                                                            <div>
+                                                                <div class="transaction-description">Point:</div>
+
+                                                            </div>
+                                                            <div class="transaction-amount ">{{ wallet.balance_point }}</div>
+                                                        </div>
+                                                        <div class="transaction">
+                                                            <div>
+                                                                <div class="transaction-description">Description</div>
+
+                                                            </div>
+                                                            <div class="transaction-amount ">{{ wallet.description }}</div>
+                                                        </div>
+                                                        <div class="transaction">
+                                                            <div>
+                                                                <div class="transaction-description">Created Wallet
+                                                                </div>
+
+                                                            </div>
+                                                            <div class="transaction-amount ">{{ wallet.create_at }}</div>
+                                                        </div>
+                                                        <div class="transaction">
+                                                            <div>
+                                                                <div class="transaction-description">Update Wallet</div>
+
+                                                            </div>
+                                                            <div class="transaction-amount ">{{ wallet.updated_at }}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="history-wallet" class="tab-pane fade">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <div class="right-trans " id="infor-wallet">
+                                                    <h4 id="balance"></h4>
+                                                    <div class="balance">
+                                                        <div class="balance-header">
+                                                            Current Balance <span>({{wallet.balance_point}})</span>
+                                                        </div>
+                                                        <div class="transaction">
+                                                            <div>
+                                                                <div class="transaction-description">Apple iPhone 6, 6g
+                                                                    GB
+                                                                </div>
+                                                                <div class="transaction-details">Electronics #343223 -
+                                                                    12
+                                                                    July,
+                                                                    2015
+                                                                </div>
+                                                            </div>
+                                                            <div class="transaction-amount negative">$650.00</div>
+                                                        </div>
+                                                        <div class="transaction">
+                                                            <div>
+                                                                <div class="transaction-description">Funds Added</div>
+                                                                <div class="transaction-details">Payment #343212 - 11
+                                                                    July,
+                                                                    2015
+                                                                </div>
+                                                            </div>
+                                                            <div class="transaction-amount positive">$900.00</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+{% endblock %}
