@@ -1,9 +1,7 @@
 {% extends 'base.html' %}
-
 {% load static %}
 {% block css %}
     <link href="{% static 'css/customer.css' %}" rel="stylesheet">
-
 {% endblock %}
 {% block content %}
     <div class="main-section">
@@ -13,7 +11,6 @@
                 <div class="row">
                     <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
                         {% include 'includes/c_sidebar.html' %}
-                        
                     </div>
                     <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
                         <div class="user-dashboard loader-holder">
@@ -26,13 +23,15 @@
                                             <div class="right-filters row pull-right">
                                                 <div class="col-lg-6 col-md-6 col-xs-6">
                                                     <div class="input-field">
-                                                        <select class="chosen-select-no-single">
-                                                            <option selected="selected" value="">Select Orders Status
-                                                            </option>
-                                                            <option value="Processing">Processing</option>
-                                                            <option value="Cancelled">Cancelled</option>
-                                                            <option value="Completed">Completed</option>
-                                                        </select>
+{#                                                        <select class="chosen-select-no-single">#}
+{#                                                            <option selected="selected" value="">Select Orders Status#}
+{#                                                            </option>#}
+{#                                                            <option value="Processing">Processing</option>#}
+{#                                                            <option value="Cancelled">Cancelled</option>#}
+{#                                                            <option value="Completed">Completed</option>#}
+{#                                                        </select>#}
+{#                                                                                                    <img alt="No Reviews" src="https://b.zmtcdn.com/webFrontend/691ad4ad27a5804a3033977d45390c811584432410.png" loading="lazy" class="box-not-record jQwYOW">#}
+
                                                     </div>
                                                 </div>
 

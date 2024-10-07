@@ -90,8 +90,10 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
                                             {{ user.username }}
                                         </a>
                                         <ul>
-                                            <li class="active"><a href="{% url 'middleware_account' %}"><i
+                                            <li class=""><a href="{% url 'middleware_account' %}"><i
                                                     class="icon-dashboard3"></i>Dashboard</a></li>
+                                            <li class=""><a href="{% url 'setting_wallet' %}"><i
+                                                    class="icon-wallet"></i>Wallet</a></li>
                                             <li><a href="buyer-bookings.html" class="btn-edit-profile"><i
                                                     class="icon-file-text2"></i>My Bookings</a></li>
                                             <li><a href="buyer-reviews.html" class="btn-edit-profile"><i
@@ -119,23 +121,23 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
                                 </li>
                                 </ul>
                             </div>
-                        </div>
+                            </div>
 
 
-                    {% else %}
-                        <div class="login-option">
+                        {% else %}
+                            <div class="login-option">
                         <span>
                             <a class="cs-color cs-popup-joinus-btn login-popup"
 
                                href="{% url '_login' %}">Login</a> </span>/ <span>
                             <a href="{% url 'register_user' %}"
                                class="cs-color cs-popup-joinus-btn login-popup ml-0">Register</a></span><a
-                                class="get-start-btn"
-                                href="{% url 'register_vendor' %}">
-                            Register
-                            Restaurant </a>
-                        </div>
-                    {% endif %}
+                                    class="get-start-btn"
+                                    href="{% url 'register_vendor' %}">
+                                Register
+                                Restaurant </a>
+                            </div>
+                        {% endif %}
                 </div>
             </div>
             {% include 'includes/alerts.html' %}

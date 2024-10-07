@@ -20,3 +20,8 @@
 .btn-logout i.icon-log-out {
     font-size: 16px;
 }
+
+.box-label {
+    padding: 13px 0px 0px 15px;
+    margin-bottom: 10px;
+}
