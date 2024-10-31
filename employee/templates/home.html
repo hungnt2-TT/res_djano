@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
+
 {% load static %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/home.css' %}">
+{% endblock %}
+
 {% block content %}
     <div class="wrapper">
 
@@ -22,11 +27,11 @@
                         </div>
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                             <div class="main-search fancy bg-holder">
-                                <form>
+                                <form action="{% url 'search' %}" method='GET'>
                                     <div class="row">
-                                        <div class="col-lg-6 col-md-6 col-sm-5 col-xs-12">
+                                        <div class="col-lg-4 col-md-4 col-sm-3 col-xs-12">
                                             <div class="field-holder">
-                                                <input type="text" placeholder="Resturant name">
+                                                <input type="text" name="keyword" placeholder="Resturant name">
                                             </div>
                                         </div>
                                         <div class="col-lg-4 col-md-4 col-sm-5 col-xs-12">
@@ -40,7 +45,14 @@
                                                                   class="foodbakery-radius-location"><i
                                                                     class="icon-target5"></i></span>
                                                             <input type="text" class="location-field-text filter"
+                                                                   id="search_box"
                                                                    placeholder="All Locations">
+                                                            <input type="hidden" name="address" value=""
+                                                                   id="id_address">
+
+                                                            <input type="hidden" name="lat" value="" id="id_latitude">
+                                                            <input type="hidden" name="lng" value="" id="id_lngitude">
+
                                                         </div>
                                                         <div class="select-location" id="foodbakery-radius-range333"
                                                              style="display: none;">
@@ -97,6 +109,19 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                            <select name="radius" id="radius" style="height: 50px" required>
+                                                <option value="" selected>Choole Radius</option>
+                                                <option value="5">5 miles</option>
+                                                <option value="10">10 miles</option>
+                                                <option value="15">15 miles</option>
+                                                <option value="20">20 miles</option>
+                                                <option value="25">25 miles</option>
+                                                <option value="25">30 miles</option>
+                                                <option value="25">35 miles</option>
+
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                                             <div class="field-holder">
                                                 <input type="submit" value="Search">
                                             </div>
@@ -105,11 +130,155 @@
                                 </form>
                             </div>
                         </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="counter-sec">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6 col-xs-6 ">
+                                        <div class="counter-holder counter-one">
+                                            <div class="text-holder">
+                                                <i class="icon- icon-check-circle"></i>
+                                                <strong class="count">{{ information.vendors }}</strong>
+                                                <span>Restaurant</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6 col-md-6 col-xs-6 ">
+                                        <div class="counter-holder counter-three">
+                                            <div class="text-holder">
+                                                <i class="icon- icon-check-circle"></i>
+                                                <strong class="count">{{ information.profile }}</strong>
+                                                <span>Registered Users</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                     </div>
                 </div>
             </div>
             <!-- Main Search End -->
+            <div class="page-section nopadding cs-nomargin"
+                 style="margin-top: 0px;padding-top: 60px;padding-bottom: 0px;margin-bottom: 0px;">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="element-title align-left">
+                                <h2>Sale</h2>
+                                <p>Discover restaurants by type of meal</p>
+                            </div>
+                            <div class="flash-sale-container">
+                                <div class="flash-sale-title">
+                                    <img src="https://img.icons8.com/ios-filled/50/ff4a00/flash.png" alt="Flash Icon">
+                                    <h1>FLASH SALE</h1>
+                                    {{ food_items }}
+                                </div>
+                                <div class="countdown" id="countdown">
+                                    <div class="countdown-box" id="hours">00</div>
+                                    :
+                                    <div class="countdown-box" id="minutes">00</div>
+                                    :
+                                    <div class="countdown-box" id="seconds">00</div>
+                                </div>
+                                <a href="#" style="margin-left: 53%" class="view-all">Xem Tất Cả</a>
+                            </div>
+                            <div class="categories-holder">
+
+                                {#								<div class="col-lg-2 col-sm-4 col-xs-6">#}
+                                {#									<div class="col-lg-2 col-sm-4 col-xs-6">#}
+                                {#										<div class="categories-list">#}
+                                {#											<a href="#">#}
+                                {#												<img alt="" src="assets/extra-images/food-icon-19-1.png">#}
+                                {#												<h6><span>BB.Q</span></h6>#}
+                                {#											</a>#}
+                                {#										</div>#}
+                                {#									</div>#}
+                                {#								</div>#}
+                                {#								<div class="col-lg-2 col-sm-4 col-xs-6">#}
+                                {#									<div class="categories-list">#}
+                                {#										<a href="#">#}
+                                {#											<img alt="" src="assets/extra-images/food-icon-22-1.png">#}
+                                {#											<h6><span>Beef Roast</span></h6>#}
+                                {#										</a>#}
+                                {#									</div>#}
+                                {#								</div>#}
+                                {#								<div class="col-lg-2 col-sm-4 col-xs-6">#}
+                                {#									<div class="categories-list">#}
+                                {#										<a href="#">#}
+                                {#											<img alt="" src="assets/extra-images/food-icon-07-1.png">#}
+                                {#											<h6><span>Chicken Roast</span></h6>#}
+                                {#										</a>#}
+                                {#									</div>#}
+                                {#								</div>#}
+                                {#								<div class="col-lg-2 col-sm-4 col-xs-6">#}
+                                {#									<div class="categories-list">#}
+                                {#										<a href="#">#}
+                                {#											<img alt="" src="assets/extra-images/food-icon-28-1.png">#}
+                                {#											<h6><span>Cupcake</span></h6>#}
+                                {#										</a>#}
+                                {#									</div>#}
+                                {#								</div>#}
+                                {#								<div class="col-lg-2 col-sm-4 col-xs-6">#}
+                                {#									<div class="categories-list">#}
+                                {#										<a href="#">#}
+                                {#											<img alt="" src="assets/extra-images/food-icon-21-1.png">#}
+                                {#											<h6><span>Doughnut</span></h6>#}
+                                {#										</a>#}
+                                {#									</div>#}
+                                {#								</div>#}
+                                {#								<div class="col-lg-2 col-sm-4 col-xs-6">#}
+                                {#									<div class="categories-list">#}
+                                {#										<a href="#">#}
+                                {#											<img alt="" src="assets/extra-images/food-icon-02-1.png">#}
+                                {#											<h6><span>Tea</span></h6>#}
+                                {#										</a>#}
+                                {#									</div>#}
+                                {#								</div>#}
+                                <section class="row">
+                                    <div class="container-item">
+                                        <div class="item">
+                                            <div class="item-overlay">
+                                                <div class="sale-tag"><span>SALE</span></div>
+                                            </div>
+                                            <div class="item-content">
+                                                <div class="item-top-content">
+                                                    <div class="item-top-content-inner">
+                                                        <div class="item-product">
+                                                            <div class="item-top-title">
+                                                                <h2>BFL Heels</h2>
+                                                                <p class="subdescription">
+                                                                    Pencil Heel - Silver
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="item-product-price">
+                                                            <span class="price-num">$17</span>
+                                                            <p class="subdescription">$36</p>
+                                                            <div class="old-price"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="item-add-content">
+                                                    <div class="item-add-content-inner">
+                                                        <div class="section">
+                                                            <h4>Sizes</h4>
+                                                            <p>40,41,42,43,44,45</p>
+                                                        </div>
+                                                        <div class="section">
+                                                            <a href="#" class="btn buy expand">Buy now</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Top Restarurants Section Start -->
             <div class="page-section nopadding cs-nomargin"
@@ -124,7 +293,7 @@
                         </div>
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                             <div class="company-logo">
-                                <ul>
+                                <ul id="vendorList" style="display: none;">
                                     {% for vendor in vendors %}
                                         <li class="has-border">
                                             <figure>
@@ -151,57 +320,58 @@
                     <div class="row">
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                             <div class="element-title align-center">
-                                <h2>Choose From Most Popular Restaurants</h2>
+                                <h2>Nearest Restaurant In Your Location</h2>
                                 <p>Cum doctus civibus efficiantur in imperdiet deterruisset.</p>
                             </div>
                         </div>
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                             <div class="listing fancy">
-                                <ul class="row">
+                                <ul class="row" id="restaurantList">
                                     {% for vendor in vendors %}
-                                    <li class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                        <div class="list-post featured">
-                                            <div class="img-holder">
-                                                <figure>
-                                                    {% if vendor.user_profile.profile_picture %}
-                                                        <a href="#"><img
-                                                                src="{{ vendor.user_profile.profile_picture.url }}"
-                                                                class="img-thumb wp-post-image" alt=""></a>
-                                                    {% else %}
-                                                        <a href="#"><img src="{% static 'employee/img/download.png' %}">
-                                                        </a>{% endif %}
-                                                </figure>
+                                        <li class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                            <div class="list-post featured">
+                                                <div class="img-holder">
+                                                    <figure>
+                                                        {% if vendor.user_profile.profile_picture %}
+                                                            <a href="#"><img
+                                                                    src="{{ vendor.user_profile.profile_picture.url }}"
+                                                                    class="img-thumb wp-post-image" alt=""></a>
+                                                        {% else %}
+                                                            <a href="#"><img
+                                                                    src="{% static 'employee/img/download.png' %}">
+                                                            </a>{% endif %}
+                                                    </figure>
 
-                                                <span class="restaurant-status close">
+                                                    <span class="restaurant-status close">
 													<em class="bookmarkRibbon"></em>Close
 												</span>
-                                                {#                                            <span class="restaurant-status open">#}
-                                                {#													<em class="bookmarkRibbon"></em>open#}
-                                                {#												</span>#}
-                                            </div>
-                                            <div class="text-holder">
-                                                <div class="list-rating">
-                                                    <div class="rating-star">
-                                                        <span class="rating-box" style="width: 100%;"></span>
+                                                    {#                                            <span class="restaurant-status open">#}
+                                                    {#													<em class="bookmarkRibbon"></em>open#}
+                                                    {#												</span>#}
+                                                </div>
+                                                <div class="text-holder">
+                                                    <div class="list-rating">
+                                                        <div class="rating-star">
+                                                            <span class="rating-box" style="width: 100%;"></span>
+                                                        </div>
+                                                        <span class="reviews">(1)</span>
                                                     </div>
-                                                    <span class="reviews">(1)</span>
-                                                </div>
-                                                <div class="post-title">
-                                                    <h5>
-                                                        <a href="listing-detail.html">{{ vendor }}</a>
-                                                        <span class="sponsored text-color">Sponsored</span>
-                                                    </h5>
-                                                </div>
-                                                <address>
-                                                    {% if vendor.address_line_1 and vendor.state and vendor.city %}
-                                                        <span>Address:
+                                                    <div class="post-title">
+                                                        <h5>
+                                                            <a href="listing-detail.html">{{ vendor }}</a>
+                                                            <span class="sponsored text-color">Sponsored</span>
+                                                        </h5>
+                                                    </div>
+                                                    <address>
+                                                        {% if vendor.address_line_1 and vendor.state and vendor.city %}
+                                                            <span>Address:
                                                     </span>{{ vendor.address_line_1 }},  {{ vendor.state }},
-                                                        {{ vendor.city }}
-                                                    {% endif %}</address>
-                                            </div>
+                                                            {{ vendor.city }}
+                                                        {% endif %}</address>
+                                                </div>
 
-                                        </div>
-                                    </li>
+                                            </div>
+                                        </li>
                                     {% endfor %}
                                 </ul>
                             </div>
@@ -217,3 +387,47 @@
 
     </div>
 {% endblock %}
+
+
+{% block extra_scripts %}
+
+    {#    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&loading=async&defer"></script>#}
+    {#    #}
+    {#    <script src="{% static 'js/search_location.js' %}"></script>#}
+    <script>
+        // Tính toán thời gian hiện tại và thời gian kết thúc
+        const now = new Date(); // Lấy thời gian hiện tại
+        const saleDurationHours = 2; // Khuyến mãi kéo dài 2 giờ
+
+        // Thêm 2 giờ vào thời gian hiện tại
+        const saleEndTime = new Date(now.getTime() + saleDurationHours * 60 * 60 * 1000);
+
+        // Hàm đếm ngược
+        function startCountdown() {
+            const now = new Date().getTime(); // Thời gian hiện tại
+            const distance = saleEndTime.getTime() - now; // Khoảng cách thời gian còn lại
+
+            if (distance <= 0) {
+                clearInterval(interval);
+                document.getElementById("countdown").innerHTML = "Hết khuyến mãi!";
+                return;
+            }
+
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("hours").textContent = hours < 10 ? '0' + hours : hours;
+            document.getElementById("minutes").textContent = minutes < 10 ? '0' + minutes : minutes;
+            document.getElementById("seconds").textContent = seconds < 10 ? '0' + seconds : seconds;
+        }
+
+        // Cập nhật countdown mỗi giây
+        const interval = setInterval(startCountdown, 1000);
+
+        // Khởi động lần đầu tiên
+        startCountdown();
+    </script>
+
+{% endblock %}
+

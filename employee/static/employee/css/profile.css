@@ -20,3 +20,9 @@
 .btn-logout i.icon-log-out {
     font-size: 16px;
 }
+
+.highlight {
+    background-color: #d4edda; /* Light green background */
+    border: 2px solid #28a745; /* Green border */
+    transition: background-color 0.5s ease, border 0.5s ease; /* Smooth transition */
+}

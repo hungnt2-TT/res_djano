@@ -5,7 +5,9 @@
 
 {% block title %}Forgot password? | {{ block.super }}{% endblock %}
 {% block css %}
-
+    {% block extra_scripts %}
+        <script src="{% static 'js/cart.js' %}"></script>
+    {% endblock %}
 
 {% endblock %}
 {% block content %}
@@ -319,7 +321,7 @@
                                                     </div>
                                                     <div class="post-title">
                                                         <h5>
-                                                            <a href="listing-detail.html">{{ vendor.vendor_name }}</a>
+                                                            <a href="{% url 'vendor_detail' vendor.vendor_slug %}">{{ vendor.vendor_name }}</a>
                                                             <span class="sponsored text-color">Sponsored</span>
                                                         </h5>
                                                     </div>
@@ -332,6 +334,10 @@
                                                                target="_blank">Xem trên Google Maps</a>
 
                                                         {% endif %}</address>
+                                                    <br>
+                                                    {% if address %}
+                                                        <span><small><b>Distance: {{ vendor.kms }} km</b> away form {{ address }}</small></span>
+                                                    {% endif %}
                                                     <div class="delivery-potions">
                                                         <div class="post-time">
                                                             <i class="icon-motorcycle"></i>
@@ -363,7 +369,6 @@
                                                             class="icon-heart4"></i> </a>
                                                     <a href="{% url 'vendor_detail' vendor.vendor_slug %}"
                                                        class="viewmenu-btn text-color">View Menu</a>
-                                                    {{ vendor.vendor_slug }}
                                                 </div>
                                             </li>
                                         {% endfor %}
@@ -390,7 +395,9 @@
                                         <li class="active"><a href="#" class="sort-by-best_match"><i
                                                 class="icon-thumbs-up2"></i>Best
                                             Match</a></li>
-                                        <li><a href="#" class="sort-by-alphabetical"><i class="icon-sort-alpha-asc"></i>Alphabetical</a>
+                                        <li><a href="#" data-url="{% url 'search' %}" data-action="alphabetical"
+                                               id="sort-by-alphabetical" class="sort-by-alphabetical"><i
+                                                class="icon-sort-alpha-asc"></i>Alphabetical</a></li>
                                         </li>
                                         <li><a href="#" class="sort-by-ratings"> <i class="icon-star-o"></i>Ratings</a>
                                         </li>

@@ -1,6 +1,11 @@
 import uuid
 import random
 import string
+from imp import reload
+import joblib
+import os
+from django.conf import settings
+
 from django.db import models
 
 from employee.models import Profile
@@ -10,6 +15,11 @@ from wallet.models import Wallet
 from django.template.defaultfilters import slugify
 from django_ckeditor_5.fields import CKEditor5Field
 
+model_path = os.path.join(settings.BASE_DIR, 'menu', 'food_time_model.pkl')
+vectorizer_path = os.path.join(settings.BASE_DIR, 'menu', 'vectorizer.pkl')
+
+clf = joblib.load(model_path)
+vectorizer = joblib.load(vectorizer_path)
 
 # Create your models here.
 class Category(models.Model):
@@ -34,12 +44,22 @@ class Category(models.Model):
 
 
 class FoodItem(models.Model):
-    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    TIME_RANGES = [
+        ('morning', '6:00-12:00'),
+        ('afternoon', '12:00-18:00'),
+        ('evening', '18:00-24:00'),
+        ('night', '0:00-6:00'),
+    ]
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='vendor_food_items')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='food_items')
     food_name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50)
     description = CKEditor5Field('Description', config_name='extends')
-    price = models.DecimalField(max_digits=5, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=0)
+    old_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    discounted_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    sale_end_time = models.DateTimeField(null=True, blank=True)
+    time_range = models.CharField(max_length=10, choices=TIME_RANGES, default='morning')
     image = models.ImageField(upload_to='food_items/')
     is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -54,6 +74,9 @@ class FoodItem(models.Model):
         self.slug = slugify(self.food_name)
         if self.price < 0 or None:
             self.price = 0
+        if not self.time_range:
+            test_food = vectorizer.transform([self.name])
+            self.time_range = clf.predict(test_food)[0]
         super(FoodItem, self).save(*args, **kwargs)
 
 

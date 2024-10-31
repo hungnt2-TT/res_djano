@@ -2,8 +2,7 @@
     line-height: 28px;
     position: relative;
     height: 30px;
-    width: 90px;
-    margin: 20px 0px 0px;
+    margin: 20px 0px 0px 400px;
     display: flex;
     width: 100%;
 }
@@ -11,6 +10,7 @@
 .btnArea {
     width: 100%;
     text-align: center;
+
 }
 
 .btnArea button,
@@ -19,7 +19,7 @@
     display: inline-block;
     min-width: 110px;
     padding: 4px;
-    margin: 0 20px;
+    margin: 0 77px;
     border: none;
     border-radius: 5px;
     font-weight: bold;
@@ -50,4 +50,12 @@
     padding: 2px 1.75em;
     font-size: 12px;
     cursor: pointer;
+}
+
+.field-icon {
+    float: right;
+    margin-left: -25px;
+    margin-top: -25px;
+    position: relative;
+    z-index: 2;
 }

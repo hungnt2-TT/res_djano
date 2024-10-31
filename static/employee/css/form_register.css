@@ -9,7 +9,8 @@
 .btnArea {
   width:100%;
   text-align:center;
-  padding:20px 0;
+    padding: 0px 0 0 303px;
+
 }
 .btnArea button,
 .btnArea a.btn-primary,

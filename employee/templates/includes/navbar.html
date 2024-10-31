@@ -4,6 +4,7 @@
     <link href="
 https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
 " rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/cart.css' %}">
 {% endblock %}
 <!-- Header Start -->
 <header id="header">
@@ -62,10 +63,10 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
 
                     <div class="main-location">
                         <ul>
-                            <li class="location-has-children choose-location">
+                            <li class="location-has-children choose-location" style="width: 160%">
                                 <form action="#">
-                                    <input type="text" value="" name="location"
-                                           placeholder="Enter your delivery location" autocomplete="off">
+                                    <input type="text" value="" name="location" id="id_address"
+                                           placeholder="Deliver To:" autocomplete="off">
                                     <span id="foodbakery_radius_location_open" class="foodbakery-radius-location"><i
                                             class="icon-target5"></i></span>
                                 </form>
@@ -76,8 +77,24 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                     <div class="login-option" style="padding-top: 9px">
-                        <a href="{% url 'marketplace' %}" class="btn btn-outline-danger text-uppercase font-weight-bold"
-                           style="margin-top: 14px">Marketplace</a>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'cart_store' %}" class="nav-bar-cart">
+                                <i class="fa fa-shopping-cart text-danger fa-2x"></i>
+                                <span class="badge badge-warning " id="cart_counter"
+                                      style="">{{ cart_count }}</span>
+
+                            </a>
+                        {% endif %}
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'marketplace' %}" class="btn btn-outline-danger text-uppercase
+                            font-weight-bold"
+                               style="margin-top: -4px">Marketplace</a>
+                        {% else %}
+                            <a href="{% url 'marketplace' %}"
+                               class="btn btn-outline-danger text-uppercase font-weight-bold"
+                               style="margin-top: 16px">Marketplace</a>
+                        {% endif %}
+
                         {% if user.is_authenticated %}
 
                             <div class="user-dashboard-menu">
@@ -119,23 +136,23 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
                                 </li>
                                 </ul>
                             </div>
-                        </div>
+                            </div>
 
 
-                    {% else %}
-                        <div class="login-option">
+                        {% else %}
+                            <div class="login-option">
                         <span>
                             <a class="cs-color cs-popup-joinus-btn login-popup"
 
                                href="{% url '_login' %}">Login</a> </span>/ <span>
                             <a href="{% url 'register_user' %}"
                                class="cs-color cs-popup-joinus-btn login-popup ml-0">Register</a></span><a
-                                class="get-start-btn"
-                                href="{% url 'register_vendor' %}">
-                            Register
-                            Restaurant </a>
-                        </div>
-                    {% endif %}
+                                    class="get-start-btn"
+                                    href="{% url 'register_vendor' %}">
+                                Register
+                                Restaurant </a>
+                            </div>
+                        {% endif %}
                 </div>
             </div>
             {% include 'includes/alerts.html' %}
@@ -144,3 +161,11 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
     </div>
 </header>
 <!-- Header End -->
+
+{% block extra_scripts %}
+    {#    <script src="{% static 'js/init_google_map_plf.js' %}"></script>#}
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&defer"></script>
+
+    <script src="{% static 'employee/js/location.js' %}"></script>
+    <script src="{% static 'js/search_location.js' %}"></script>
+{% endblock %}
