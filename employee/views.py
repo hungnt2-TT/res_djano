@@ -500,6 +500,7 @@ def auth_receiver(request):
         user = Profile.objects.filter(email=user_data['email']).first()
         print('user', user)
         if user:
+            print('auth_receiver=', user)
             messages.success(request, 'You are now logged in')
             login(request, user)
             return redirect('home')

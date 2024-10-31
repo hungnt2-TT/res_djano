@@ -5,6 +5,8 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_protect
 
 from employee.models import Profile, EmployeeProfile
+from marketplace.context_processors import get_cart_amount
+from marketplace.models import Cart
 from orders.forms import OrderForm
 from orders.utils import generate_order_number
 from wallet.models import PaymentMethod
@@ -38,13 +40,11 @@ def checkout(request):
 @csrf_protect
 def place_order(request):
     print(request.POST)
-    # cart_items = Cart.objects.filter(user=request.user).order_by('-created_at')
-    # cart_count = cart_items.count()
-    # if caer_count == 0:
-    #     return redirect('home')
-    cart_count = 2
-    # subtotal = get_cart_amount(request.user)['subtotal']
-    subtotal = 100
+    cart_items = Cart.objects.filter(user=request.user).order_by('-created_at')
+    cart_count = cart_items.count()
+    if cart_count == 0:
+        return redirect('home')
+    subtotal = get_cart_amount(request.user)['subtotal']
     total_tax = 0.05 * subtotal
     total = subtotal + total_tax
     if request.method == 'POST':
