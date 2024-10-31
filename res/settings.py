@@ -60,11 +60,12 @@ else:
     ALLOWED_HOSTS = [
         '127.0.0.1',
         'localhost',
+        'snail-tight-albacore.ngrok-free.app'
     ]
 
     SITE_ID = 1
 
-
+CSRF_TRUSTED_ORIGINS = ['https://snail-tight-albacore.ngrok-free.app']
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -83,6 +84,10 @@ INSTALLED_APPS = [
     "customers",
     "marketplace",
     "django_ckeditor_5",
+    'paypal.standard.ipn',
+    'django_extensions',
+    'orders',
+    'csp'
 ]
 
 MIDDLEWARE = [
@@ -109,7 +114,8 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "vendor.views.get_google_api",
-                "employee.context_processors.get_vendor"
+                "employee.context_processors.get_vendor",
+                "employee.context_processors.get_paypal_client_id"
             ],
         },
     },
@@ -339,3 +345,21 @@ CKEDITOR_5_CONFIGS = {
 # SESSION_CACHE_ALIAS = 'default'
 # PASSWORD RESET SETTINGS
 PASSWORD_RESET_TIMEOUT_DAYS = 1
+
+# PayPal Standard IPN
+PAYPAL_TEST = True
+PAYPAL_CLIENT_ID = os.getenv('PAYPAL_CLIENT_ID')
+PAYPAL_RECEIVER_EMAIL = os.getenv('PAYPAL_RECEIVER_EMAIL')
+
+
+# VNPAY CONFIG
+VNPAY_TMN_CODE = os.getenv('VNPAY_TMN_CODE')
+VNPAY_HASH_SECRET_KEY = os.getenv('VNPAY_HASH_SECRET_KEY')
+VNPAY_RETURN_URL = os.getenv('VNPAY_RETURN_URL')
+VNPAY_PAYMENT_URL = os.getenv('VNPAY_PAYMENT_URL')
+VNPAY_API_URL = os.getenv('VNPAY_API_URL')
+
+# CURRENCY
+CURRENCYFREAKS_API_KEY = os.getenv('CURRENCYFREAKS_API_KEY')
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
