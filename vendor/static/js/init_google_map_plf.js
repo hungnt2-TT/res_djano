@@ -29,16 +29,17 @@ function updateFormFields(places) {
 }
 
 function initAutocomplete() {
+    const input = document.getElementById('my-input-searchbox');
+
   const map = new google.maps.Map(document.getElementById('map'), {
     center: {
-      lat: 48,
-      lng: 4
+        lat: 21.028511,
+        lng: 105.804817
     },
     zoom: 150,
     disableDefaultUI:true
   });
 
-  const input = document.getElementById('my-input-searchbox');
   const searchBox = new google.maps.places.SearchBox(input, {
     types: ['geocode', 'establishment', 'address', 'food'],
     componentRestrictions: {
@@ -79,3 +80,9 @@ function initAutocomplete() {
     map.fitBounds(bounds);
   });
 }
+
+window.initAutocomplete = initAutocomplete;
+window.onload = function () {
+    initAutocomplete();
+}
+

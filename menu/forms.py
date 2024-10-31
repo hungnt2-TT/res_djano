@@ -32,7 +32,6 @@ class FoodItemForm(forms.ModelForm):
         self.fields['image'].widget.attrs['placeholder'] = 'Image'
         self.fields['image'].widget.attrs['id'] = 'imageUpload'
         self.fields['image'].widget.attrs['class'] = 'btn btn-info'
-
         self.fields['is_available'].widget.attrs['placeholder'] = 'Available'
 
         self.fields['description'].widget = CKEditor5Widget(config_name='extends')

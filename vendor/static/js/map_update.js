@@ -47,14 +47,17 @@ function updateFormFields(places) {
 }
 
 function initSearchBox() {
-    let id_latitude = document.getElementById('id_latitude').value;
-    let id_longitude = document.getElementById('id_longitude').value;
+    const input = document.getElementById('my-input-searchbox');
+    let id_latitude_elem = document.getElementById('id_latitude');
+    let id_longitude_elem = document.getElementById('id_longitude');
+
+    let id_latitude = id_latitude_elem ? id_latitude_elem.value : 0;
+    let id_longitude = id_longitude_elem ? id_longitude_elem.value : 0;
     const vendor_loc = new google.maps.LatLng(id_latitude, id_longitude);
 
     const map = new google.maps.Map(document.getElementById('map_'), {
         center: vendor_loc, zoom: 15, mapTypeId: 'roadmap', types: ['geocode', 'establishment', 'address', 'food'],
     });
-    const input = document.getElementById('my-input-searchbox');
     const searchBox = new google.maps.places.SearchBox(input, {
         types: ['geocode', 'establishment', 'address', 'food'], componentRestrictions: {
             'country': ['vn']
@@ -98,8 +101,4 @@ function initSearchBox() {
         updateFormFields(places);
         map.fitBounds(bounds);
     });
-}
-
-window.onload = function () {
-    initSearchBox();
 }

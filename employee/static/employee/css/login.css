@@ -1,14 +1,17 @@
 
 .box-form {
     margin: 0 auto;
-    background: #FFFFFF;
+    /*background: #FFFFFF;*/
     border-radius: 10px;
     overflow: hidden;
     display: flex;
     flex: 1 1 100%;
     align-items: stretch;
-    justify-content: space-between;
+    justify-content: space-around;
     box-shadow: 0 0 20px 6px #090b6f85;
+    /*background-image: url("https://images.pexels.com/photos/776538/pexels-photo-776538.jpeg");*/
+    /*background-size: cover;*/
+    /*background-repeat: no-repeat;*/
 }
 
 @media (max-width: 980px) {
@@ -33,7 +36,7 @@
 }
 
 .box-form .left .overlay {
-    padding: 30px;
+    padding: 90px 30px 30px 30px;
     width: 100%;
     height: 100%;
     background: #5961f9ad;

@@ -1,14 +1,15 @@
 $(document).ready(function () {
 
-
     // initListPagination();
 
     $('#menuForm').on('submit', function (e) {
+        console.log('submit');
         e.preventDefault();
         let submitButtonValue = $(document.activeElement).val();
 
         console.log('submitButtonValue', submitButtonValue);
         let formData = $(this).serializeArray();
+        console.log('formData', formData);
         if (submitButtonValue === 'Add Food Item') {
             formData.push({name: 'submit', value: 'add_food'});
         }
@@ -72,8 +73,6 @@ $(document).ready(function () {
     $(".edit-link").on('click', function (e) {
         e.preventDefault();
         let transactionId = $(this).data('id');
-        console.log(transactionId);
-
         $('.btn-update').data('id', transactionId);
     });
     $(".btn-update").on('click', function (e) {
@@ -92,7 +91,9 @@ $(document).ready(function () {
             data: JSON.stringify(data),
             success: function (result) {
                 alert(result.message, result.alert);
-                location.reload();
+                $('#category_name' + transactionId).val(data.category_name);
+                $('#category_description' + transactionId).val(data.category_description);
+                $('#name' + transactionId).html(data.category_name);
             },
             error: function (response) {
                 alert(response.message, response.alert);
@@ -126,13 +127,43 @@ $(document).ready(function () {
         });
     }
 
-    // $('.nav-item ').first().addClass('active');
-    // $('.nav-item .menu-sidebar  ').click(function (e) {
-    //     e.preventDefault();
-    //     $('.nav-item').removeClass('active');
-    //     $(this).parent('.nav-item').addClass('active');
-    // });
-});
+    $('#foodForm').on('submit', function (e) {
+        e.preventDefault();
+        let data = $('.ck-editor-container').find('.ck-content').html();
+        console.log('data', data);
+        let selectedCategory = $('#category').val();
+        let formData = new FormData(this);
+        formData.append('category_food', selectedCategory)
+        formData.append('description', data)
+
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                alert(response.message, response.alert);
+                $('#foodForm')[0].reset();
+                $('#message').html('');
+                window.location.reload();
+
+            },
+            error: function (response) {
+                let errors = response.responseJSON.errors;
+                let errorMessages = '<ul>';
+                for (let field in errors) {
+                    errors[field].forEach(function (error) {
+                        errorMessages += error + '<br>';
+                    });
+                }
+                $('#message').html('<div class="text-danger">' + errorMessages + '</div>');
+                alert(response.responseJSON.message, response.responseJSON.alert);
+            }
+        });
+    });
+})
+;
 
 function alert(message, alertType) {
     $('#message_alert').html('<div class="message_alert alert alert-' + alertType + ' alert-dismissible fade show show-notification" style="position: fixed" role="alert">' + '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' + '<span aria-hidden="true">&times;</span>' + '</button>' + '<strong>' + message + '</strong>' + '</div>')

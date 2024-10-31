@@ -25,7 +25,7 @@
                     <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
                         <div class="user-dashboard loader-holder w-100 p-3">
                             <div class="user-holder">
-                                <form action="{% url 'food_menu' %}" method="POST" id="menuForm"
+                                <form action="{% url 'food_menu' %}" method="POST" id="foodForm"
                                       enctype="multipart/form-data" novalidate>
                                     {% csrf_token %}
                                     <ul class="restaurant-menu-nav nav nav-tabs">
@@ -68,21 +68,32 @@
                                                                 <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                                                     <div class="field-holder">
                                                                         <label>Title *</label>
-                                                                        {{ food_form.food_name }}
+                                                                        <input type="text" name="food_name"
+                                                                               value="{{ food_form.instance.food_name }}"
+                                                                               class="form-control" required>
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                                                     <div class="field-holder">
                                                                         <label>Price * (VND)</label>
-                                                                        {{ food_form.price }}
+                                                                        {% if food_form.instance.price %}
+                                                                            <input type="text" name="price"
+                                                                                   value="{{ food_form.instance.price }}"
+                                                                                   class="form-control" required>
+                                                                        {% else %}
+                                                                            <input type="text" name="price"
+                                                                                   value="0"
+                                                                                   class="form-control" required>
+                                                                        {% endif %}
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                                                     <div class="field-holder checkbox-wrapper">
                                                                         <label>Is Available</label>
                                                                         <label class="switch">
-                                                                            {{ food_form.is_available }}
-                                                                            <span class="slider" id="is_available"></span>
+                                                                            {<input type="checkbox" name="is_available"
+                                                                                    {% if food_form.instance.is_available %}checked{% endif %}>
+                                                                            <span class="slider"></span>
                                                                         </label>
                                                                     </div>
                                                                 </div>
@@ -170,7 +181,7 @@
                                                         <div class="service-list">
                                                             <ul id="restaurant_menu_items-list-87340687"
                                                                 class="restaurant_menu_items_cat_list panel-group ui-sortable">
-                                                                {% for category in category_food %}
+                                                                {% for category in categories %}
                                                                     <li id="menu-pizzas2" class="panel panel-default">
                                                                         <div class="element-title panel-heading">
                                                                         <span class="drag-option ui-sortable-handle"><i
@@ -333,7 +344,7 @@
                                                                                                                 <textarea
                                                                                                                         class="menu-item-desc"
                                                                                                                         id="description{{ food.id }}"
-                                                                                                                        placeholder="Menu Item Description">{{ food.description }}</textarea>
+                                                                                                                        placeholder="Menu Item Description">{{ food.description|safe }}</textarea>
                                                                                                             </div>
                                                                                                         </div>
                                                                                                         <ul id="menu-item-extra-list-681849489"
@@ -419,9 +430,7 @@
     </div>
 {% endblock %}
 {% block extra_scripts %}
-    <script src="{% static 'js/food_order.js' %}"></script>
-
-    <script src="https://cdn.ckeditor.com/ckeditor5/35.0.1/classic/ckeditor.js"></script>
+    <script src="{% static 'js/menu_order.js' %}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const checkboxes = document.querySelector('.slider #is_available');

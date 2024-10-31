@@ -1,4 +1,3 @@
-
 // $(document).ready(function () {
 //     $('#imageGallery').lightSlider({
 //         gallery: true,
@@ -19,14 +18,15 @@ function readURL(input) {
     if (input.files && input.files[0]) {
         var reader = new FileReader();
         console.log('readURL')
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             $('#imagePreview').attr('src', e.target.result);
         }
         reader.readAsDataURL(input.files[0]);
     }
 }
-$(document).ready(function() {
-    $("#imageUpload").change(function() {
+
+$(document).ready(function () {
+    $("#imageUpload").change(function () {
         console.log('change')
         readURL(this);
     });
@@ -56,5 +56,15 @@ $(document).ready(function() {
                 });
             }
         });
+    });
+
+    $(".toggle-password").click(function () {
+        $(this).toggleClass("fa-eye fa-eye-slash");
+        var input = $($(this).attr("toggle"));
+        if (input.attr("type") == "password") {
+            input.attr("type", "text");
+        } else {
+            input.attr("type", "password");
+        }
     });
 });

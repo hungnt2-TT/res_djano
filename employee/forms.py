@@ -14,9 +14,18 @@ from django.core.validators import RegexValidator
 
 
 class RegisterForm(UserCreationForm):
+    phone_number = forms.CharField(
+        validators=[RegexValidator(
+            regex=r'^(84|0[3|5|7|8|9])+([0-9]{8})\b',
+            message="The phone number must start with 84 or 0[3|5|7|8|9] and be 10 digits long."
+        )],
+        max_length=10,
+        required=True,
+        label='Phone Number'
+    )
     class Meta:
         model = Profile
-        fields = ['username', 'email', 'password1', 'password2']
+        fields = ['username', 'email', 'password1', 'password2', 'phone_number', 'nickname']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -28,7 +37,15 @@ class RegisterForm(UserCreationForm):
         self.fields['password2'].widget.attrs['placeholder'] = 'Confirm Password'
         self.fields['password1'].help_text = None
         self.fields['password2'].help_text = None
+        self.fields['phone_number'].widget.attrs['placeholder'] = 'Phone Number'
+        self.fields['nickname'].widget.attrs['placeholder'] = 'Nickname'
 
+    def clean_phone_number(self):
+        phone_number = self.cleaned_data['phone_number']
+        print('phone_number', phone_number)
+        if Profile.objects.filter(phone_number=phone_number).exists():
+            raise forms.ValidationError('This phone number is already in use.')
+        return phone_number
 
 class RegisterFormByEmail(UserCreationForm):
     phone_number = forms.RegexField(regex=r"^(84|0[3|5|7|8|9])+([0-9]{8})\b",
@@ -58,8 +75,8 @@ class RegisterFormByEmail(UserCreationForm):
         self.fields['first_name'].widget.attrs['placeholder'] = 'First Name'
         self.fields['last_name'].widget.attrs['placeholder'] = 'Last Name'
         self.fields['phone_number'].widget.attrs['placeholder'] = 'Phone Number'
-        if phone_number:
-            self.fields['phone_number'].initial = phone_number
+        # if phone_number:
+        #     self.fields['phone_number'].initial = phone_number
 
 
 class MyPasswordResetForm(PasswordResetForm):
