@@ -59,13 +59,13 @@ elif ENVIRONMENT == 'development':
 else:
     ALLOWED_HOSTS = [
         '127.0.0.1',
-        'localhost',
         'snail-tight-albacore.ngrok-free.app'
     ]
 
     SITE_ID = 1
 
 CSRF_TRUSTED_ORIGINS = ['https://snail-tight-albacore.ngrok-free.app']
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",

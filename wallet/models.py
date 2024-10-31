@@ -233,7 +233,7 @@ class SubTransaction(models.Model):
         verbose_name_plural = 'Sub Transactions'
 
 
-class Cart(models.Model):
+class CartPayment(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE)
     account_name = models.CharField(_("account name"), max_length=250)
     account_number = models.CharField(_("account number"), max_length=100)
