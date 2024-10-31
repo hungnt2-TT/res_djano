@@ -1,0 +1,36 @@
+
+
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+    <link href="{% static 'css/wallet.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="main-section">
+        {% include 'includes/cover.html' %}
+        <div class="page-section account-header buyer-logged-in">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        {% include 'includes/c_sidebar.html' %}
+                    </div>
+                    <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                        <div class="user-dashboard loader-holder">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <div class="wallet">
+
+                                    <aside class="left-wallet">
+                                        {{ form.render }}
+
+                                    </aside>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}

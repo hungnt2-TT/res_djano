@@ -33,7 +33,9 @@
 
             <li class="{% if '/wallet/setting_wallet/' == request.path %}active{% endif %}"><a
                     href="{% url 'setting_wallet' %}"><i class="icon-wallet"></i>Wallet</a></li>
-            <li><a href="{% url 'cprofile' %}"><i class="icon-credit-card"></i>Cards</a></li>
+            <li class="{% if '/wallet/payment/' == request.path %}active{% endif %}"><a href="{% url 'payment_paypal' %}"><i class="icon-paypal"></i>Cards</a></li>
+            <li><a href="{% url 'index' %}"><i class="icon-credit-card"></i>Vnpay</a></li>
+
         </ul>
     </div>
 <div class="user-nav-list box">

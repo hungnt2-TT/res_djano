@@ -1,0 +1,37 @@
+
+
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+    <link href="{% static 'css/jumbotron.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="main-section">
+        {% include 'includes/cover.html' %}
+        <div class="page-section account-header buyer-logged-in">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        {% include 'includes/c_sidebar.html' %}
+                    </div>
+                    <div class="panel panel-default">
+                        <!-- Default panel contents -->
+                        <div class="panel-heading">{{ title }}</div>
+                        <div class="table-responsive">
+                            <ul class="list-group">
+                                <i class="list-group-item"><a href="{% url "payment" %}">Demo Thanh toán</a></i>
+                                <i class="list-group-item"><a href="{% url "query" %}">Demo Query (Kiểm tra kết quả Giao
+                                    dịch tại
+                                    VNPAY)</a></i>
+                                <i class="list-group-item"><a href="{% url "refund" %}">Demo Refund (Gửi yêu cầu hoàn
+                                    tiền cho giao
+                                    dịch)</a></i>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -33,6 +33,7 @@ urlpatterns = [
                   path('marketplace/', include('marketplace.urls')),
                   path('customer/', include('customers.urls')),
                   path('wallet/', include('wallet.urls')),
+                  path('orders/', include('orders.urls')),
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:

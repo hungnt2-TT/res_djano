@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import get_object_or_404
+
+from res import settings
 from vendor.models import Vendor
 
 
@@ -9,3 +11,7 @@ def get_vendor(request):
     else:
         vendor = get_object_or_404(Vendor, user=request.user)
         return {'vendor': vendor}
+
+
+def get_paypal_client_id(request):
+    return {'paypal_client_id': settings.PAYPAL_CLIENT_ID}

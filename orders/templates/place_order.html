@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+    <link href="{% static 'css/customer_setting.css' %}" rel="stylesheet">
+
+{% endblock %}
+{% block content %}
+    <div class="main-section">
+    {% include 'includes/cover.html' %}
+    <div class="page-section account-header buyer-logged-in">
+        <div class="container">
+            <div class="row" style="display: block">
+                <form action="{% url 'place-order' %}" method="post">
+                    {% csrf_token %}
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
+                        <div class="user-sidebar">
+                            <div class="user-order">
+                                <h6><i class="icon-v-card"></i>Review Your Billing Address</h6>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="sticky-sidebar col-lg-5 col-md-5 col-sm-12 col-xs-12">
+                        <div class="user-order-holder">
+                            <div class="user-order">
+                                <h6><i class="icon-shopping-basket"></i>Your Order</h6>
+                                <div id="dev-menu-orders-list">
+                                    <div class="price-area dev-menu-price-con">
+                                        <ul>
+                                            <li>Subtotal <span class="price">£<em
+                                                    class="dev-menu-subtotal">20.00</em></span></li>
+                                            <li class="restaurant-fee-con">
+                                                <span class="fee-title">Pick-Up</span>
+                                                <span class="price">£<em class="dev-menu-charges">15.00</em></span>
+                                            </li>
+                                            <li>VAT (13%) <span class="price">£<em
+                                                    class="dev-menu-vtax">4.55</em></span></li>
+                                        </ul>
+                                        <p class="total-price">Total <span class="price">£<em class="dev-menu-grtotal">39.55</em></span>
+                                        </p>
+                                        <div id="dev-no-menu-orders-list">
+                                            <span class="price-area">Ba mươi chín nghìn đồng</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="dev-no-menu-orders-list">
+                                    <span class="success-message">There are no items in your basket.</span>
+                                </div>
+                                <div class="pay-option dev-order-pay-options ">
+                                    <div id="paypal-button-container"></div>
+
+                                    {#                                    <ul class="list_payment_method">#}
+                                    {#                                        <li>#}
+                                    {#                                            <input id="order-cash-payment" type="radio" name="payment_method" value="PayPal">#}
+                                    {#                                            <label for="order-cash-payment"><i class="icon-coins"></i>Cash</label>#}
+                                    {#                                        </li>#}
+                                    {#                                        <li>#}
+                                    {#                                            <input id="order-card-payment" type="radio" value="Wallet"#}
+                                    {#                                                   name="payment_method">#}
+                                    {#                                            <label for="order-card-payment"><i#}
+                                    {#                                                    class="icon-account_balance_wallet"></i>Wallet</label>#}
+                                    {#                                        </li>#}
+                                    {#                                        <li>#}
+                                    {#                                            <input id="order-card-payment" type="radio" value="PayPal"#}
+                                    {#                                                   name="payment_method">#}
+                                    {#                                            <label for="order-card-payment"><i#}
+                                    {#                                                    class="icon-paypal"></i>Paypal</label>#}
+                                    {#                                        </li>#}
+                                    {#                                        <li>#}
+                                    {#                                            <input id="order-card-payment" type="radio" value="VnPay"#}
+                                    {#                                                   name="payment_method">#}
+                                    {#                                            <label for="order-card-payment"><i#}
+                                    {#                                                    class="icon-credit-card4"></i>Vnpay</label>#}
+                                    {#                                        </li>#}
+                                    {#                                    </ul>#}
+                                    {#                                    <span class="text-danger" id="payment_method-error"></span>#}
+                                    {##}
+                                </div>
+                                {#                                <a href="#" class="menu-order-confirm">Confirm Order</a>#}
+                                <button name="order"
+                                        class="menu-order-confirm text-uppercase font-weight-bold" type="submit">
+                                    PROCEED
+                                    TO CHECKOUT
+                                </button>
+                                <span class="menu-loader"></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        paypal.Buttons({
+
+            // Set up the transaction
+            createOrder: function (data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: 20
+                        }
+                    }]
+                });
+            },
+
+            // Finalize the transaction
+            onApprove: function (data, actions) {
+                return actions.order.capture().then(function (orderData) {
+                    // Successful capture! For demo purposes:
+                    console.log(orderData)
+                    var transaction = orderData.purchase_units[0].payments.captures[0];
+
+                    var transaction_id = transaction.id
+                    var status = orderData.status
+                    var payment_method = 'PayPal'
+                    sendTransaction(transaction_id, payment_method, status);
+
+                    // Replace the above to show a success message within this page, e.g.
+                    const element = document.getElementById('paypal-button-container');
+                    element.innerHTML = '';
+                    element.innerHTML = '<h4 class="text-center"><i class="fa fa-spinner fa-spin"></i> Please wait...</h4>';
+                    // Or go to another URL:  actions.redirect('thank_you.html');
+                });
+            }
+
+
+        }).render('#paypal-button-container');
+
+    </script>
+
+{% endblock %}
