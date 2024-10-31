@@ -3,8 +3,11 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, AbstractUser
-
+from django.contrib.gis.db import models as gis_models
+from django.contrib.gis.geos import Point
 from django.utils.translation import gettext_lazy as _
+from django.contrib.gis.db import models as gis_models
+
 
 class UserManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email, password=None):
@@ -58,7 +61,8 @@ class Profile(AbstractBaseUser):
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(max_length=255, unique=True, blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    employee_type = models.IntegerField(choices=EMPLOYEE_TYPE_CHOICES, default=EMPLOYEE_TYPE_OWNER)
+    phone_number_verified = models.BooleanField(default=False)
+    employee_type = models.IntegerField(choices=EMPLOYEE_TYPE_CHOICES, default=EMPLOYEE_TYPE_CUSTOMER)
     nickname = models.CharField(max_length=50, blank=True, null=True)
     email_contact = models.CharField(max_length=50, blank=True, null=True, default='email')
     data_joined = models.DateTimeField(auto_now_add=True)
@@ -102,7 +106,14 @@ class EmployeeProfile(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE, blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pictures', blank=True, null=True)
     cover_photo = models.ImageField(upload_to='cover_photos', blank=True, null=True)
+    city = models.CharField(max_length=255, blank=True, null=True)
+    pincode = models.CharField(max_length=10, blank=True, null=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    location = gis_models.PointField(geography=True, default=Point(0.0, 0.0), srid=4326)
+    address_line_1 = models.CharField(max_length=255, blank=True, null=True)
     address_line_2 = models.CharField(max_length=255, blank=True, null=True)
+    address_line_3 = models.CharField(max_length=255, blank=True, null=True)
     success_privacy_policy = models.BooleanField(default=False)
     email_is_confirmed = models.BooleanField(default=False)
     create_at = models.DateTimeField(auto_now_add=True)
@@ -112,7 +123,37 @@ class EmployeeProfile(models.Model):
     def __str__(self):
         return self.user.email
 
+    def save(
+            self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
+        if self.latitude and self.longitude:
+            self.location = Point(float(self.longitude), float(self.latitude))
+            super(EmployeeProfile, self).save()
+        return super(EmployeeProfile, self).save()
 
 class CustomProfile(AbstractUser):
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     nickname = models.CharField(max_length=50, blank=True, null=True)
+
+
+class District(models.Model):
+    city_name = models.CharField(max_length=255)
+    geom = gis_models.MultiPolygonField(geography=True, srid=4326)
+    objectid = models.IntegerField()
+    f_code = models.CharField(max_length=255, blank=True, null=True)
+    ten_tinh = models.CharField(max_length=255, blank=True, null=True)
+    ten_huyen = models.CharField(max_length=255, blank=True, null=True)
+    dan_so = models.IntegerField(blank=True, null=True)
+    nam_tk = models.IntegerField(blank=True, null=True)
+    code_vung = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        db_table = 'districts'
+        managed = False
+
+    def __str__(self):
+        return self.ten_huyen
+
+    #
+    # def get_districts_by_location(self, location):
+    #     return self.objects.filter(location=location)

@@ -9,33 +9,20 @@
 {% block content %}
     <div class="main-section">
         <div class="page-section nopadding cs-nomargin"
-             style="margin-top: 0px;padding-top: 60px;padding-bottom: 60px;margin-bottom: 0px;">
+             style="margin-top: 0px;padding-top: 60px;padding-bottom: 60px;margin-bottom: 0px; background-image: url('https://images.pexels.com/photos/776538/pexels-photo-776538.jpeg') ;background-size: cover; background-position: center;">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                         <div class="user-dashboard loader-holder" style="width: 100%; min-width: auto">
                             <div class="user-holder">
-                                {#                                <h4 class="text-center" style="margin-bottom: 0;">SIGN IN</h4>#}
-                                {#                                <p class="text-center">Order food from your favorite restaurants</p>#}
-                                {#                                <hr>#}
                                 <div class="box-form">
                                     <div class="left">
                                         <div class="overlay">
-                                            <h1>SIGN IN</h1>
                                             <p>Order food from your favorite restaurants
-
                                             </p>
                                             <span>
-			<p>Login with social media</p>
-<a href="#" title="Facebook" data-original-title="Facebook"
-   class="social_login_login_facebook facebook"><span
-        class="social-mess-top fb-social-login" style="display:none">Please set API key</span><i
-        class="icon-facebook"></i>Sign In With Facebook</a>		
-{#                                                <a href="#" rel="nofollow" title="google-plus"#}
-{#                                                   data-original-title="google+"#}
-{#                                                   class="social_login_login_google gplus"><span#}
-{#                                                        class="social-mess-top gplus-social-login" style="display:none">Please set API key</span><i#}
-{#                                                        class="icon-google4"></i>Sign In With Google</a>#}
+                                            <p>Login with social media</p>
+               
                                             <div id="g_id_onload"
                                                  data-client_id="15793022601-j6jpjs760iaa3561m7aljtk0m6kmfn6f.apps.googleusercontent.com"
                                                  data-context="signin"
@@ -57,6 +44,8 @@
                                         </div>
                                     </div>
                                     <div class="right">
+                                        <h1>SIGN IN</h1>
+
                                         <p>Don't have an account? <a href="{% url 'register_user' %}">Creat Your
                                             Account</a> it takes less than
                                             a minute</p>

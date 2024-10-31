@@ -41,3 +41,7 @@ google~=3.0.0
 django-ckeditor==6.7.1
 django-paypal==2.1
 django-csp==3.8
+
+protobuf~=5.28.2
+twilio~=9.3.1
+

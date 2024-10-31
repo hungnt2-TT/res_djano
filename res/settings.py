@@ -84,6 +84,8 @@ INSTALLED_APPS = [
     "customers",
     "marketplace",
     "django_ckeditor_5",
+    'django.contrib.gis',
+
     'paypal.standard.ipn',
     'django_extensions',
     'orders',
@@ -115,6 +117,9 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "vendor.views.get_google_api",
                 "employee.context_processors.get_vendor",
+                "marketplace.context_processors.get_cart_counter",
+                "marketplace.context_processors.get_cart_amount",
+                "employee.context_processors.get_vendor",
                 "employee.context_processors.get_paypal_client_id"
             ],
         },
@@ -128,7 +133,7 @@ WSGI_APPLICATION = "res.wsgi.application"
 if 'RDS_DB_NAME' in os.environ:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
+            'ENGINE': 'django.contrib.gis.db.backends.postgis',
             'NAME': os.getenv('RDS_DB_NAME'),
             'USER': os.getenv('RDS_USERNAME'),
             'PASSWORD': os.getenv('RDS_PASSWORD'),
@@ -345,6 +350,8 @@ CKEDITOR_5_CONFIGS = {
 # SESSION_CACHE_ALIAS = 'default'
 # PASSWORD RESET SETTINGS
 PASSWORD_RESET_TIMEOUT_DAYS = 1
+
+GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH', '/usr/lib/x86_64-linux-gnu/libgdal.so')
 
 # PayPal Standard IPN
 PAYPAL_TEST = True

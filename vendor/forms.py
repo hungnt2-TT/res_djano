@@ -6,7 +6,7 @@ from django.contrib.auth import (
 
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm, UserCreationForm, PasswordChangeForm
 
-from vendor.models import Vendor
+from vendor.models import Vendor, VendorService
 
 
 class VendorForm(forms.ModelForm):
@@ -71,3 +71,27 @@ class VendorUpdateMapForm(forms.ModelForm):
         self.fields['location'].widget.attrs['placeholder'] = 'Location'
         self.fields['street_number'].widget.attrs['placeholder'] = 'Street number'
         self.fields['street_number'].widget.attrs['id'] = 'street_number'
+
+
+class VendorServiceForm(forms.ModelForm):
+    class Meta:
+        model = VendorService
+        fields = ['pre_order', 'pre_order_days', 'pre_order_hours', 'delivery_available', 'delivery_fee',
+                  'payment_on_delivery', 'booking']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['pre_order'].widget = forms.Select(choices=[('no', 'No'), ('yes', 'Yes')])
+        self.fields['delivery_available'].widget = forms.Select(choices=[('no', 'No'), ('yes', 'Yes')])
+        self.fields['payment_on_delivery'].widget = forms.Select(choices=[('no', 'No'), ('yes', 'Yes')])
+        self.fields['booking'].widget = forms.Select(choices=[('no', 'No'), ('yes', 'Yes')])
+
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+        self.fields['pre_order'].widget.attrs['placeholder'] = 'Pre Order'
+        self.fields['pre_order_days'].widget.attrs['placeholder'] = 'Pre Order Days'
+        self.fields['pre_order_hours'].widget.attrs['placeholder'] = 'Pre Order Hours'
+        self.fields['delivery_available'].widget.attrs['placeholder'] = 'Delivery Available'
+        self.fields['delivery_fee'].widget.attrs['placeholder'] = 'Delivery Fee'
+        self.fields['payment_on_delivery'].widget.attrs['placeholder'] = 'Payment On Delivery'
+        self.fields['booking'].widget.attrs['placeholder'] = 'Booking'
