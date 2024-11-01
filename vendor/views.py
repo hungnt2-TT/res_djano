@@ -18,6 +18,8 @@ from vendor.forms import VendorForm, VendorUpdateForm, VendorUpdateMapForm
 from django.conf import settings
 from vendor.models import Vendor
 from wallet.models import Wallet
+from django.db import transaction
+from django.http import HttpResponseServerError
 
 import os
 import json
@@ -90,42 +92,49 @@ def handle_next_payment(request, form, vendor_form):
 
 
 def handle_send(request):
-    form_data = request.session.get('form_data', {})
-    print('form_data', form_data)
-    if form_data:
-        user = Profile.objects.create_user(
-            username=form_data.get('username', ''),
-            email=form_data.get('email', ''),
-            password=form_data.get('password1', ''),
-            first_name=form_data.get('first_name', ''),
-            last_name=form_data.get('last_name', ''),
-        )
-        user.is_active = True
-        user.employee_type = 2
-        user.save()
+    try:
+        form_data = request.session.get('form_data', {})
+        print('form_data', form_data)
+        if form_data:
+            with transaction.atomic():
+                user = Profile.objects.create_user(
+                    username=form_data.get('username', ''),
+                    email=form_data.get('email', ''),
+                    password=form_data.get('password1', ''),
+                    first_name=form_data.get('first_name', ''),
+                    last_name=form_data.get('last_name', ''),
+                )
+                user.is_active = True
+                user.employee_type = 1
+                user.save()
 
-        Wallet.objects.create(user=user, balance=0)
-        employee = EmployeeProfile.objects.filter(user=user).first()
-        employee.success_privacy_policy = True
-        employee.save()
-        Vendor.objects.create(
-            user=user,
-            user_profile=employee,
-            vendor_name=form_data.get('vendor_name', ''),
-            fax_number=form_data.get('fax_number', ''),
-            vendor_type=form_data.get('vendor_type', ''),
-            vendor_license=form_data.get('upload_file_url', ''),
-            is_approved=False,
-            address_line_1=form_data.get('address_line_1', ''),
-            state=form_data.get('state', ''),
-            city=form_data.get('city', ''),
-            longitude=form_data.get('foodbakery_post_loc_longitude_restaurant', ''),
-            latitude=form_data.get('foodbakery_post_loc_latitude_restaurant', ''),
-        )
-        return render(request, 'vendor/register_vendor_send.html', {
-            "form_data": form_data,
-        })
-    return redirect('vendor:register_vendor')
+                employee = EmployeeProfile.objects.filter(user=user).first()
+                employee.success_privacy_policy = True
+                employee.save()
+                Vendor.objects.create(
+                    user=user,
+                    user_profile=employee,
+                    vendor_name=form_data.get('vendor_name', ''),
+                    fax_number=form_data.get('fax_number', ''),
+                    vendor_type=form_data.get('vendor_type', ''),
+                    vendor_license=form_data.get('upload_file_url', ''),
+                    is_approved=False,
+                    address_line_1=form_data.get('address_line_1', ''),
+                    state=form_data.get('state', ''),
+                    city=form_data.get('city', ''),
+                    longitude=form_data.get('foodbakery_post_loc_longitude_restaurant', ''),
+                    latitude=form_data.get('foodbakery_post_loc_latitude_restaurant', ''),
+                )
+            messages.info(request, 'Please check your email to confirm your account')
+            return render(request, 'vendor/register_vendor_send.html', {
+                    "form_data": form_data,
+                })
+        return redirect('vendor:register_vendor')
+
+    except Exception as e:
+        print('error', e)
+        messages.error(request, 'Vendor not added')
+        return HttpResponseServerError('Internal Server Error')
 
 
 def register_vendor(request):
@@ -135,9 +144,7 @@ def register_vendor(request):
     print('request', request)
     upload_file_url = upload_file(request.FILES.get('vendor_license'))
     form = RegisterForm(request.POST or None)
-    print('form', form.errors)
     vendor_form = VendorForm(request.POST or None)
-    print('vendor_form', vendor_form.errors)
     if request.method == 'POST':
         next_action = request.POST.get('next', '')
         if next_action == 'confirm':

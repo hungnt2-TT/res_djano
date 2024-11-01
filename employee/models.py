@@ -137,7 +137,7 @@ class CustomProfile(AbstractUser):
 
 
 class District(models.Model):
-    city_name = models.CharField(max_length=255)
+    # city_name = models.CharField(max_length=255)
     geom = gis_models.MultiPolygonField(geography=True, srid=4326)
     objectid = models.IntegerField()
     f_code = models.CharField(max_length=255, blank=True, null=True)

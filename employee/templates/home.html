@@ -171,18 +171,16 @@
                             </div>
                             <div class="flash-sale-container">
                                 <div class="flash-sale-title">
-                                    <img src="https://img.icons8.com/ios-filled/50/ff4a00/flash.png" alt="Flash Icon">
-                                    <h1>FLASH SALE</h1>
-                                    {{ food_items }}
+                                    <h1>FoodItems</h1>
                                 </div>
-                                <div class="countdown" id="countdown">
-                                    <div class="countdown-box" id="hours">00</div>
-                                    :
-                                    <div class="countdown-box" id="minutes">00</div>
-                                    :
-                                    <div class="countdown-box" id="seconds">00</div>
-                                </div>
-                                <a href="#" style="margin-left: 53%" class="view-all">Xem Tất Cả</a>
+                                {#                                <div class="countdown" id="countdown">#}
+                                {#                                    <div class="countdown-box" id="hours">00</div>#}
+                                {#                                    :#}
+                                {#                                    <div class="countdown-box" id="minutes">00</div>#}
+                                {#                                    :#}
+                                {#                                    <div class="countdown-box" id="seconds">00</div>#}
+                                {#                                </div>#}
+                                {#                                <a href="#" style="margin-left: 53%" class="view-all">Xem Tất Cả</a>#}
                             </div>
                             <div class="categories-holder">
 
@@ -394,40 +392,41 @@
     {#    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&loading=async&defer"></script>#}
     {#    #}
     {#    <script src="{% static 'js/search_location.js' %}"></script>#}
-    <script>
-        // Tính toán thời gian hiện tại và thời gian kết thúc
-        const now = new Date(); // Lấy thời gian hiện tại
-        const saleDurationHours = 2; // Khuyến mãi kéo dài 2 giờ
-
-        // Thêm 2 giờ vào thời gian hiện tại
-        const saleEndTime = new Date(now.getTime() + saleDurationHours * 60 * 60 * 1000);
-
-        // Hàm đếm ngược
-        function startCountdown() {
-            const now = new Date().getTime(); // Thời gian hiện tại
-            const distance = saleEndTime.getTime() - now; // Khoảng cách thời gian còn lại
-
-            if (distance <= 0) {
-                clearInterval(interval);
-                document.getElementById("countdown").innerHTML = "Hết khuyến mãi!";
-                return;
-            }
-
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            document.getElementById("hours").textContent = hours < 10 ? '0' + hours : hours;
-            document.getElementById("minutes").textContent = minutes < 10 ? '0' + minutes : minutes;
-            document.getElementById("seconds").textContent = seconds < 10 ? '0' + seconds : seconds;
-        }
-
-        // Cập nhật countdown mỗi giây
-        const interval = setInterval(startCountdown, 1000);
-
-        // Khởi động lần đầu tiên
-        startCountdown();
-    </script>
+    {#    <script>#}
+    {#        // Tính toán thời gian hiện tại và thời gian kết thúc#}
+    {#        const now = new Date(); // Lấy thời gian hiện tại#}
+    {#        const saleDurationHours = 2; // Khuyến mãi kéo dài 2 giờ#}
+    {##}
+    {#        // Thêm 2 giờ vào thời gian hiện tại#}
+    {#        const saleEndTime = new Date(now.getTime() + saleDurationHours * 60 * 60 * 1000);#}
+    {##}
+    {#        // Hàm đếm ngược#}
+    {#        function startCountdown() {#}
+    {#            const now = new Date().getTime(); // Thời gian hiện tại#}
+    {#            const distance = saleEndTime.getTime() - now; // Khoảng cách thời gian còn lại#}
+    {##}
+    {#            if (distance <= 0) {#}
+    {#                clearInterval(interval);#}
+    {#                document.getElementById("countdown").innerHTML = "Hết khuyến mãi!";#}
+    {#                return;#}
+    {#            }#}
+    {##}
+    {#            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));#}
+    {#            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));#}
+    {#            const seconds = Math.floor((distance % (1000 * 60)) / 1000);#}
+    {##}
+    {#            document.getElementById("hours").textContent = hours < 10 ? '0' + hours : hours;#}
+    {#            document.getElementById("minutes").textContent = minutes < 10 ? '0' + minutes : minutes;#}
+    {#            document.getElementById("seconds").textContent = seconds < 10 ? '0' + seconds : seconds;#}
+    {#        }#}
+    {##}
+    {#        // Cập nhật countdown mỗi giây#}
+    {#        const interval = setInterval(startCountdown, 1000);#}
+    {##}
+    {#        // Khởi động lần đầu tiên#}
+    {#        startCountdown();#}
+    {#    </script>#}
+    <script src="{% static 'js/search_location.js' %}"></script>
 
 {% endblock %}
 

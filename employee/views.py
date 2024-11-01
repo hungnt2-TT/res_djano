@@ -57,6 +57,7 @@ def home(request):
         time_range = 'night'
 
     food_items = FoodItem.objects.filter(time_range=time_range)
+    vendors_list = []  # Initialize vendors_list
     if lat and lng:
         lat = float(lat)
         lng = float(lng)
@@ -64,6 +65,7 @@ def home(request):
         districts = District.objects.filter(geom__contains=user_location).first()
         print('districts', districts)
         if vendors:
+            print('vendors', vendors)
             vendor_district = vendors.filter(name_district=districts)
             print('vendors', vendors)
             vendors_list = list(vendor_district.values())
@@ -72,16 +74,14 @@ def home(request):
 
         districts_dict = districts and {
             'id': districts.id,
-            'city_name': districts.city_name,
             'ten_tinh': districts.ten_tinh,
             'ten_huyen': districts.ten_huyen,
             'dan_so': districts.dan_so,
             'nam_tk': districts.nam_tk,
             'code_vung': districts.code_vung,
         }
-        print('vendors_list', vendors_list)
         return JsonResponse({
-            'vendors': vendors_list,
+            'vendors': vendors_list if vendors_list else [],
             'information': information,
             'districts': districts_dict,
             'status': 'success'
@@ -97,11 +97,9 @@ def home(request):
         'lng': lng,
         'information': information,
         'food_items': food_items,
-
     }
     print('context', context)
     return render(request, 'home.html', context)
-
 
 def register(request):
     return render(request, 'account/register.html')
@@ -247,9 +245,11 @@ class LoginResView(LoginView):
 
         if form.is_valid():
             user = form.get_user()
+            print('user ====', user)
             if user.employee_type == 1:
                 try:
                     vendor = get_object_or_404(Vendor, user=user)
+                    print('vendor', vendor)
                     if not vendor.is_approved:
                         messages.warning(self.request, 'Your account is not approved yet')
                         raise PermissionDenied
