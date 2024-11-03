@@ -117,7 +117,6 @@
 
                                                 <div class="element-title" id="menu-category-2">
                                                     <h5 class="text-color">{{ category }}</h5>
-                                                    <span>{{ category.description|safe }}</span>
                                                 </div>
                                                 <ul>
                                                     {% for food_item in category.food_items.all %}
@@ -125,8 +124,9 @@
                                                             <div class="image-holder"><img
                                                                     src={{ food_item.image.url }} alt=""></div>
                                                             <div class="text-holder" style="width: calc(75% - 144px);">
-                                                                <h6>{{ food_item }}</h6>
-                                                                <span>{{ food_item.description | safe }}</span>
+                                                                <h6>
+                                                                    <a href="{% url 'food_item_detail' food_item.id %}">{{ food_item }}</a>
+                                                                </h6>
                                                             </div>
                                                             <div class="price-holder">
                                                                 <span class="price">{{ food_item.price }} VND</span>

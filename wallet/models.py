@@ -80,7 +80,7 @@ class Wallet(models.Model):
         super(Wallet, self).save(*args, **kwargs)
 
     def deposit(self, value, type=''):
-        admin_user = get_user_model().objects.get(is_superuser=True)
+        admin_user = get_user_model().objects.filter(is_superuser=True).first()
         if not admin_user:
             raise ValueError("No admin user found")
         print('admin_user', admin_user)

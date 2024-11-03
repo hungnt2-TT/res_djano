@@ -1,10 +1,12 @@
 import uuid
 import random
 import string
+from decimal import Decimal
 from imp import reload
 import joblib
 import os
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from django.db import models
 
@@ -21,10 +23,11 @@ vectorizer_path = os.path.join(settings.BASE_DIR, 'menu', 'vectorizer.pkl')
 clf = joblib.load(model_path)
 vectorizer = joblib.load(vectorizer_path)
 
+
 # Create your models here.
 class Category(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
-    category_name = models.CharField(max_length=50, unique=True)
+    category_name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50, unique=True)
     description = CKEditor5Field(null=True, blank=True, config_name='default')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -39,9 +42,25 @@ class Category(models.Model):
     def save(
             self, *args, **kwargs
     ):
-        self.slug = slugify(self.category_name)
+        self.slug = slugify(self.category_name) + '-' + str(self.id)
         super(Category, self).save(*args, **kwargs)
 
+
+class Size(models.Model):
+    SIZE_CHOICES = [
+        ('N', 'Normal'),
+        ('S', 'Small'),
+        ('M', 'Medium'),
+        ('L', 'Large'),
+        ('XL', 'Extra Large'),
+        ('XXL', 'Extra Extra Large'),
+    ]
+    size = models.CharField(max_length=3, choices=SIZE_CHOICES)
+    price = models.IntegerField(default=0)
+    food_item = models.ForeignKey('FoodItem', related_name='size_items', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.get_size_display()} - {self.price} VND"
 
 class FoodItem(models.Model):
     TIME_RANGES = [
@@ -50,14 +69,17 @@ class FoodItem(models.Model):
         ('evening', '18:00-24:00'),
         ('night', '0:00-6:00'),
     ]
+    sizes = models.ManyToManyField(Size, related_name="food_items")
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='vendor_food_items')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='food_items')
     food_name = models.CharField(max_length=50)
+    food_title = models.CharField(max_length=255, null=True, blank=True)
+    sub_food_title = models.CharField(max_length=255, null=True, blank=True)
     slug = models.SlugField(max_length=50)
     description = CKEditor5Field('Description', config_name='extends')
-    price = models.DecimalField(max_digits=10, decimal_places=0)
-    old_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    discounted_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    price = models.IntegerField(null=True, default=0)
+    old_price = models.IntegerField(null=True, default=0)
+    discounted_price = models.IntegerField(null=True, default=0)
     sale_end_time = models.DateTimeField(null=True, blank=True)
     time_range = models.CharField(max_length=10, choices=TIME_RANGES, default='morning')
     image = models.ImageField(upload_to='food_items/')
@@ -122,7 +144,8 @@ class Coupon(models.Model):
 
     def is_valid(self):
         from django.utils import timezone
-        return self.coupon_expiry_date >= timezone.now() and (not self.usage_limit or self.current_usage < self.usage_limit)
+        return self.coupon_expiry_date >= timezone.now() and (
+                not self.usage_limit or self.current_usage < self.usage_limit)
 
     def apply_discount(self, order_total):
         if not self.is_valid():

@@ -7,13 +7,14 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.db.models import Prefetch, Q
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 
 from employee.models import EmployeeProfile
 from marketplace.context_processors import get_cart_counter, get_total_price_by_marketplace, get_cart_amount
 from marketplace.models import Cart
 from marketplace.templatetags.custom_filters import to_vnd_words
-from menu.models import Category, FoodItem
+from menu.models import Category, FoodItem, Size
 from vendor.models import Vendor
 
 
@@ -48,22 +49,35 @@ def vendor_detail(request, vendor_slug):
     return render(request, 'vendor_maketplace_detail.html', context)
 
 
+@csrf_exempt
 @login_required(login_url='login')
 def add_to_cart(request, food_item_id):
+    print('add_to_cart', request.POST)
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
-            food_item = FoodItem.objects.get(pk=food_item_id)
-            cart, created = Cart.objects.get_or_create(
+            size_id = request.POST.get('firstSizeId')
+            quantity = int(request.POST.get('quantity', 1))
+
+            food_item = get_object_or_404(FoodItem, id=food_item_id)
+            print('food_item', food_item)
+            size = get_object_or_404(Size, id=size_id)
+            print('size', size)
+            cart_item, created = Cart.objects.get_or_create(
                 user=request.user,
                 food_item=food_item,
-                is_ordered=False
+                size=size,
+                is_ordered=False,
+                defaults={'quantity': quantity, 'note': request.POST.get('note', None)}
             )
+            print('cart_item', cart_item)
             if not created:
-                cart.quantity += 1
-                cart.save()
+                cart_item.quantity += quantity
+                cart_item.note = request.POST.get('note', None)
+                cart_item.save()
             return JsonResponse(
-                {'quantity': cart.quantity, 'cart_counter': get_cart_counter(request),
-                 'cart_amount': get_cart_amount(request), 'status': 'success'})
+                {'quantity': cart_item.quantity, 'cart_counter': get_cart_counter(request),
+                 'cart_amount': get_cart_amount(request), 'status': 'success'}
+            )
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
@@ -189,3 +203,13 @@ def search(request):
     }
 
     return render(request, 'listings.html', context)
+
+
+def food_item_detail(request, id):
+    food_item = get_object_or_404(FoodItem, id=id)
+    sizes = Size.objects.filter(food_item=food_item)
+    contex = {
+        'food_item': food_item,
+        'sizes': sizes
+    }
+    return render(request, 'food_item_detail.html', contex)

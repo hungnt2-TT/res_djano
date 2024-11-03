@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_scripts %}
+    <script src="{% static 'js/cart_order.js' %}"></script>
+    <script>
+        const sizes = {
+            {% for size in sizes %}
+                {{ size.id }}: {price: {{ size.price }}},
+            {% endfor %}
+        };
+    </script>
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/food_item_detail.css' %}">
+
+
+
+{% endblock %}
+{% block content %}
+    <div class="sub-header align-center">
+        <div class="subheader-holder"
+             style="background:url({% static "img/subheader-img2-1.jpg" %})  no-repeat ; background-size: cover; padding-top: 60px; padding-bottom: 30px; margin-top: 0px; margin-bottom: 0px; min-height: 186px !important;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="text-holder">
+                            <div class="page-title ">
+                                <h1 style="color:#ffffff !important;">Creating The World’s Greatest Food Community With
+                                    Food Bakery</h1>
+                            </div>
+                            <p style="color:#ffffff !important;">A great restaurant website</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- Main Section Start -->
+    <div class="main-section">
+        <div class="container">
+            <div class="row">
+                <div class="page-content col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="page-section">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <div class="blog-detail">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="main-post">
+                                                <figure><a href="#"><img src="{{ food_item.image.url }}" alt=""></a>
+                                                </figure>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <aside class="page-sidebar right col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="widget-holder">
+
+                        <div class="widget widget_archive">
+                            <div class="widget-title">
+                                <h2>{{ food_item.food_name }}
+                                </h2>
+                            </div>
+                        </div>
+                        <div class="widget widget_archive">
+                            <span class="amount" id="price-display">{{ food_item.price }} VND</span>
+                        </div>
+                        <div class="widget widget_archive">
+                            <p>{{ food_item.food_title }}</p>
+                        </div>
+                        <hr>
+                        <div class="sub_title">
+                            <p>{{ food_item.sub_food_title }}</p>
+                        </div>
+                        <hr>
+                        <div class="widget widget-related-post">
+                            <div class="widget widget-recent-blog-post list-sizes">
+                                <div class="widget-title">
+                                    <h5>Available Sizes:</h5>
+                                </div>
+                                <ul>
+                                    {% for size in sizes %}
+                                        <li>
+                                            <label class="size-option">
+                                                <input type="radio" name="size_option" value="{{ size.id }}"
+                                                       id="size_{{ size.id }}">
+                                                <span class="size-label">{{ size.get_size_display }} - {{ size.size }}</span>
+                                            </label>
+                                        </li>
+                                    {% empty %}
+                                        <li>No sizes available for this item.</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="widget widget-related-post">
+                            <div class="widget widget-recent-blog-post list-sizes">
+                                <label for="note">Note:</label>
+                                <textarea id="note_{{ food_item.id }}" rows="1"
+                                          placeholder="Add a note to your order"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="widget widget_search">
+                            <a class="decrease_cart"
+                               style="margin-right: 28px"
+                               data-id="{{ food_item.id }}
+                              "><i
+                                    class="icon-minus text-color"></i></a>
+                            <label id="qty-{{ food_item.id }}">1</label>
+                            <a class="add_to_cart" style="padding-left: 25px"
+                               data-id="{{ food_item.id }}"
+                            ><i
+                                    class="icon-plus4 text-color"></i></a>
+                            <span id="add-menu-loader-10"></span>
+                        </div>
+                        <div class="card_holder field-holder">
+                            <div id="update-menu-items-holder "
+                                 class="payment-holder input-button-loader  btn-card">
+                                <input
+                                        class=" redirect-button-click update-menu-items"
+                                        name="submit_button"
+                                        value="Add to Cart"
+                                        type="submit"
+                                        data-url="{% url 'add_to_cart' food_item.id %}"
+                                        data-id="{{ food_item.id }}"
+                                        id="add_to_cart"
+                                        style="background-color: #62d773">
+                            </div>
+                            <div class="field-holder">
+                                <div id="update-menu-items-holder "
+                                     class="payment-holder input-button-loader  btn-update btn-card">
+                                    <input
+                                            class="btn-update"
+                                            name="food"
+                                            value="By Now"
+                                            type="submit"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+                <hr>
+                <div class="page-content col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="page-section">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <div class="blog-detail">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-8 col-xs-12">
+                                            <div class="tabs-holder horizontal">
+                                                <ul class="stickynav-tabs nav nav-tabs">
+                                                    <li class="active"><a data-toggle="tab" href="#home"> <i
+                                                            class="icon-description text-color"></i>Description</a>
+                                                    </li>
+                                                </ul>
+                                                <div class="tab-content">
+                                                    <div id="home" class="tab-pane in active">
+                                                        <div class="menu-itam-holder" style="padding:8px 30px">
+                                                            {% if food_item.description %}
+                                                                <p>{{ food_item.description | safe }}</p>
+                                                            {% else %}
+                                                                <p>No description available for this item.</p>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

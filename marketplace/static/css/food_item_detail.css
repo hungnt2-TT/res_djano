@@ -1,0 +1,61 @@
+.size-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.size-option input[type="radio"] {
+    display: none; /* Ẩn radio button gốc */
+}
+
+.size-option .size-label {
+    display: inline-block;
+    padding: 10px 20px;
+    border: 2px solid #ccc;
+    border-radius: 50px; /* Bo tròn */
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.size-option input[type="radio"]:checked + .size-label {
+    background-color: #4CAF50; /* Màu nền khi chọn */
+    color: white;
+    border-color: #4CAF50;
+}
+
+.amount {
+    white-space: nowrap;
+    color: #111;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.sub_title {
+    font-size: 90%;
+    color: #808080;
+}
+
+.list-sizes ul {
+    gap: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.card_holder {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 30px;
+}
+
+.btn-card {
+    margin-bottom: 21px;
+
+    line-height: 20px;
+    border-radius: 4px;
+    margin-right: 0;
+    font-size: 14px;
+}
