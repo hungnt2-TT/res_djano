@@ -36,6 +36,7 @@ from datetime import datetime
 
 from twilio.rest import Client
 
+
 def home(request):
     print('home', request)
     lat = request.GET.get('lat')
@@ -62,6 +63,10 @@ def home(request):
         lat = float(lat)
         lng = float(lng)
         user_location = Point(lng, lat, srid=4326)
+        employee_profile = EmployeeProfile.objects.get(user=request.user)
+        employee_profile.latitude = lat
+        employee_profile.longitude = lng
+        employee_profile.save()
         districts = District.objects.filter(geom__contains=user_location).first()
         print('districts', districts)
         if vendors:
@@ -100,6 +105,7 @@ def home(request):
     }
     print('context', context)
     return render(request, 'home.html', context)
+
 
 def register(request):
     return render(request, 'account/register.html')
@@ -563,3 +569,19 @@ def register_by_email(request):
     #         else:
     #             messages.error(request, 'Invalid code.')
     #             return render(request, 'send_sms_form.html', {'form': form})
+
+
+def update_location(request):
+    if request.method == 'POST':
+        lat = request.POST.get('lat')
+        lng = request.POST.get('lng')
+        address = request.POST.get('address')
+        user = request.user
+        if user:
+            profile = EmployeeProfile.objects.get(user=user)
+            profile.latitude = lat
+            profile.longitude = lng
+            profile.address_line_1 = address
+            profile.save()
+            return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'failed'})

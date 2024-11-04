@@ -27,11 +27,6 @@ def get_total_price_by_marketplace(request):
         for vendor, items in grouped_cart_items.items():
             total_price = sum([item.total_price() for item in items])
             total_price_by_marketplace.append({'vendor': vendor, 'total_price': total_price})
-        for a, f in total_price_by_marketplace:
-            print(a)
-            print(f)
-        print(total_price_by_marketplace)
-
     else:
         total_price_by_marketplace = []
     return {'total_price_by_marketplace': total_price_by_marketplace}
@@ -44,8 +39,8 @@ def get_cart_amount(request):
     if request.user.is_authenticated:
         cart = Cart.objects.filter(user=request.user, is_ordered=False)
         for item in cart:
-            food_item = FoodItem.objects.get(pk=item.food_item.id)
-            subtotal += food_item.price * item.quantity
+            size_price = item.size.price if item.size else 0
+            subtotal += size_price * item.quantity
         grand_total = subtotal + tax
 
     return dict(subtotal=subtotal, tax=tax, grand_total=grand_total)

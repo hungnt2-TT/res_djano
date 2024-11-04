@@ -16,8 +16,6 @@ $(document).ready(function () {
 
     $('input[type="radio"][name="size_option"]').off('click').click(function () {
         firstSizeId = $(this).val();
-        console.log('Size ID:', firstSizeId);
-        // Lấy giá trị price từ sizes dựa trên sizeId
         if (sizes[firstSizeId]) {
             selectedSizePrice = sizes[firstSizeId].price;
             $('#price-display').text(selectedSizePrice + ' VND');
@@ -55,14 +53,13 @@ $(document).ready(function () {
     }
 
     $('#add_to_cart').off('click').on('click', function () {
+        showLoading();
         var url = $(this).attr('data-url');
         const foodId = $(this).data('id');
-        console.log('Add to cart:', foodId);
         const sizeId = $('#size_option_' + foodId).val();
         quantity = parseInt(quantity) || 1;
         const note = $('#note_' + foodId).val();
 
-        // Lấy giá size dựa trên option đã chọn
         const sizePrice = selectedSizePrice;
         console.log('sizePrice ID:', sizePrice);
         console.log('Size price:', sizePrice);
@@ -80,7 +77,14 @@ $(document).ready(function () {
                 csrfmiddlewaretoken: '{{ csrf_token }}'
             },
             success: function (response) {
-                console.log(response);
+                if (response.status === 'success') {
+                    hideLoading()
+                    Swal.fire({
+                        title: "Added to Cart",
+                        text: "This item has been added to your cart.",
+                        icon: "success"
+                    });
+                }
                 if (response.status === 'undefined') {
                     Swal.fire({
                         icon: 'warning',
@@ -102,5 +106,17 @@ $(document).ready(function () {
                 console.log('Error:', response);
             }
         });
+
     })
+
+    function hideLoading() {
+        document.getElementById('loading_spinner').style.display = 'none';
+        document.getElementById('loadingArea').style.display = 'none';
+    }
+
+    function showLoading() {
+        console.log('Loading...');
+        document.getElementById('loading_spinner').classList.remove('d-none');
+        document.getElementById('loadingArea').classList.remove('d-none');
+    }
 });

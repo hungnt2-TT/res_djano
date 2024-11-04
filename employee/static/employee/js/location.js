@@ -49,6 +49,7 @@ function getCurrentLocation() {
 function updateLocationAndFetchRestaurants(lat, lng) {
     updateDeliveryLocation(lat, lng);
     fetchRestaurants(lat, lng);
+    updateLocationProfile(lat, lng);
 }
 
 function fetchRestaurants(lat, lng) {
@@ -136,7 +137,9 @@ function updateDeliveryLocation(lat, lng) {
         }
     });
 }
+function updateLocationProfile(lat, lng) {
 
+}
 function hideLoading() {
     document.getElementById('loading_spinner').style.display = 'none';
     document.getElementById('loadingArea').style.display = 'none';

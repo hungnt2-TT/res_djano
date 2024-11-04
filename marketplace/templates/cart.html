@@ -49,7 +49,7 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="price-holder" style="right: 22px">
-                                                                    <span class="price">{{ cart_item.food_item.price }} VND</span>
+                                                                    <span class="price">{{ cart_item.size.price }} VND</span>
                                                                     <a href="#" class="decrease_cart"
                                                                        style="margin-right: 28px"
                                                                        id="{{ cart_item.id }}"
@@ -77,11 +77,12 @@
                                                         <ul>
                                                             <li>
                                                                 <a class="reviews-sortby-active" data-toggle="collapse"
-                                                           href="#collapseOrderSummary" aria-expanded="false"
-                                                           aria-controls="collapseOrderSummary">
+                                                                   href="#collapseOrderSummary" aria-expanded="false"
+                                                                   aria-controls="collapseOrderSummary">
                                                                     <span>Order Summary :</span>
                                                                     <span class="total-item-by-store">
-                                                                        TOTAL: <span class="currency">50.000 VND</span></span><i
+                                                                        TOTAL: <span
+                                                                            class="currency">{{ data.total_with_shipping }}</span></span><i
                                                                         class="icon-chevron-small-down"></i>
                                                                 </a>
                                                                 <ul class="collapse" id="collapseOrderSummary"
@@ -90,25 +91,18 @@
                                                                         Time
                                                                         <span class="price float-right">
                                                                     <span class="currency">Estimated Time:</span>
-                                                                    <span id="subtotal">30 minutes</span>
+                                                                    <span id="subtotal">{{ data.time_to_deliver }} Minutes</span>
                                                                 </span>
                                                                     </li>
                                                                     <li>
                                                                         Shipping
                                                                         <span class="price float-right">
-                                                                    <span id="shipping">50.000</span>
+                                                                    <span id="shipping">{{ data.shipping_cost }}</span>
                                                                     <span class="currency">VND</span>
                                                                 </span>
                                                                     </li>
                                                                     <li>
-                                                                        Voucher
-                                                                        <span class="price float-right">
-                                                                    <span class="currency">Free shipping discount</span>
-                                                                    <span id="voucher">25.000</span>
-                                                                </span>
-                                                                    </li>
-                                                                    <li>
-                                                                        TOTAL
+                                                                        Total Price
                                                                         <span class="price float-right">
                                                                     <span class="currency">VND</span>
                                                                     <span id="total">{{ data.total_price }}</span>
@@ -154,13 +148,22 @@
                                                 <span class="price" id="tax"><em
                                                         class="dev-menu-charges">{{ tax }} VND</em></span>
                                             </li>
+                                            <li class="restaurant-fee-con">
+                                                <span class="fee-title">Ship</span>
+                                                <span class="price" id="tax"><em
+                                                        class="dev-menu-charges">{{ total_shipping_cost }} VND</em></span>
+                                            </li>
                                         </ul>
                                         <p class="total-price">Total <span class="price" id="grand_total"><em
-                                                class="dev-menu-grtotal">{{ grand_total }} VND</em></span>
+                                                class="dev-menu-grtotal">{{ final_grand_total }} VND</em></span>
                                         </p>
-                                        <span class="total-price total-words">
+                                        <span class="total-price total-words" style="font-size: 11px">
+                                            {% if final_grand_total %}
                                             {% load custom_filters %}
-                                             <span>{{ grand_total|to_vnd_words }}</span>
+                                             <span>{{ final_grand_total|to_vnd_words }}</span>
+                                            {% else %}
+                                            <span>...</span>
+                                            {% endif %}
                                         </span>
                                     </div>
                                 </div>

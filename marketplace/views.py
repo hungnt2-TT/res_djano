@@ -1,6 +1,9 @@
+import math
 from collections import defaultdict
 from unicodedata import category
 
+import requests
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import GEOSGeometry
@@ -12,6 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from employee.models import EmployeeProfile
 from marketplace.context_processors import get_cart_counter, get_total_price_by_marketplace, get_cart_amount
+from marketplace.distance import calculate_distance, estimate_time, calculate_shipping_cost
 from marketplace.models import Cart
 from marketplace.templatetags.custom_filters import to_vnd_words
 from menu.models import Category, FoodItem, Size
@@ -76,7 +80,7 @@ def add_to_cart(request, food_item_id):
                 cart_item.save()
             return JsonResponse(
                 {'quantity': cart_item.quantity, 'cart_counter': get_cart_counter(request),
-                 'cart_amount': get_cart_amount(request), 'status': 'success'}
+                 'cart_amount': get_cart_amount(request), 'status': 'success', 'message': 'Added to cart'}
             )
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
@@ -88,7 +92,9 @@ def remove_from_cart(request, food_item_id):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
             food_item = FoodItem.objects.get(pk=food_item_id)
-            cart = Cart.objects.get(user=request.user, food_item=food_item, is_ordered=False)
+            size_id = request.POST.get('firstSizeId')
+            size = get_object_or_404(Size, id=size_id)
+            cart = Cart.objects.get(user=request.user, food_item=food_item, size=size, is_ordered=False)
             cart.quantity -= 1
             if cart.quantity == 0:
                 cart.delete()
@@ -101,26 +107,81 @@ def remove_from_cart(request, food_item_id):
     return render(request, 'vendor_maketplace_detail.html')
 
 
+def get_distance_and_time(api_key, origin, destination, mode="driving"):
+    url = "https://maps.googleapis.com/maps/api/distancematrix/json"
+    params = {
+        "origins": origin,
+        "destinations": destination,
+        "mode": mode,
+        "key": api_key
+    }
+    response = requests.get(url, params=params)
+    print('response', response)
+    data = response.json()
+    print('data = ', data)
+
+    if data["status"] == "OK":
+        element = data["rows"][0]["elements"][0]
+        if element["status"] == "OK":
+            distance = element["distance"]["value"] / 1000
+            duration = element["duration"]["value"] / 60
+            return distance, duration
+        else:
+            print("Error with element:", element["status"])
+    else:
+        print("Error with API request:", data["status"])
+
+    return None, None
+
+
 @login_required(login_url='login')
 def cart(request):
-    print('cart')
+    subtotal = 0
+    tax = 0
+    total_shipping_cost = 0
+
     cart_items = Cart.objects.filter(user=request.user, is_ordered=False).order_by('-created_at')
     profile = EmployeeProfile.objects.get(user=request.user)
+    profile_lat, profile_lng = profile.latitude, profile.longitude
+    destination = f"{profile_lat},{profile_lng}"
     grouped_cart_items = defaultdict(lambda: {'items': [], 'total_price': 0})
+    api_key = settings.GOOGLE_API_KEY_BY_IP
+
     for item in cart_items:
         vendor = item.food_item.vendor
         grouped_cart_items[vendor]['items'].append(item)
-        grouped_cart_items[vendor]['total_price'] += item.total_price()
+        grouped_cart_items[vendor]['total_price'] += item.get_total_price()
     grouped_cart_items = dict(grouped_cart_items)
-    for vendor, data in grouped_cart_items.items():
-        print(f"Vendor: {vendor}, Total Price: {data['total_price']}, Items: {data['items']}")
 
-    print('grouped_cart_items.items()0', grouped_cart_items.items())
+    for item in cart_items:
+        size_price = item.size.price if item.size else 0
+        subtotal += size_price * item.quantity
+    grand_total = subtotal + tax
+
+    for vendor, data in grouped_cart_items.items():
+        vendor = Vendor.objects.get(vendor_name=vendor)
+        lat, lng = vendor.latitude, vendor.longitude
+        origin = f"{lat},{lng}"
+        distance, duration = get_distance_and_time(api_key, origin, destination)
+        shipping_cost = calculate_shipping_cost(distance)
+        data['shipping_cost'] = shipping_cost
+        data['time_to_deliver'] = math.ceil(duration)
+
+        vendor_total_price = data['total_price'] + shipping_cost
+        data['total_with_shipping'] = vendor_total_price
+        total_shipping_cost += shipping_cost
+
+        print(f"Vendor: {vendor}, Total Price: {data['total_price']}, Items: {data['items']}, data: {data}")
+
+    final_grand_total = grand_total + total_shipping_cost
+    print('final_grand_total', final_grand_total)
+
     context = {
         'grouped_cart_items': grouped_cart_items.items(),
-        'profile': profile
+        'profile': profile,
+        'total_shipping_cost': total_shipping_cost,
+        'final_grand_total': final_grand_total,
     }
-    print('vcontext', cart_items)
 
     return render(request, 'cart.html', context)
 
