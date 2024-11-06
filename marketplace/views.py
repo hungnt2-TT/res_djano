@@ -60,6 +60,12 @@ def add_to_cart(request, food_item_id):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
             size_id = request.POST.get('firstSizeId')
+            if size_id is not None:
+                size_id = int(size_id)
+                if size_id == 0:
+                    print('size_id', size_id)
+                    size_id = 1
+            print('size_id', size_id)
             quantity = int(request.POST.get('quantity', 1))
             food_item = get_object_or_404(FoodItem, id=food_item_id)
             size = get_object_or_404(Size, id=size_id)
@@ -138,6 +144,7 @@ def get_distance_and_time(api_key, origin, destination, mode="driving"):
     return None, None
 
 
+@csrf_exempt
 @login_required(login_url='login')
 def cart(request):
     cart_items = Cart.objects.filter(user=request.user, is_ordered=False).order_by('-created_at')
@@ -168,10 +175,11 @@ def cart(request):
         lat, lng = vendor_obj.latitude, vendor_obj.longitude
         origin = f"{lat},{lng}"
         distance, duration = get_distance_and_time(api_key, origin, destination)
-        shipping_cost = calculate_shipping_cost(distance)
+        # shipping_cost = calculate_shipping_cost(distance)
+        shipping_cost = 15000
         data['shipping_cost'] = shipping_cost
-        data['time_to_deliver'] = math.ceil(duration)
-
+        # data['time_to_deliver'] = math.ceil(duration)
+        data['time_to_deliver'] = 30
         vendor_total_price = data['total_price'] + shipping_cost
         data['total_with_shipping'] = vendor_total_price
         total_shipping_cost += shipping_cost
@@ -188,16 +196,18 @@ def cart(request):
     return render(request, 'cart.html', context)
 
 
+@csrf_exempt
 @login_required(login_url='login')
 def delete_cart_item(request, cart_id):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
-            cart = Cart.objects.get(pk=cart_id, user=request.user)
+            size = request.POST.get('firstSizeId')
+            cart = Cart.objects.get(pk=cart_id, user=request.user, size=size)
             print('delete_cart_item', cart)
-            cart.delete()
+            # cart.delete()
             return JsonResponse({'cart_counter': get_cart_counter(request), 'status': 'success'})
         except Exception as e:
-            print(e)
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     return render(request, 'cart.html')
 
 

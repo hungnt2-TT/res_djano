@@ -17,7 +17,6 @@ def calculate_shipping_cost(distance_km):
 
 
 def cost_distance_km(distance_km):
-    # Nếu distance_km là một chuỗi, chuyển đổi thành float
     if isinstance(distance_km, str):
         distance_km = float(distance_km.split()[0])
 

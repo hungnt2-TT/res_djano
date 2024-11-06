@@ -6,10 +6,15 @@ from django.db.models import Sum, F
 
 
 def get_cart_counter(request):
-    print('reqquest', request.GET)
+    print('reqquest', request.POST)
     if request.user.is_authenticated:
+        size = request.POST.get('firstSizeId')
         cart = Cart.objects.filter(user=request.user, is_ordered=False)
+        print('cart', cart.query)
+        print('cart', cart)
         cart_count = cart.aggregate(total_quantity=Sum('quantity'))['total_quantity'] or 0
+        cart_list = cart.values_list('food_item', flat=True)
+        print('cart_list', cart_list)
     else:
         cart_count = 0
     return {'cart_count': cart_count}

@@ -2,14 +2,25 @@ $(document).ready(function () {
     console.log('cart.js loaded');
     let selectedSizePrice = 0;
     let shopTotals = {};
-
+    let orderTotal = {};
     $('.total-item-by-store').each(function () {
         const shopId = $(this).data('shop-id');
         console.log('shopId', shopId);
         const total = parseFloat($(this).find('.currency').text()) || 0;
-        console.log('total', total);
         shopTotals[shopId] = total;
     });
+    console.log('shopTotals', shopTotals);
+    $('.shipping_cost').each(function () {
+        const shopId = $(this).data('shop-id');
+        const shippingFee = parseFloat($(this).find('#shipping').text()) || 0;
+        shopTotals[shopId] += shippingFee;
+    });
+
+    function updateTotalDisplay(shopId) {
+        console.log('shopId', shopId);
+        $(`#currency_id${shopId}`).text(shopTotals[shopId].toFixed(2) + ' VND');
+    }
+
     // $('.shipping_cost').each(function () {
     //     const shopId = $(this).data('shop-id');
     //     const shippingFee = parseFloat($(this).find('#shipping').text()) || 0;
@@ -37,21 +48,21 @@ $(document).ready(function () {
     });
 
     $('.add_to_cart').off('click').click(function () {
-        const shopId = $(this).data('shop-id');
-        var food_id = $(this).attr('data-id');
-        var url = $(this).attr('data-url');
-        const sizeId = $('#size_option_' + food_id).attr('data-size-id');
+        const shopId = $(this).data('shop-id').split('_')[0];
+        console.log('shopId', shopId);
+        const foodId = $(this).attr('data-id');
+        const url = $(this).attr('data-url');
+        const sizeId = $('#size_option_' + foodId).attr('data-size-id');
         const itemPrice = parseFloat($(this).closest('.cart-item').find('.price').text().replace(' VND', ''));
-        const shippingFee = parseFloat($(this).data('shipping-fee'));
+        console.log('itemPrice', itemPrice);
         if (!shopTotals[shopId]) {
             shopTotals[shopId] = 0;
         }
 
         $.ajax({
             type: 'POST', url: url, data: {
-                'food_id': food_id, sizeId: sizeId, firstSizeId: sizeId
+                'food_id': foodId, sizeId: sizeId, firstSizeId: sizeId
             }, success: function (response) {
-                console.log(response);
                 if (response.status === 'undefined') {
                     Swal.fire({
                         icon: 'warning',
@@ -60,85 +71,81 @@ $(document).ready(function () {
                         confirmButtonText: 'Log In'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            // Redirect to login page or perform login action
                             window.location.href = '/login';
                         }
                     });
                 }
                 if (response.quantity !== undefined) {
                     $('#cart_counter').html(response.cart_counter['cart_count']);
-                    $('#qty-' + food_id).html(response.quantity);
+                    $('#qty-' + foodId).html(response.quantity);
                     update_price(response.cart_amount.subtotal, response.cart_amount.tax, response.cart_amount.grand_total);
                     shopTotals[shopId] += itemPrice;
                     updateTotalDisplay(shopId);
-
                 }
             }, error: function (response) {
                 console.log('Error:', response);
             }
         });
         return false;
-    });
-    $('.decrease_cart').off('click').click(function () {
-        var food_id = $(this).attr('data-id');
-        var sizeId = $(this).attr('data-size-id');
-        var url = $(this).attr('data-url');
-        var cart_id = $(this).attr('id')
-        const shopId = $(this).data('shop-id');
-        console.log('shopId', shopId);
-        const itemPrice = parseFloat($('#currency_id'+shopId).text().replace(' VND', ''));
-        console.log('itemPrice', itemPrice);
-        // const itemPrice = parseFloat($(this).closest('.cart-item').find('.price').text().replace(' VND', ''));
-        if (!shopTotals[shopId]) {
-            shopTotals[shopId] = 0;
-        }
-        console.log('shopTotals', shopTotals[shopId]);
-        // $.ajax({
-        //     type: 'POST', url: url, data: {
-        //         'food_id': food_id, 'firstSizeId': sizeId
-        //     }, success: function (response) {
-        //
-        //         if (response.quantity !== undefined) {
-        //             $('#cart_counter').html(response.cart_counter['cart_count']);
-        //             $('#qty-' + food_id).html(response.quantity);
-        //             console.log('response', response);
-        //             console.log('cart_id', cart_id);
-        //             console.log('sizeId', sizeId);
-        //             remove_cart(response.quantity, cart_id, sizeId);
-        //             update_price(response.cart_amount.subtotal, response.cart_amount.tax, response.cart_amount.grand_total);
-        //             console.log('itemPrice', itemPrice);
-        //             shopTotals[shopId] -= itemPrice;
-        //             updateTotalDisplay(shopId);
-        //         }
-        //     }, error: function (response) {
-        //         console.log('Error:', response);
-        //     }
-        // });
-        // return false;
     });
     $('.delete_cart').off('click').click(function () {
         showLoading();
+        const cartItemId = $(this).data('item-id');
+        const vendorId = $(this).closest('.list-cart-item').data('vendor-id');
+        const vendorElement = $(`.list-cart-item[data-vendor-id="${vendorId}"]`);
+        const shopId = $(this).data('shop-id');
+        const itemPrice = parseFloat($(this).closest('.cart-item').find('.price').text().replace(' VND', ''));
+        const foodId = $(this).attr('data-id');
+        const sizeId = $(this).attr('data-size-id');
+        const url = $(this).attr('data-url');
+        console.log('shopId', shopId);
+        $.ajax({
+            type: 'POST', url: url, data: {'food_id': foodId, 'firstSizeId': sizeId}, success: function (response) {
+                if (response.status === 'success') {
 
-        var cart_id = $(this).attr('data-id');
-        var url = $(this).attr('data-url');
-        const sizeId = $('#size_option_' + food_id).attr('data-size-id');
+                    shopTotals[shopId] -= itemPrice;
+                    updateTotalDisplay(shopId);
+                    setTimeout(function () {
+                        $(`.cart-item[data-item-id="${cartItemId}"]`).remove();
+                        if (vendorElement.find('.cart-item').length === 0) {
+                            vendorElement.remove();
+                        }
+                        hideLoading();
+                        remove_cart(response.cart_counter['cart_count'], foodId, sizeId);
+
+                    }, 500);
+
+                }
+            }, error: function (response) {
+                console.log('Error:', response);
+            }
+        });
+        return false;
+
+    });
+
+    $('.decrease_cart').off('click').click(function () {
+        const shopId = $(this).data('shop-id').split('_')[0];
+        const foodId = $(this).attr('data-id');
+        const sizeId = $(this).attr('data-size-id');
+        const url = $(this).attr('data-url');
+        const itemPrice = parseFloat($(this).closest('.cart-item').find('.price').text().replace(' VND', ''));
+
+        if (!shopTotals[shopId]) {
+            shopTotals[shopId] = 0;
+        }
 
         $.ajax({
-            type: 'GET', url: url, data: {
-                'cart_id': cart_id, 'firstSizeId': sizeId
+            type: 'POST', url: url, data: {
+                'food_id': foodId, 'firstSizeId': sizeId
             }, success: function (response) {
-                console.log(response);
-                if (response.status === 'success') {
+                if (response.quantity !== undefined) {
                     $('#cart_counter').html(response.cart_counter['cart_count']);
-                    Swal.fire({
-                        icon: 'success', title: 'Item Removed', text: 'Item has been removed from cart!',
-
-                    })
-                    hideLoading();
+                    $('#qty-' + foodId).html(response.quantity);
                     update_price(response.cart_amount.subtotal, response.cart_amount.tax, response.cart_amount.grand_total);
-                    remove_cart(0, cart_id, sizeId);
+                    shopTotals[shopId] -= itemPrice;
+                    updateTotalDisplay(shopId);
                 }
-
             }, error: function (response) {
                 console.log('Error:', response);
             }
@@ -146,33 +153,19 @@ $(document).ready(function () {
         return false;
     });
 
-    function updateTotalDisplay(shopId) {
-        console.log('shopTotals', shopTotals);
-        $(`#currency_id${shopId}`).text(shopTotals[shopId]);
-    }
-
-
-    function remove_cart(cartItemQty, cart_id, sizeId) {
-        console.log('cartItemQty', cartItemQty);
+    function remove_cart(cartItemQty, cartId, sizeId) {
         if (window.location.pathname === '/marketplace/cart/') {
-            if (cartItemQty <= 0) {
-                console.log('sizeId', sizeId);
-                $('.list-cart-item' + sizeId).remove();
-                $('#total_shipping_cost').text('0');
-                document.getElementById('cart-item-' + cart_id).remove();
-            }
-
             if ($('.menu-itam-list li').length === 0) {
-                var marketplaceUrl = $('.menu-itam-list').data('marketplace-url');
+                console.log('Cart is empty');
+                const marketplaceUrl = $('.menu-itam-list').data('marketplace-url');
                 $('.menu-itam-list').html(`
-            <div class="text-center p-5" role="alert"
-                 style="border: 2px dashed #ccc; border-radius: 10px; background-color: #f9f9f9;">
-                <i class="fa fa-shopping-cart fa-3x text-muted mb-3"></i>
-                <h3>Your cart is empty</h3>
-                <p>Browse our menu and add items to your cart.</p>
-                <a href="${marketplaceUrl}" class="btn btn-primary mt-3">Start Shopping</a>
-            </div>
-        `);
+                    <div class="text-center p-5" role="alert" style="border: 2px dashed #ccc; border-radius: 10px; background-color: #f9f9f9;">
+                        <i class="fa fa-shopping-cart fa-3x text-muted mb-3"></i>
+                        <h3>Your cart is empty</h3>
+                        <p>Browse our menu and add items to your cart.</p>
+                        <a href="${marketplaceUrl}" class="btn btn-primary mt-3">Start Shopping</a>
+                    </div>
+                `);
             }
         }
     }
@@ -183,24 +176,17 @@ $(document).ready(function () {
             $('#tax').html(tax);
             $('#grand_total').html(grand_total);
             $.ajax({
-                type: 'POST',
-                url: 'convert-to-words/',
-                data: {
-                    'amount': grand_total,
-                    'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
-                },
-
-                success: function (response) {
+                type: 'POST', url: 'convert-to-words/', data: {
+                    'amount': grand_total, 'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
+                }, success: function (response) {
                     if (response.words) {
                         $('.total-words span').html(response.words);
                     }
-                },
-                error: function (response) {
+                }, error: function (response) {
                     console.log('Error:', response);
                 }
             });
         }
-
     }
 
     $('#sort-by-alphabetical').off('click').click(function (event) {
@@ -298,14 +284,13 @@ $(document).ready(function () {
         }
     }
 
-    function hideLoading() {
-        document.getElementById('loading_spinner').style.display = 'none';
-        document.getElementById('loadingArea').style.display = 'none';
+    function showLoading() {
+        $("#loading_spinner").removeClass("d-none");
+        $("#loadingArea").removeClass("d-none");
     }
 
-    function showLoading() {
-        console.log('Loading...');
-        document.getElementById('loading_spinner').classList.remove('d-none');
-        document.getElementById('loadingArea').classList.remove('d-none');
+    function hideLoading() {
+        $("#loading_spinner").addClass("d-none");
+        $("#loadingArea").addClass("d-none");
     }
 })
