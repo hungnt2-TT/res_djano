@@ -6,8 +6,9 @@ from django.db.models import Sum, F
 
 
 def get_cart_counter(request):
+    print('reqquest', request.GET)
     if request.user.is_authenticated:
-        cart = Cart.objects.filter(user=request.user)
+        cart = Cart.objects.filter(user=request.user, is_ordered=False)
         cart_count = cart.aggregate(total_quantity=Sum('quantity'))['total_quantity'] or 0
     else:
         cart_count = 0

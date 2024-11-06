@@ -61,11 +61,8 @@ def add_to_cart(request, food_item_id):
         try:
             size_id = request.POST.get('firstSizeId')
             quantity = int(request.POST.get('quantity', 1))
-
             food_item = get_object_or_404(FoodItem, id=food_item_id)
-            print('food_item', food_item)
             size = get_object_or_404(Size, id=size_id)
-            print('size', size)
             cart_item, created = Cart.objects.get_or_create(
                 user=request.user,
                 food_item=food_item,
@@ -73,7 +70,6 @@ def add_to_cart(request, food_item_id):
                 is_ordered=False,
                 defaults={'quantity': quantity, 'note': request.POST.get('note', None)}
             )
-            print('cart_item', cart_item)
             if not created:
                 cart_item.quantity += quantity
                 cart_item.note = request.POST.get('note', None)
@@ -87,15 +83,23 @@ def add_to_cart(request, food_item_id):
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 
+@csrf_exempt
 @login_required(login_url='login')
 def remove_from_cart(request, food_item_id):
+    print('remove_from_cart', request.POST)
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
             food_item = FoodItem.objects.get(pk=food_item_id)
             size_id = request.POST.get('firstSizeId')
+            cart_user = request.user
             size = get_object_or_404(Size, id=size_id)
             cart = Cart.objects.get(user=request.user, food_item=food_item, size=size, is_ordered=False)
+            print('cart', cart.quantity)
+
             cart.quantity -= 1
+            print('cart', cart)
+            print('cart', cart.quantity)
+
             if cart.quantity == 0:
                 cart.delete()
             else:
@@ -136,10 +140,6 @@ def get_distance_and_time(api_key, origin, destination, mode="driving"):
 
 @login_required(login_url='login')
 def cart(request):
-    subtotal = 0
-    tax = 0
-    total_shipping_cost = 0
-
     cart_items = Cart.objects.filter(user=request.user, is_ordered=False).order_by('-created_at')
     profile = EmployeeProfile.objects.get(user=request.user)
     profile_lat, profile_lng = profile.latitude, profile.longitude
@@ -147,10 +147,15 @@ def cart(request):
     grouped_cart_items = defaultdict(lambda: {'items': [], 'total_price': 0})
     api_key = settings.GOOGLE_API_KEY_BY_IP
 
+    subtotal = 0
+    tax = 0
+    total_shipping_cost = 0
+
     for item in cart_items:
         vendor = item.food_item.vendor
         grouped_cart_items[vendor]['items'].append(item)
         grouped_cart_items[vendor]['total_price'] += item.get_total_price()
+
     grouped_cart_items = dict(grouped_cart_items)
 
     for item in cart_items:
@@ -159,8 +164,8 @@ def cart(request):
     grand_total = subtotal + tax
 
     for vendor, data in grouped_cart_items.items():
-        vendor = Vendor.objects.get(vendor_name=vendor)
-        lat, lng = vendor.latitude, vendor.longitude
+        vendor_obj = Vendor.objects.get(vendor_name=vendor)
+        lat, lng = vendor_obj.latitude, vendor_obj.longitude
         origin = f"{lat},{lng}"
         distance, duration = get_distance_and_time(api_key, origin, destination)
         shipping_cost = calculate_shipping_cost(distance)
@@ -171,10 +176,7 @@ def cart(request):
         data['total_with_shipping'] = vendor_total_price
         total_shipping_cost += shipping_cost
 
-        print(f"Vendor: {vendor}, Total Price: {data['total_price']}, Items: {data['items']}, data: {data}")
-
     final_grand_total = grand_total + total_shipping_cost
-    print('final_grand_total', final_grand_total)
 
     context = {
         'grouped_cart_items': grouped_cart_items.items(),

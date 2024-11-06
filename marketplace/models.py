@@ -15,7 +15,7 @@ class Cart(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('food_item', 'size')
+        unique_together = ('food_item', 'size', 'user')
     def __str__(self):
         return self.food_item.food_name
 

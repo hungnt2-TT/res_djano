@@ -122,8 +122,7 @@ class Coupon(models.Model):
         (CREATED_BY_VENDOR, 'Vendor'),
         (CREATED_BY_ADMIN, 'Admin')
     ]
-    food_item = models.ForeignKey(FoodItem, on_delete=models.CASCADE)
-    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    # food_item = models.ForeignKey(FoodItem, on_delete=models.CASCADE)
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     coupon_code = models.CharField(max_length=50, unique=True, blank=True)
     description = CKEditor5Field('Description', config_name='extends')
@@ -137,8 +136,8 @@ class Coupon(models.Model):
     max_discount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
     usage_limit = models.IntegerField(default=1)
     current_usage = models.IntegerField(default=0)
-    created_by = models.CharField(max_length=10, choices=CREATED_BY_CHOICES, default='admin')
-
+    # created_by = models.CharField(max_length=10, choices=CREATED_BY_CHOICES, default='admin')
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     def __str__(self):
         return self.coupon_code
 
@@ -156,7 +155,6 @@ class Coupon(models.Model):
             discount = self.discount_value * order_total / 100
         elif self.type_of_discount in [self.REFUND_COIN, self.FREE_DELIVERY]:
             discount = self.discount_value
-
         if self.max_discount:
             discount = min(discount, self.max_discount)
 
@@ -173,14 +171,14 @@ class Coupon(models.Model):
         if self.min_order_value is None or self.min_order_value < 0:
             self.min_order_value = 0
 
-        if self.created_by == self.CREATED_BY_VENDOR:
-            if not self.user.get_role() == 'owner':
-                raise PermissionError("Only vendors can create coupons for their own products.")
-            if self.food_item.vendor != self.user.vendor:
-                raise PermissionError("Vendors can only create coupons for their own products.")
-        elif self.created_by == self.CREATED_BY_ADMIN:
-            if not self.user.is_admin:
-                raise PermissionError("Only admins can create coupons for all products.")
+        # if self.created_by == self.CREATED_BY_VENDOR:
+        #     if not self.user.get_role() == 'owner':
+        #         raise PermissionError("Only vendors can create coupons for their own products.")
+        #     if self.food_item.vendor != self.user.vendor:
+        #         raise PermissionError("Vendors can only create coupons for their own products.")
+        # elif self.created_by == self.CREATED_BY_ADMIN:
+        #     if not self.user.is_admin:
+        #         raise PermissionError("Only admins can create coupons for all products.")
 
         if not self.coupon_code:
             self.coupon_code = generate_coupon_code()

@@ -13,7 +13,6 @@
     <div class="main-section pt-5">
         <div class="page-section">
             <div class="container">
-                <script src="{% static 'js/cart.js' %}"></script>
                 <div class="row">
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                         <div class="tabs-holder horizontal">
@@ -28,91 +27,102 @@
                                              class="menu-itam-list cart-border-market">
                                             {% if grouped_cart_items %}
                                                 {% for vendor, data in grouped_cart_items %}
-                                                    <h3><a href="{% url 'vendor_detail' vendor.vendor_slug %}"
-                                                           class="badge badge-warning">
-                                                        <i class="fa-solid fa-store fa-2x"></i>{{ vendor }}
-                                                    </a></h3>
+                                                    <div class="list-cart-item{{ forloop.counter }}">
+                                                        <h6><a href="{% url 'vendor_detail' vendor.vendor_slug %}"
+                                                               class="badge badge-warning">
+                                                            <i class="fa-solid fa-store fa-2x"></i>{{ vendor }}
+                                                        </a></h6>
 
-                                                    <ul>
-                                                        {% for cart_item in data.items %}
-                                                            <li id="cart-item-{{ cart_item.id }}" class="cart-item"
-                                                                style="padding:25px">
-                                                                <div class="image-holder"><img
-                                                                        src="{{ cart_item.food_item.image.url }}"
-                                                                        alt=""></div>
-                                                                <div class="text-holder"
-                                                                     style="width: calc(75% - 144px);">
-                                                                    <h6>{{ cart_item }}</h6>
-                                                                    <a href="{% url 'vendor_detail' cart_item.food_item.vendor.vendor_slug %}"
-                                                                       class="badge badge-warning">
-                                                                        {{ cart_item.food_item.vendor.name }}
-                                                                    </a>
-                                                                </div>
-                                                                <div class="price-holder" style="right: 22px">
-                                                                    <span class="price">{{ cart_item.size.price }} VND</span>
-                                                                    <a href="#" class="decrease_cart"
-                                                                       style="margin-right: 28px"
-                                                                       id="{{ cart_item.id }}"
-                                                                       data-id="{{ cart_item.food_item.id }}"
-                                                                       data-url="{% url 'remove_from_cart' cart_item.food_item.id %}">
-                                                                        <i class="icon-minus text-color"></i>
-                                                                    </a>
-                                                                    <label id="qty-{{ cart_item.food_item.id }}">{{ cart_item.quantity }}</label>
-                                                                    <a href="#" class="add_to_cart"
-                                                                       data-id="{{ cart_item.food_item.id }}"
-                                                                       data-url="{% url 'add_to_cart' cart_item.food_item.id %}">
-                                                                        <i class="icon-plus4 text-color"></i>
-                                                                    </a>
-                                                                    <a href="#" class="delete_cart"
-                                                                       data-id="{{ cart_item.id }}"
-                                                                       data-url="{% url 'delete_cart_item' cart_item.id %}">
-                                                                        <i class="icon-delete text-color"></i>
-                                                                    </a>
-                                                                    <span id="add-menu-loader-10"></span>
-                                                                </div>
-                                                            </li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                    <div class="delivery-timing reviews-sortby">
                                                         <ul>
-                                                            <li>
-                                                                <a class="reviews-sortby-active" data-toggle="collapse"
-                                                                   href="#collapseOrderSummary" aria-expanded="false"
-                                                                   aria-controls="collapseOrderSummary">
-                                                                    <span>Order Summary :</span>
-                                                                    <span class="total-item-by-store">
+                                                            {% for cart_item in data.items %}
+                                                                <li id="cart-item-{{ cart_item.id }}" class="cart-item"
+                                                                    style="padding:25px">
+                                                                    <div class="image-holder"><img
+                                                                            src="{{ cart_item.food_item.image.url }}"
+                                                                            alt=""></div>
+                                                                    <div class="badge badge-primary"
+                                                                         data-size-id="{{ cart_item.size.id }}"
+                                                                         id="size_option_{{ cart_item.food_item.id }}">{{ cart_item.size }}</div>
+                                                                    <div class="text-holder"
+                                                                         style="width: calc(75% - 144px);">
+                                                                        <h6>{{ cart_item }}</h6>
+
+
+                                                                    </div>
+                                                                    <div class="price-holder"
+                                                                         style="right: 13px; padding-top: 23px">
+                                                                        <span class="price">{{ cart_item.size.price }} VND</span>
+                                                                        <a href="#" class="decrease_cart"
+                                                                           style="margin-right: 28px"
+                                                                           id="{{ cart_item.id }}"
+                                                                           data-size-id="{{ cart_item.size.id }}"
+                                                                           data-shop-id="{{ forloop.counter }}"
+                                                                           data-id="{{ cart_item.food_item.id }}"
+                                                                           data-url="{% url 'remove_from_cart' cart_item.food_item.id %}">
+                                                                            <i class="icon-minus text-color"></i>
+                                                                        </a>
+                                                                        <label id="qty-{{ cart_item.food_item.id }}">{{ cart_item.quantity }}</label>
+                                                                        <a href="#" class="add_to_cart"
+                                                                           data-id="{{ cart_item.food_item.id }}"
+                                                                           data-shop-id="{{ forloop.counter }}"
+                                                                           data-url="{% url 'add_to_cart' cart_item.food_item.id %}">
+                                                                            <i class="icon-plus4 text-color"></i>
+                                                                        </a>
+                                                                        <a href="#" class="delete_cart"
+                                                                           data-id="{{ cart_item.id }}"
+                                                                           data-url="{% url 'delete_cart_item' cart_item.id %}">
+                                                                            <i class="icon-delete text-color"></i>
+                                                                        </a>
+                                                                        <span id="add-menu-loader-10"></span>
+                                                                    </div>
+                                                                </li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                        <div class="delivery-timing reviews-sortby{{ forloop.counter }}">
+                                                            <ul>
+                                                                <li>
+                                                                    <a class="reviews-sortby-active"
+                                                                       data-toggle="collapse"
+                                                                       href="#collapseOrderSummary"
+                                                                       aria-expanded="false"
+                                                                       aria-controls="collapseOrderSummary">
+                                                                        <span>Order Summary :</span>
+                                                                        <span class="total-item-by-store"
+                                                                              data-shop-id="{{ forloop.counter }}">
                                                                         TOTAL: <span
-                                                                            class="currency">{{ data.total_with_shipping }}</span></span><i
-                                                                        class="icon-chevron-small-down"></i>
-                                                                </a>
-                                                                <ul class="collapse" id="collapseOrderSummary"
-                                                                    style="padding:30px;">
-                                                                    <li>
-                                                                        Time
-                                                                        <span class="price float-right">
-                                                                    <span class="currency">Estimated Time:</span>
+                                                                                class="currency"
+                                                                                id="currency_id{{ forloop.counter }}">{{ data.total_with_shipping }} VND</span></span><i
+                                                                            class="icon-chevron-small-down"></i>
+                                                                    </a>
+                                                                    <ul class="collapse" id="collapseOrderSummary"
+                                                                        style="padding:30px;">
+                                                                        <li>
+                                                                            Time
+                                                                            <span class="price float-right ">
+                                                                    <span class="currency"
+                                                                          data-shop-id="{{ forloop.counter }}">Estimated Time:</span>
                                                                     <span id="subtotal">{{ data.time_to_deliver }} Minutes</span>
                                                                 </span>
-                                                                    </li>
-                                                                    <li>
-                                                                        Shipping
-                                                                        <span class="price float-right">
+                                                                        </li>
+                                                                        <li>
+                                                                            Shipping
+                                                                            <span class="price float-right shipping_cost">
                                                                     <span id="shipping">{{ data.shipping_cost }}</span>
                                                                     <span class="currency">VND</span>
                                                                 </span>
-                                                                    </li>
-                                                                    <li>
-                                                                        Total Price
-                                                                        <span class="price float-right">
+                                                                        </li>
+                                                                        <li>
+                                                                            Total Price
+                                                                            <span class="price float-right">
                                                                     <span class="currency">VND</span>
                                                                     <span id="total">{{ data.total_price }}</span>
                                                                 </span>
-                                                                    </li>
-                                                                </ul>
-                                                            </li>
-                                                        </ul>
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
                                                     </div>
-
                                                 {% endfor %}
                                             {% else %}
                                                 <div class="text-center p-5" role="alert"
@@ -134,10 +144,6 @@
                         <div class="user-order-holder">
                             <div class="user-order">
                                 <h6><i class="icon-shopping-basket "></i>Your Order</h6>
-                                <span class="error-message pre-order-msg">This restaurant allows Pre orders.</span>
-                                <span class="discount-info" style="display: block;">If you have a discount code,<br>
-											you will
-											be able to input it<br> at the payments stage.</span>
                                 <div id="dev-menu-orders-list">
                                     <div class="price-area dev-menu-price-con">
                                         <ul>
@@ -150,8 +156,9 @@
                                             </li>
                                             <li class="restaurant-fee-con">
                                                 <span class="fee-title">Ship</span>
-                                                <span class="price" id="tax"><em
-                                                        class="dev-menu-charges">{{ total_shipping_cost }} VND</em></span>
+                                                <span class="price"><em
+                                                        class="dev-menu-charges"
+                                                        id="total_shipping_cost">{{ total_shipping_cost }} VND</em></span>
                                             </li>
                                         </ul>
                                         <p class="total-price">Total <span class="price" id="grand_total"><em
@@ -159,17 +166,15 @@
                                         </p>
                                         <span class="total-price total-words" style="font-size: 11px">
                                             {% if final_grand_total %}
-                                            {% load custom_filters %}
-                                             <span>{{ final_grand_total|to_vnd_words }}</span>
+                                                {% load custom_filters %}
+                                                <span>{{ final_grand_total|to_vnd_words }}</span>
                                             {% else %}
-                                            <span>...</span>
+                                                <span>...</span>
                                             {% endif %}
                                         </span>
                                     </div>
                                 </div>
-                                <div id="dev-no-menu-orders-list">
-                                    <span class="success-message">There are no items in your basket.</span>
-                                </div>
+
                                 {#                                <a href="#" class="menu-order-confirm">Confirm Order</a>#}
                                 <button type="submit"
                                         class="menu-order-confirm text-uppercase font-weight-bold" type="submit">
