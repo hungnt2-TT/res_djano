@@ -56,6 +56,7 @@
                                                                            style="margin-right: 28px"
                                                                            id="{{ cart_item.id }}"
                                                                            data-size-id="{{ cart_item.size.id }}"
+                                                                           data-item-id="{{ cart_item.id }}"
                                                                            data-shop-id="{{ vendor.id }}_{{ cart_item.id }}"
                                                                            data-id="{{ cart_item.food_item.id }}"
                                                                            data-url="{% url 'remove_from_cart' cart_item.food_item.id %}">
@@ -65,6 +66,7 @@
                                                                                id="qty-{{ cart_item.food_item.id }}">{{ cart_item.quantity }}</label>
                                                                         <a href="#" class="add_to_cart"
                                                                            data-id="{{ cart_item.food_item.id }}"
+                                                                           data-item-id="{{ cart_item.id }}"
                                                                            data-shop-id="{{ vendor.id }}_{{ cart_item.id }}"
                                                                            data-url="{% url 'add_to_cart' cart_item.food_item.id %}">
                                                                             <i class="icon-plus4 text-color"></i>
@@ -72,6 +74,7 @@
                                                                         <a href="#" class="delete_cart"
                                                                            data-id="{{ cart_item.id }}"
                                                                            data-item-id="{{ cart_item.id }}"
+                                                                           data-quan="{{ cart_item.food_item.id }}"
                                                                            data-shop-id="{{ vendor.id }}"
                                                                            data-size-id="{{ cart_item.size.id }}"
                                                                            data-url="{% url 'delete_cart_item' cart_item.id %}">
@@ -117,8 +120,8 @@
                                                                         <li>
                                                                             Total Price
                                                                             <span class="price float-right">
-                                <span class="currency">VND</span>
-                                <span id="total">{{ data.total_price }}</span>
+                                <span class="currency"></span>
+                                <span id="total">{{ data.total_price }} VND</span>
                             </span>
                                                                         </li>
                                                                     </ul>

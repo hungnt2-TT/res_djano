@@ -205,7 +205,9 @@ def delete_cart_item(request, cart_id):
             cart = Cart.objects.get(pk=cart_id, user=request.user, size=size)
             print('delete_cart_item', cart)
             # cart.delete()
-            return JsonResponse({'cart_counter': get_cart_counter(request), 'status': 'success'})
+            return JsonResponse({'cart_counter': get_cart_counter(request),
+                                 'cart_amount': get_cart_amount(request),
+                                 'status': 'success'})
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     return render(request, 'cart.html')
