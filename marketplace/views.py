@@ -13,12 +13,13 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
-from employee.models import EmployeeProfile
+from employee.models import EmployeeProfile, Profile
 from marketplace.context_processors import get_cart_counter, get_total_price_by_marketplace, get_cart_amount
 from marketplace.distance import calculate_distance, estimate_time, calculate_shipping_cost
 from marketplace.models import Cart
 from marketplace.templatetags.custom_filters import to_vnd_words
 from menu.models import Category, FoodItem, Size
+from orders.forms import OrderForm
 from vendor.models import Vendor
 
 
@@ -147,8 +148,30 @@ def get_distance_and_time(api_key, origin, destination, mode="driving"):
 @csrf_exempt
 @login_required(login_url='login')
 def cart(request):
-    cart_items = Cart.objects.filter(user=request.user, is_ordered=False).order_by('-created_at')
+    user_profile = Profile.objects.get(email=request.user.email)
     profile = EmployeeProfile.objects.get(user=request.user)
+    if request.method == 'POST':
+        default_data = {
+            'first_name': user_profile.first_name,
+            'last_name': user_profile.last_name,
+            'username': user_profile.username,
+            'email': user_profile.email,
+            'phone': user_profile.phone_number,
+            'country': 'Viet Nam',
+            'pin_code': profile.pincode,
+            'city': profile.city,
+            'address': profile.address_line_2
+        }
+        form = OrderForm(initial=default_data)
+
+        print('profile ===', profile)
+        context = {
+            'profile': profile,
+            'form': form
+        }
+        print('cart', request.POST)
+        return render(request, 'checkout.html', context)
+    cart_items = Cart.objects.filter(user=request.user, is_ordered=False).order_by('-created_at')
     profile_lat, profile_lng = profile.latitude, profile.longitude
     destination = f"{profile_lat},{profile_lng}"
     grouped_cart_items = defaultdict(lambda: {'items': [], 'total_price': 0})
@@ -203,8 +226,7 @@ def delete_cart_item(request, cart_id):
         try:
             size = request.POST.get('firstSizeId')
             cart = Cart.objects.get(pk=cart_id, user=request.user, size=size)
-            print('delete_cart_item', cart)
-            # cart.delete()
+            cart.delete()
             return JsonResponse({'cart_counter': get_cart_counter(request),
                                  'cart_amount': get_cart_amount(request),
                                  'status': 'success'})

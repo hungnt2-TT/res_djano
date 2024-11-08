@@ -15,6 +15,9 @@ from wallet.models import PaymentMethod
 # Create your views here.
 @login_required(login_url='login')
 def checkout(request):
+    print('request = ', request)
+    if request.method == 'POST':
+        print('request.POST = ', request.POST)
     user_profile = Profile.objects.get(email=request.user.email)
     employee_profile = EmployeeProfile.objects.get(user=user_profile)
 

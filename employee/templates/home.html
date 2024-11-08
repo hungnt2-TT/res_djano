@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% load static %}
+{% load custom_filters %}
 {% block css %}
     <link rel="stylesheet" type="text/css" href="{% static 'employee/css/home.css' %}">
 {% endblock %}
@@ -165,13 +166,9 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <div class="element-title align-left">
-                                <h2>Sale</h2>
-                                <p>Discover restaurants by type of meal</p>
-                            </div>
                             <div class="flash-sale-container">
                                 <div class="flash-sale-title">
-                                    <h1>FoodItems</h1>
+                                    <h3>Recommended</h3>
                                 </div>
                                 {#                                <div class="countdown" id="countdown">#}
                                 {#                                    <div class="countdown-box" id="hours">00</div>#}
@@ -234,154 +231,154 @@
                                 {#										</a>#}
                                 {#									</div>#}
                                 {#								</div>#}
-                                <section class="row">
-                                    <div class="container-item">
-                                        <div class="item">
-                                            <div class="item-overlay">
-                                                <div class="sale-tag"><span>SALE</span></div>
-                                            </div>
-                                            <div class="item-content">
-                                                <div class="item-top-content">
-                                                    <div class="item-top-content-inner">
-                                                        <div class="item-product">
-                                                            <div class="item-top-title">
-                                                                <h2>BFL Heels</h2>
-                                                                <p class="subdescription">
-                                                                    Pencil Heel - Silver
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                        <div class="item-product-price">
-                                                            <span class="price-num">$17</span>
-                                                            <p class="subdescription">$36</p>
-                                                            <div class="old-price"></div>
+
+                                <section class="slider-container">
+                                    <div class="slider">
+                                        {% for item in food_items %}
+                                            <div class="container-item">
+                                                <div class="item">
+                                                    <!-- Nội dung sản phẩm, bao gồm ảnh, tên sản phẩm và giá -->
+                                                    <div class="item-info">
+                                                        <div class="item-image"
+                                                             style="background: url('{{ item.image.url }}') no-repeat center center; background-size: cover;"></div>
+                                                        <div class="item-details">
+                                                            <h5 class="item-title">{{ item.food_name }}</h5>
+                                                            <p class="item-price">{{ item.price }}</p>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="item-add-content">
-                                                    <div class="item-add-content-inner">
-                                                        <div class="section">
-                                                            <h4>Sizes</h4>
-                                                            <p>40,41,42,43,44,45</p>
-                                                        </div>
-                                                        <div class="section">
-                                                            <a href="#" class="btn buy expand">Buy now</a>
-                                                        </div>
+                                                    <!-- Nội dung hiển thị khi hover -->
+                                                    <div class="item-hover-content">
+{#                                                        <p class="item-description">{{ item.food_title|truncate_chars:20 }}</p>#}
+{#                                                        <div class="item-sizes">#}
+{#                                                            <h4>Sizes</h4>#}
+{#                                                            <p>40, 41, 42, 43, 44, 45</p>#}
+{#                                                        </div>#}
+                                                        <a href="#" class="btn buy-now">Buy Now</a>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        {% endfor %}
+                                    </div>
+
+                                    <!-- Thay thế button bằng icon (FontAwesome) -->
+                                    <div class="prev-btn">
+                                        <i class="fa fa-chevron-left"></i>
+                                    </div>
+                                    <div class="next-btn">
+                                        <i class="fa fa-chevron-right"></i>
+                                    </div>
                                 </section>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Top Restarurants Section Start -->
-            <div class="page-section nopadding cs-nomargin"
-                 style="margin-top: 0px;padding-top: 60px;padding-bottom: 0px;margin-bottom: 0px;background: #ffffff;">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <div class="element-title align-left">
-                                <h2>Top Restaurants</h2>
-                                <p>Explore restaurants, bars, and cafés by locality</p>
-                            </div>
+        <!-- Top Restarurants Section Start -->
+        <div class="page-section nopadding cs-nomargin"
+             style="margin-top: 0px;padding-top: 60px;padding-bottom: 0px;margin-bottom: 0px;background: #ffffff;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="element-title align-left">
+                            <h2>Top Restaurants</h2>
+                            <p>Explore restaurants, bars, and cafés by locality</p>
                         </div>
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <div class="company-logo">
-                                <ul id="vendorList" style="display: none;">
-                                    {% for vendor in vendors %}
-                                        <li class="has-border">
-                                            <figure>
-                                                {% if vendor.user_profile.profile_picture %}
-                                                    <a href="#"><img src="{{ vendor.user_profile.profile_picture.url }}"
-                                                                     class="attachment-full size-full wp-post-image"
-                                                                     alt=""></a>{% else %}
-                                                    <a href="#"><img src="{% static 'employee/img/download.png' %}">
-                                                    </a>{% endif %}
-                                            </figure>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="company-logo">
+                            <ul id="vendorList" style="display: none;">
+                                {% for vendor in vendors %}
+                                    <li class="has-border">
+                                        <figure>
+                                            {% if vendor.user_profile.profile_picture %}
+                                                <a href="#"><img src="{{ vendor.user_profile.profile_picture.url }}"
+                                                                 class="attachment-full size-full wp-post-image"
+                                                                 alt=""></a>{% else %}
+                                                <a href="#"><img src="{% static 'employee/img/download.png' %}">
+                                                </a>{% endif %}
+                                        </figure>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Top Restarurants Section End -->
-            <!-- Choose From Most Popular Listin Start -->
-            <div class="page-section nopadding cs-nomargin"
-                 style="margin-top: 0px;padding-top: 60px;padding-bottom: 50px;margin-bottom: 0px;background: #ffffff;">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <div class="element-title align-center">
-                                <h2>Nearest Restaurant In Your Location</h2>
-                                <p>Cum doctus civibus efficiantur in imperdiet deterruisset.</p>
-                            </div>
+        </div>
+        <!-- Top Restarurants Section End -->
+        <!-- Choose From Most Popular Listin Start -->
+        <div class="page-section nopadding cs-nomargin"
+             style="margin-top: 0px;padding-top: 60px;padding-bottom: 50px;margin-bottom: 0px;background: #ffffff;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="element-title align-center">
+                            <h2>Nearest Restaurant In Your Location</h2>
+                            <p>Cum doctus civibus efficiantur in imperdiet deterruisset.</p>
                         </div>
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <div class="listing fancy">
-                                <ul class="row" id="restaurantList">
-                                    {% for vendor in vendors %}
-                                        <li class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                            <div class="list-post featured">
-                                                <div class="img-holder">
-                                                    <figure>
-                                                        {% if vendor.user_profile.profile_picture %}
-                                                            <a href="#"><img
-                                                                    src="{{ vendor.user_profile.profile_picture.url }}"
-                                                                    class="img-thumb wp-post-image" alt=""></a>
-                                                        {% else %}
-                                                            <a href="#"><img
-                                                                    src="{% static 'employee/img/download.png' %}">
-                                                            </a>{% endif %}
-                                                    </figure>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="listing fancy">
+                            <ul class="row" id="restaurantList">
+                                {% for vendor in vendors %}
+                                    <li class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                        <div class="list-post featured">
+                                            <div class="img-holder">
+                                                <figure>
+                                                    {% if vendor.user_profile.profile_picture %}
+                                                        <a href="#"><img
+                                                                src="{{ vendor.user_profile.profile_picture.url }}"
+                                                                class="img-thumb wp-post-image" alt=""></a>
+                                                    {% else %}
+                                                        <a href="#"><img
+                                                                src="{% static 'employee/img/download.png' %}">
+                                                        </a>{% endif %}
+                                                </figure>
 
-                                                    <span class="restaurant-status close">
+                                                <span class="restaurant-status close">
 													<em class="bookmarkRibbon"></em>Close
 												</span>
-                                                    {#                                            <span class="restaurant-status open">#}
-                                                    {#													<em class="bookmarkRibbon"></em>open#}
-                                                    {#												</span>#}
-                                                </div>
-                                                <div class="text-holder">
-                                                    <div class="list-rating">
-                                                        <div class="rating-star">
-                                                            <span class="rating-box" style="width: 100%;"></span>
-                                                        </div>
-                                                        <span class="reviews">(1)</span>
-                                                    </div>
-                                                    <div class="post-title">
-                                                        <h5>
-                                                            <a href="listing-detail.html">{{ vendor }}</a>
-                                                            <span class="sponsored text-color">Sponsored</span>
-                                                        </h5>
-                                                    </div>
-                                                    <address>
-                                                        {% if vendor.address_line_1 and vendor.state and vendor.city %}
-                                                            <span>Address:
-                                                    </span>{{ vendor.address_line_1 }},  {{ vendor.state }},
-                                                            {{ vendor.city }}
-                                                        {% endif %}</address>
-                                                </div>
-
+                                                {#                                            <span class="restaurant-status open">#}
+                                                {#													<em class="bookmarkRibbon"></em>open#}
+                                                {#												</span>#}
                                             </div>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
+                                            <div class="text-holder">
+                                                <div class="list-rating">
+                                                    <div class="rating-star">
+                                                        <span class="rating-box" style="width: 100%;"></span>
+                                                    </div>
+                                                    <span class="reviews">(1)</span>
+                                                </div>
+                                                <div class="post-title">
+                                                    <h5>
+                                                        <a href="listing-detail.html">{{ vendor }}</a>
+                                                        <span class="sponsored text-color">Sponsored</span>
+                                                    </h5>
+                                                </div>
+                                                <address>
+                                                    {% if vendor.address_line_1 and vendor.state and vendor.city %}
+                                                        <span>Address:
+                                                    </span>{{ vendor.address_line_1 }},  {{ vendor.state }},
+                                                        {{ vendor.city }}
+                                                    {% endif %}</address>
+                                            </div>
+
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Choose From Most Popular Listing End -->
-
-            <!-- Home Pages Elements End  -->
         </div>
-        <!-- Main Section End -->
+        <!-- Choose From Most Popular Listing End -->
+
+        <!-- Home Pages Elements End  -->
+    </div>
+    <!-- Main Section End -->
 
     </div>
 {% endblock %}

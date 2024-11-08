@@ -2,27 +2,34 @@ $(document).ready(function () {
     console.log('cart.js loaded');
     let shopTotals = {};
 
-    function updateTotalDisplay(shopId) {
+    function updateTotalDisplay(shopId, itemPrice = 0) {
         $(`#currency_id${shopId}`).text(shopTotals[shopId] + ' VND');
-        let totalAllShops = Object.values(shopTotals).reduce((acc, total) => acc + total, 0);
-        $('#total').text(totalAllShops + ' VND');
+        console.log('totalAllShops:', itemPrice);
+        $('#total').text(itemPrice + ' VND');
     }
 
     function updatePrice(subtotal, tax, grandTotal, shipping = 0, type = '') {
         console.log('shipping:', shipping);
         if (window.location.pathname === '/marketplace/cart/') {
-            const $totalShippingCostElement = $("#total_shipping_cost");
-            $totalShippingCostElement.text(shipping + ' VND');
+            const totalShippingCostElement = parseInt($("#total_shipping_cost").text().replace(' VND', '').trim(), 10);
+            console.log('totalShippingCostElement', totalShippingCostElement);
+            // console.log('subtotal:', subtotal);
+            // console.log('$totalShippingCostElement:', $totalShippingCostElement);
+            // $totalShippingCostElement.text(shipping + ' VND');
             $('#subtotal_all').html(subtotal + ' VND');
             $('#tax').html(tax + ' VND');
-            if (type === 'add') {
-                $('#grand_total').html(grandTotal + shipping + ' VND');
+            if (type === 'add' || type === 'decrease') {
+                $('#grand_total').html(grandTotal + totalShippingCostElement + ' VND');
             } else {
-                $('#grand_total').html(grandTotal + ' VND');
+                const $totalShippingCostElement = $("#total_shipping_cost");
+                var newTotalShippingCost = totalShippingCostElement - shipping;
+                $totalShippingCostElement.text(newTotalShippingCost + ' VND');
+                $('#grand_total').html(grandTotal + newTotalShippingCost +' VND');
             }
             $.ajax({
                 type: 'POST', url: 'convert-to-words/', data: {
-                    'amount': grandTotal, 'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
+                    'amount': grandTotal + totalShippingCostElement,
+                    'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
                 }, success: function (response) {
                     if (response.words) {
                         $('.total-words span').html(response.words);
@@ -73,13 +80,9 @@ $(document).ready(function () {
         if (response.quantity !== undefined) {
             $('#cart_counter').html(response.cart_counter['cart_count']);
             $('#qty-' + foodId).html(response.quantity);
-            console.log('response:', response);
-            const $totalShippingCostElement = $("#total_shipping_cost");
-            let currentTotalShippingCost = parseFloat($totalShippingCostElement.text().replace(' VND', '').trim());
-            let newTotalShippingCost = shipCost;
             updatePrice(response.cart_amount.subtotal, response.cart_amount.tax, response.cart_amount.grand_total, shipCost, type = 'add');
             shopTotals[shopId] += itemPrice;
-            updateTotalDisplay(shopId);
+            updateTotalDisplay(shopId, itemPrice * response.quantity);
         }
     }
 
@@ -87,13 +90,10 @@ $(document).ready(function () {
         if (response.status === 'success') {
             shopTotals[shopId] -= itemPrice;
             updateTotalDisplay(shopId);
-
             setTimeout(function () {
                 $(`.cart-item[data-item-id="${cartItemId}"]`).remove();
                 if (vendorElement.find('.cart-item').length === 0) {
                     vendorElement.remove();
-                    console.log('quantity:', quantity);
-                    console.log('cartItemId:', cartItemId);
                     const newGrandTotal = response.cart_amount.grand_total - itemPrice * quantity;
                     const newSubtotal = response.cart_amount.subtotal - itemPrice * quantity;
                     $('#subtotal_all').html(newSubtotal + ' VND');
@@ -105,7 +105,6 @@ $(document).ready(function () {
                         }
                         removeCart();
                     }
-                    console.log('response.cart_amount.ship_cost:', response.cart_amount.ship_cost);
                     const $totalShippingCostElement = $("#total_shipping_cost");
                     let currentTotalShippingCost = parseFloat($totalShippingCostElement.text().replace(' VND', '').trim());
                     let newTotalShippingCost = currentTotalShippingCost - response.cart_amount.ship_cost;
@@ -118,20 +117,18 @@ $(document).ready(function () {
 
     function handleDecreaseCartSuccess(response, shopId, itemPrice, cartItemId, vendorElement, foodId) {
         if (response.quantity !== undefined) {
-
-            console.log('response:', response);
             $('#qty-' + foodId).html(response.quantity);
 
             $('#cart_counter').html(response.cart_counter['cart_count']);
-            updatePrice(response.cart_amount.subtotal, response.cart_amount.tax, response.cart_amount.grand_total);
             shopTotals[shopId] -= itemPrice;
-            updateTotalDisplay(shopId);
-            console.log('response.quantity:', response);
-            updatePrice(response.cart_amount.subtotal, response.cart_amount.tax, response.cart_amount.grand_total, response.cart_amount.ship_cost);
+            updateTotalDisplay(shopId, itemPrice * response.quantity);
+            updatePrice(response.cart_amount.subtotal, response.cart_amount.tax, response.cart_amount.grand_total, response.cart_amount.ship_cost, 'decrease');
             if (response.quantity === 0) {
                 $(`.cart-item[data-item-id="${cartItemId}"]`).remove();
                 if (vendorElement.find('.cart-item').length === 0) {
                     vendorElement.remove();
+                    updatePrice(response.cart_amount.subtotal, response.cart_amount.tax, response.cart_amount.grand_total, response.cart_amount.ship_cost, 'delete');
+
                 }
                 removeCart(response.cart_counter['cart_count'], foodId, sizeId, shipCost);
             }
@@ -330,4 +327,5 @@ $(document).ready(function () {
         var action = $(this).attr('data-action');
         fetchSortedVendors(action, url);
     });
+
 });

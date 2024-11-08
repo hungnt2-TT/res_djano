@@ -1,389 +1,186 @@
-.main-search.fancy .field-holder input[type="text"] {
-    color: #000000 !important;
-}
-
-/*#loadingArea {*/
-/*    position: fixed;*/
-/*    top: 0;*/
-/*    left: 0;*/
-/*    right: 0;*/
-/*    bottom: 0;*/
-/*    width: 100%;*/
-/*    height: 100%;*/
-/*    background: rgba(256, 256, 256, 0.6);*/
-/*    text-align: center;*/
-/*    z-index: 3;*/
-/*}*/
-
-/*#loadingArea #loading_spinner {*/
-/*    width: 3rem;*/
-/*    height: 3rem;*/
-/*    position: absolute;*/
-/*    color: rgba(0, 66, 144, 0.8);*/
-/*    top: 50%;*/
-/*    left: 50%;*/
-/*    margin-top: -1.5rem;*/
-/*    margin-left: -1.5rem;*/
-/*}*/
-
-
-.row {
-    width: 100%;
-    display: block;
-    clear: both;
-}
-
-/* Actual content */
-
-.container-item {
-    /*position: relative;
-      margin-top:40px;
-      float:left;
-      margin-right:20px;*/
-    max-width: 960px;
-    margin: 0px auto;
-    height: 295px;
-}
-
-.item {
-    width: 24%;
-    height: 260px;
-    background-image: url(http://i202.photobucket.com/albums/aa307/slucas_bucket/fresh-1.jpg);
-    -webkit-background-size: 100%;
-    -o-background-size: 100%;
-    background-size: 100%;
+/* Cấu hình chung cho container */
+.slider-container {
     position: relative;
-    float: left;
-    margin-right: 1.33%;
-    top: 0;
-    left: 0;
-    z-index: 5;
+    width: 100%;
     overflow: hidden;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-    -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+    padding: 20px 0; /* Thêm khoảng cách từ trên và dưới */
+        margin-bottom: 20px;
 }
 
-.item:nth-child(4n+4) {
-    margin-right: 0px;
+/* Slider sử dụng flexbox */
+.slider {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: 100%;
 }
 
-.item-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
+/* Mỗi phần tử chiếm 25% chiều rộng (4 items trên một hàng) */
+.container-item {
+    flex: 0 0 calc(100% / 4); /* Adjust based on itemsPerSlide */
+    padding: 10px;
+    box-sizing: border-box;
+    transition: transform 0.3s ease;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+/* Ẩn nội dung chi tiết cho đến khi hover */
+.item {
+    position: relative;
     width: 100%;
     height: 100%;
-    /* IE9 SVG, needs conditional override of 'filter' to 'none' */
-
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjI4JSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC40MiIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-    background: -moz-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0.42) 100%);
-    /* FF3.6+ */
-
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0, 0, 0)), color-stop(28%, rgba(0, 0, 0, 0)), color-stop(100%, rgba(0, 0, 0, 0.42)));
-    /* Chrome,Safari4+ */
-
-    background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0.42) 100%);
-    /* Chrome10+,Safari5.1+ */
-
-    background: -o-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0.42) 100%);
-    /* Opera 11.10+ */
-
-    background: -ms-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0.42) 100%);
-    /* IE10+ */
-
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0.42) 100%);
-    /* W3C */
-
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#6b000000', GradientType=0);
-    /* IE6-8 */
-
-    -webkit-transition: background-color 0.3s ease-in-out;
-    -moz-transition: background-color 0.3s ease-in-out;
-    -ms-transition: background-color 0.3s ease-in-out;
-    -o-transition: background-color 0.3s ease-in-out;
-    transition: background-color 0.3s ease-in-out;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
 }
 
-.item:hover .item-overlay {
-    /* IE9 SVG, needs conditional override of 'filter' to 'none' */
-
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjI4JSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMC40MiIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-    background: -moz-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0.42) 100%);
-    /* FF3.6+ */
-
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(0, 0, 0, 0)), color-stop(28%, rgba(0, 0, 0, 0)), color-stop(100%, rgba(0, 0, 0, 0.42)));
-    /* Chrome,Safari4+ */
-
-    background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0.42) 100%);
-    /* Chrome10+,Safari5.1+ */
-
-    background: -o-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0.42) 100%);
-    /* Opera 11.10+ */
-
-    background: -ms-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0.42) 100%);
-    /* IE10+ */
-
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0.42) 100%);
-    /* W3C */
-
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#6b000000', GradientType=0);
-    /* IE6-8 */
-
-    background-color: rgba(0, 0, 0, 0.4);
+/* Hiển thị hình ảnh sản phẩm và thông tin bên trái */
+.item-info {
+    display: flex;
+    justify-content: space-between;
+    padding: 11px;
 }
 
-.item-content {
-    position: absolute;
-    width: 100%;
-    bottom: 0;
-    -webkit-transform: translate(0, 100%);
-    -moz-transform: translate(0, 100%);
-    -ms-transform: translate(0, 100%);
-    -o-transform: translate(0, 100%);
-    transform: translate(0, 100%);
-    -webkit-transition: all 0.3s ease-in-out;
-    -moz-transition: all 0.3s ease-in-out;
-    -ms-transition: all 0.3s ease-in-out;
-    -o-transition: all 0.3s ease-in-out;
-    transition: all 0.3s ease-in-out;
+.item-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 10px;
+    background-size: cover;
+    background-position: center;
+    transition: opacity 0.3s ease;
 }
 
-.item:hover .item-content {
-    -webkit-transform: translate(0, 0);
-    -moz-transform: translate(0, 0);
-    -ms-transform: translate(0, 0);
-    -o-transform: translate(0, 0);
-    transform: translate(0, 0);
-    -webkit-transition: all 0.3s ease-in-out;
-    -moz-transition: all 0.3s ease-in-out;
-    -ms-transition: all 0.3s ease-in-out;
-    -o-transition: all 0.3s ease-in-out;
-    transition: all 0.3s ease-in-out;
+.item-details {
+    flex: 1;
+    padding-left: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
-.item-top-content {
-    position: relative;
-}
-
-.item-top-content-inner {
-    position: absolute;
-    bottom: 0;
-    padding: 10px 15px 10px 15px;
-    background: rgba(255, 255, 255, .85);
-    width: 100%;
-}
-
-.item-add-content {
-    padding: 0 15px 15px 15px;
-    opacity: 0;
-    -webkit-transition: all 0.3s ease-in-out;
-    -moz-transition: all 0.3s ease-in-out;
-    -ms-transition: all 0.3s ease-in-out;
-    -o-transition: all 0.3s ease-in-out;
-    transition: all 0.3s ease-in-out;
-}
-
-.item:hover .item-add-content {
-    opacity: 1
-}
-
-.item-add-content-inner {
-    border: 0px solid #dadada;
-    border-top-width: 1px;
-    padding-top: 10px;
-}
-
-/* Buttons */
-
-
-.btn.buy {
-    background-color: #40c781;
-    text-align: center;
-    line-height: 42px;
-    font-weight: 700;
-    color: #fff;
-    border-radius: 3px;
-    text-decoration: none;
-    opacity: 1;
-    border: 0px solid #35a76e;
-    border-bottom-width: 2px;
-    -webkit-transition: all 0.2s ease-in-out;
-    -moz-transition: all 0.2s ease-in-out;
-    -ms-transition: all 0.2s ease-in-out;
-    -o-transition: all 0.2s ease-in-out;
-    transition: all 0.2s ease-in-out;
-}
-
-.btn.buy:hover {
-    background-color: #34a46c;
-}
-
-.expand {
-    display: block;
-}
-
-/* Tags */
-
-.sale-tag {
-    width: 50px;
-    height: 100px;
-    background: #40c781;
-    position: absolute;
-    top: -45px;
-    right: -10px;
-    -webkit-transform: rotate(-45deg);
-    -moz-transform: rotate(-45deg);
-    -ms-transform: rotate(-45deg);
-    -o-transform: rotate(-45deg);
-    transform: rotate(-45deg);
-}
-
-.sale-tag span {
-    position: absolute;
-    top: 48px;
-    left: 2px;
-    -webkit-transform: rotate(45deg);
-    -moz-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    -o-transform: rotate(45deg);
-    transform: rotate(45deg);
-    font-size: 11px;
-    color: #fff;
-}
-
-/* content */
-
-.item-product {
-    width: 70%;
-    float: left;
-}
-
-.item-product-price {
-    width: 30%;
-    float: right;
-    text-align: right;
-}
-
-/* Style / Theming */
-/*Prduct title*/
-
-h2 {
-    font-size: 1em;
-    font-weight: 400;
-    color: #222;
-}
-
-.subdescription {
-    font-family: 'helvetica neue';
-    font-size: 0.8em;
-    font-weight: 400;
-    color: #7d7d7d;
-}
-
-/*product price*/
-
-.item-product-price {
-    color: #40c781;
-    font-size: 1em;
-    font-weight: 700;
-    position: relative;
-    font-family: 'helvetica neue'
-}
-
-.item-product-price .subdescription {
-    color: #7d7d7d;
-}
-
-.old-price {
-    border: 0 solid #7d7d7d;
-    border-bottom-width: 1px;
-    margin-top: -11px;
-    width: 30px;
-    position: absolute;
-    right: -2px;
-    bottom: 27px;
-    -webkit-transform: rotate(-30deg);
-    -moz-transform: rotate(-30deg);
-    -ms-transform: rotate(-30deg);
-    -o-transform: rotate(-30deg);
-    transform: rotate(-30deg);
-}
-
-.item-content {
-    background: rgba(255, 255, 255, .85);
-}
-
-.item-add-content {
-    font-family: 'Lato', sans-serif;
-    font-weight: 400;
-    color: #7d7d7d;
-}
-
-.item-add-content .section {
+/* Tên sản phẩm và giá */
+.item-title {
+    font-size: 18px;
+    font-weight: bold;
     margin-bottom: 10px;
 }
 
-.item-add-content .section:last-of-type {
-    margin-bottom: 0;
+.item-price {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ff5733; /* Màu sắc của giá */
 }
 
-.item-add-content h4 {
-    font-weight: 600;
-    color: #222;
-    font-size: 0.8em;
-}
-
-.item-add-content p {
-    font-size: 0.8em;
-}
-
-
-.flash-sale-container {
+/* Nội dung hiển thị khi hover */
+.item-hover-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7); /* Nền mờ khi hover */
+    opacity: 0;
+    visibility: hidden;
+    padding: 20px;
     display: flex;
-    align-items: center;
-    background-color: #fff;
+    flex-direction: column;
+    justify-content: flex-end;
+    text-align: center;
+    color: #fff;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.item:hover .item-hover-content {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Hiển thị mô tả và size khi hover */
+.item-description {
+    font-size: 14px;
+    margin-bottom: 15px;
+    color: #ccc;
+}
+
+.item-sizes {
+    margin-bottom: 15px;
+}
+
+.item-sizes h4 {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.item-sizes p {
+    font-size: 14px;
+    color: #fff;
+}
+
+.btn.buy-now {
+    background-color: #ff5733; /* Nền màu cam */
+    color: #fff;
     padding: 10px 20px;
-    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
 }
 
-.flash-sale-title {
-    display: flex;
-    align-items: center;
+.btn.buy-now:hover {
+    background-color: #d44e2e; /* Màu sắc khi hover */
 }
 
-.flash-sale-title h1 {
-    color: #ff4a00 !important;
-    font-size: 2em;
-    margin-right: 10px;
-}
-
-.flash-sale-title img {
-    width: 30px;
-    margin-right: 10px;
-}
-
-.countdown {
-    display: flex;
-    align-items: center;
-}
-
-.countdown-box {
-    width: 40px;
-    height: 40px;
-    background-color: black;
+/* Nút "Previous" và "Next" (Sử dụng icon FontAwesome) */
+.prev-btn, .next-btn {
+    position: absolute;
+    top: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
     color: white;
-    font-size: 1.5em;
+    padding: 10px;
+    cursor: pointer;
+    transform: translateY(-50%);
+    z-index: 10;
+    border-radius: 50%;
+    font-size: 24px; /* Đặt kích thước icon */
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-right: 5px;
-    border-radius: 5px;
 }
 
-.view-all {
-    color: #ff4a00;
-    text-decoration: none;
-    font-size: 1.2em;
+.prev-btn {
+    left: 20px;
+}
+
+.next-btn {
+    right: 20px;
+}
+
+/* Hiệu ứng hover cho icon */
+.prev-btn:hover, .next-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.prev-btn i, .next-btn i {
+    font-size: 24px;
+}
+
+/* Responsive: Điều chỉnh khi màn hình nhỏ hơn */
+@media (max-width: 1024px) {
+    .container-item {
+        flex: 0 0 33.33%; /* Hiển thị 3 items mỗi hàng */
+    }
+}
+
+@media (max-width: 768px) {
+    .container-item {
+        flex: 0 0 50%; /* Hiển thị 2 items mỗi hàng */
+    }
+}
+
+@media (max-width: 480px) {
+    .container-item {
+        flex: 0 0 100%; /* Hiển thị 1 item mỗi hàng */
+    }
 }
