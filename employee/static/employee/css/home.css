@@ -184,3 +184,8 @@
         flex: 0 0 100%; /* Hiển thị 1 item mỗi hàng */
     }
 }
+
+.disabled {
+    pointer-events: none;
+    opacity: 0.5; /* Tùy chọn, để làm mờ các nút đã vô hiệu hóa */
+}

@@ -40,19 +40,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const slideItems = document.querySelectorAll('.container-item');
     const totalItems = slideItems.length;
+    console.log('Total items:', totalItems);
     const itemsPerSlide = 4; // Số lượng items hiển thị mỗi lần
     let currentIndex = 0; // Vị trí nhóm hiện tại
 
     // Hàm cập nhật vị trí slider
     function updateSlider() {
-        console.log('Current updateSlider:', currentIndex);
+
         slider.style.transform = `translateX(-${(currentIndex * (100 / itemsPerSlide))}%)`;
+        console.log('TranslateX:', currentIndex * (100 / itemsPerSlide));
+        console.log('Slider:', slider.style.transform);
+        console.log('Current index:', currentIndex);
+
     }
 
     // Sự kiện khi nhấn nút Next
     nextBtn.addEventListener('click', function () {
         console.log('Current index:', currentIndex);
-        if (currentIndex < Math.floor(totalItems / itemsPerSlide) - 1) {
+        console.log('Total items:', totalItems);
+        console.log('Items per slide:', itemsPerSlide);
+        if (currentIndex < totalItems - itemsPerSlide) {
             currentIndex++;
         } else {
             currentIndex = 0; // Nếu đã đến cuối thì quay lại đầu
@@ -65,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (currentIndex > 0) {
             currentIndex--;
         } else {
-            currentIndex = Math.floor(totalItems / itemsPerSlide) - 1; // Quay lại nhóm cuối cùng
+            currentIndex = totalItems - itemsPerSlide; // Quay lại nhóm cuối cùng
         }
         updateSlider();
     });
@@ -73,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Khởi tạo slider ban đầu
     updateSlider();
 });
+
 window.onload = function () {
     initSearchLocation();
 }

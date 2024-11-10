@@ -6,7 +6,7 @@ from django.db.models import Sum, F
 
 
 def get_cart_counter(request):
-    print('reqquest', request.POST)
+    print('reqquest ?????', request.POST)
     if request.user.is_authenticated:
         size = request.POST.get('firstSizeId')
         cart = Cart.objects.filter(user=request.user, is_ordered=False)

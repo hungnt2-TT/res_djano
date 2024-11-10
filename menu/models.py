@@ -6,6 +6,7 @@ from imp import reload
 import joblib
 import os
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 
 from django.db import models
@@ -17,11 +18,13 @@ from wallet.models import Wallet
 from django.template.defaultfilters import slugify
 from django_ckeditor_5.fields import CKEditor5Field
 
-model_path = os.path.join(settings.BASE_DIR, 'menu', 'food_time_model.pkl')
-vectorizer_path = os.path.join(settings.BASE_DIR, 'menu', 'vectorizer.pkl')
 
-clf = joblib.load(model_path)
-vectorizer = joblib.load(vectorizer_path)
+#
+# model_path = os.path.join(settings.BASE_DIR, 'menu', 'food_time_model.pkl')
+# vectorizer_path = os.path.join(settings.BASE_DIR, 'menu', 'vectorizer.pkl')
+#
+# clf = joblib.load(model_path)
+# vectorizer = joblib.load(vectorizer_path)
 
 
 # Create your models here.
@@ -62,6 +65,7 @@ class Size(models.Model):
     def __str__(self):
         return f"{self.get_size_display()} - {self.price} VND"
 
+
 class FoodItem(models.Model):
     TIME_RANGES = [
         ('morning', '6:00-12:00'),
@@ -96,9 +100,29 @@ class FoodItem(models.Model):
         self.slug = slugify(self.food_name)
         if self.price < 0 or None:
             self.price = 0
-        if not self.time_range:
-            test_food = vectorizer.transform([self.name])
+            # Đường dẫn tới các file model và vectorizer đã được huấn luyện và lưu trữ trước đó
+        model_path = os.path.join(settings.BASE_DIR, 'menu', 'food_time_model.pkl')
+        vectorizer_path = os.path.join(settings.BASE_DIR, 'menu', 'vectorizer.pkl')
+        # model_path = os.path.join('path_to_saved_model', 'food_time_model.pkl')
+        # vectorizer_path = os.path.join('path_to_saved_vectorizer', 'vectorizer.pkl')
+        print('model_path', model_path)
+        print('vectorizer_path', vectorizer_path)
+        # Kiểm tra nếu model và vectorizer tồn tại
+        if os.path.exists(model_path) and os.path.exists(vectorizer_path):
+            # Tải mô hình và vectorizer
+            clf = joblib.load(model_path)
+            vectorizer = joblib.load(vectorizer_path)
+            print('clf', clf)
+            # Kiểm tra nếu time_range chưa được xác định, tiến hành dự đoán
+            print('self.food_name', self.food_name)
+            food_name_lower = self.food_name.lower()
+            # Chuyển tên món ăn thành vector
+            test_food = vectorizer.transform([food_name_lower])
+            print('test_food', test_food)
+            # Dự đoán time_range và gán vào thuộc tính của đối tượng
+            print('clf.predict(test_food)', clf.predict(test_food))
             self.time_range = clf.predict(test_food)[0]
+        # Gọi phương thức save của lớp cha để lưu đối tượng vào DB
         super(FoodItem, self).save(*args, **kwargs)
 
 
@@ -116,71 +140,86 @@ class Coupon(models.Model):
         (PERCENTAGE, 'Percentage'),
         (REFUND_COIN, 'Refund Coin')
     ]
-    CREATED_BY_VENDOR = 'Vendor'
-    CREATED_BY_ADMIN = 'Admin'
-    CREATED_BY_CHOICES = [
-        (CREATED_BY_VENDOR, 'Vendor'),
-        (CREATED_BY_ADMIN, 'Admin')
-    ]
-    # food_item = models.ForeignKey(FoodItem, on_delete=models.CASCADE)
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+
     coupon_code = models.CharField(max_length=50, unique=True, blank=True)
     description = CKEditor5Field('Description', config_name='extends')
     coupon_creation_date = models.DateTimeField(auto_now_add=True)
     coupon_expiry_date = models.DateTimeField()
     redeemed = models.BooleanField(default=False)
     redeemed_at = models.DateTimeField(null=True, blank=True)
-    discount_value = models.DecimalField(max_digits=5, decimal_places=2)
+    discount_value = models.IntegerField()
     type_of_discount = models.CharField(max_length=50, choices=TYPE_OF_DISCOUNT_CHOICES, default=PERCENTAGE)
-    min_order_value = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, default=0)
-    max_discount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
+    min_order_value = models.IntegerField(null=True, blank=True)
+    max_discount = models.IntegerField(null=True, blank=True)
     usage_limit = models.IntegerField(default=1)
     current_usage = models.IntegerField(default=0)
-    # created_by = models.CharField(max_length=10, choices=CREATED_BY_CHOICES, default='admin')
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+
     def __str__(self):
         return self.coupon_code
 
     def is_valid(self):
         from django.utils import timezone
-        return self.coupon_expiry_date >= timezone.now() and (
-                not self.usage_limit or self.current_usage < self.usage_limit)
 
-    def apply_discount(self, order_total):
-        if not self.is_valid():
+        if self.coupon_expiry_date < timezone.now():
+            print("Coupon expired:", self.coupon_expiry_date)
+            return False
+
+        if self.usage_limit and self.current_usage >= self.usage_limit:
+            self.redeemed = True
+            self.save()
+            print("Coupon usage limit reached. Current usage:", self.current_usage, "Limit:", self.usage_limit)
+            return False
+
+        print("Coupon is valid.")
+        return True
+
+    def apply_discount(self, order_total, delivery_fee=0):
+
+        if not self.is_valid() or (self.min_order_value and order_total < self.min_order_value):
             return order_total
 
+        order_total = order_total
+        discount_value = self.discount_value
         discount = 0
         if self.type_of_discount == self.PERCENTAGE:
-            discount = self.discount_value * order_total / 100
-        elif self.type_of_discount in [self.REFUND_COIN, self.FREE_DELIVERY]:
-            discount = self.discount_value
+            discount = discount_value * order_total / 100
+        elif self.type_of_discount == self.FREE_DELIVERY:
+            discount = min(delivery_fee, self.max_discount if self.max_discount else delivery_fee)
+        elif self.type_of_discount == self.REFUND_COIN:
+            return {'refund_coin': discount_value, 'discount': 0}
         if self.max_discount:
-            discount = min(discount, self.max_discount)
+            discount = min(discount, float(self.max_discount))
+        return {'discount': discount, 'refund_coin': 0}
 
-        return discount
-
-    def successfully_redeemed(self):
+    def successfully_redeemed(self, user):
         from django.utils import timezone
+        if self.user is not None:
+            if self.redeemed:
+                return False
+            self.redeemed = True
+            self.redeemed_at = timezone.now()
         self.current_usage += 1
-        self.redeemed = True
-        self.redeemed_at = timezone.now()
+        if self.usage_limit is not None:
+            self.usage_limit -= 1
+        if self.user is not None:
+            self.user = user
         self.save()
+        return self
 
     def save(self, *args, **kwargs):
         if self.min_order_value is None or self.min_order_value < 0:
             self.min_order_value = 0
-
-        # if self.created_by == self.CREATED_BY_VENDOR:
-        #     if not self.user.get_role() == 'owner':
-        #         raise PermissionError("Only vendors can create coupons for their own products.")
-        #     if self.food_item.vendor != self.user.vendor:
-        #         raise PermissionError("Vendors can only create coupons for their own products.")
-        # elif self.created_by == self.CREATED_BY_ADMIN:
-        #     if not self.user.is_admin:
-        #         raise PermissionError("Only admins can create coupons for all products.")
+        if not self.coupon_code:
+            self.coupon_code = self.generate_coupon_code()
 
         if not self.coupon_code:
             self.coupon_code = generate_coupon_code()
 
         super(Coupon, self).save(*args, **kwargs)
+
+    @staticmethod
+    def generate_coupon_code(length=8):
+        characters = string.ascii_uppercase + string.digits
+        return ''.join(random.choices(characters, k=length))

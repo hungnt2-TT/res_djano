@@ -13,6 +13,7 @@
 .payment-method [type="radio"]:checked {
     outline: 2px solid #f97456;
 }
+
 .list_payment_method {
     display: flex;
 }
@@ -44,4 +45,628 @@
     margin-top: 10px;
     display: flex;
     justify-content: center;
+}
+
+.swiper {
+    width: 97%;
+}
+
+.swiper-slide {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.swiper-slide img {
+    display: block;
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+.mySwiperTab .swiper-slide {
+    width: auto;
+    height: auto;
+    padding: 30px;
+    font-weight: 700;
+    background-color: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    transition: .25s;
+}
+
+@media (max-width: 991px) {
+    .mySwiperTab .swiper-slide {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 767px) {
+    .mySwiperTab .swiper-slide {
+        padding: 15px;
+    }
+}
+
+.mySwiperTab .swiper-slide-thumb-active.tabHomeElectric {
+    color: var(--blue);
+    border-color: var(--blue);
+    background-color: rgba(var(--blueRGB), 0.1);
+}
+
+.mySwiperTab .swiper-slide-thumb-active.tabHomeLife {
+    color: var(--green);
+    border-color: var(--green);
+    background-color: rgba(var(--greenRGB), 0.1);
+}
+
+.mySwiperTab .swiper-slide-thumb-active.tabFashion {
+    color: var(--red);
+    border-color: var(--red);
+    background-color: rgba(var(--redRGB), 0.1);
+}
+
+.mySwiperTab .swiper-slide-thumb-active.tabMotherBaby {
+    color: var(--pink);
+    border-color: var(--pink);
+    background-color: rgba(var(--pinkRGB), 0.1);
+}
+
+.mySwiperTab .swiper-slide-thumb-active.tabBeauty {
+    color: var(--purple);
+    border-color: var(--purple);
+    background-color: rgba(var(--purpleRGB), 0.1);
+}
+
+.mySwiperNested .swiper-slide {
+    padding: 15px 0;
+}
+
+@media (max-width: 991px) {
+    .mySwiperNested .swiper-slide {
+        width: 250px;
+    }
+}
+
+.mySwiperNested .coupon__wrap {
+    display: flex;
+    flex-flow: row;
+    width: 100%;
+    border-radius: 10px;
+}
+
+.mySwiperNested .coupon__title {
+    position: relative;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 35%;
+    padding: 10px;
+}
+
+@media (max-width: 991px) {
+    .mySwiperNested .coupon__title {
+        width: 30%;
+    }
+}
+
+.mySwiperNested .coupon__title:before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 15px;
+    height: 15px;
+    background-color: #fff;
+    border-radius: 100%;
+}
+
+.mySwiperNested .coupon__title:after {
+    content: "";
+    position: absolute;
+    top: -11px;
+    right: -10px;
+    width: 20px;
+    height: 10px;
+    background-color: #ffffff;
+}
+
+.mySwiperNested .coupon__title .couple__category {
+    margin-bottom: 5px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.mySwiperNested .coupon__title .coupon__max {
+    font-size: 11px;
+}
+
+.mySwiperNested .coupon__detail {
+    position: relative;
+    display: flex;
+    flex-flow: column;
+    align-items: flex-start;
+    flex: 0 0 auto;
+    width: 65%;
+    padding: 10px 10px 10px 15px;
+}
+
+@media (max-width: 991px) {
+    .mySwiperNested .coupon__detail {
+        width: 70%;
+    }
+}
+
+.mySwiperNested .coupon__detail:before {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: -10px;
+    width: 15px;
+    height: 15px;
+    background-color: #fff;
+    border-radius: 100%;
+}
+
+.mySwiperNested .coupon__detail:after {
+    content: "";
+    position: absolute;
+    bottom: -11px;
+    left: -10px;
+    width: 20px;
+    height: 10px;
+    background-color: #ffffff;
+}
+
+.mySwiperNested .coupon__detail .coupon__price {
+    margin-bottom: 5px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+@media (max-width: 991px) {
+    .mySwiperNested .coupon__detail .coupon__price {
+        font-size: 14px;
+    }
+}
+
+.mySwiperNested .coupon__detail .coupon__info {
+    display: flex;
+    flex-flow: column;
+    align-items: flex-start;
+}
+
+.mySwiperNested .coupon__detail .coupon__info span {
+    margin-bottom: 5px;
+    font-size: 11px;
+    text-align: left;
+}
+
+.mySwiperNested .coupon__footer {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.mySwiperNested .coupon__footer .coupon__condition,
+.mySwiperNested .coupon__footer .coupon__btn {
+    a {
+        display: inline-flex;
+        padding: 5px 10px;
+        text-decoration: none;
+    }
+}
+
+.mySwiperNested .coupon__footer .coupon__condition a {
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.mySwiperNested .coupon__footer .coupon__btn a {
+    border-radius: 5px;
+    font-size: 12px;
+    color: #fff;
+    font-weight: 600;
+}
+
+.mySwiperNested .coupon__border {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 2px;
+    height: calc(100% - 30px);
+    transform: translateY(-50%);
+}
+
+.swiperHomeElectric .coupon__wrap {
+    border: 1px solid var(--blue);
+    background-color: rgba(var(--blueRGB), 0.1);
+}
+
+.swiperHomeElectric .coupon__wrap .coupon__title:before,
+.swiperHomeElectric .coupon__wrap .coupon__detail:before {
+    border: 1px solid var(--blue);
+}
+
+.swiperHomeElectric .coupon__wrap .coupon__max,
+.swiperHomeElectric .coupon__wrap .couple__category {
+    color: var(--blue);
+}
+
+.swiperHomeElectric .coupon__wrap .coupon__price {
+    color: var(--blue);
+}
+
+.swiperHomeElectric .coupon__wrap .coupon__info span {
+    color: var(--blue);
+}
+
+.swiperHomeElectric .coupon__wrap .coupon__condition a {
+    color: var(--blue);
+    background-color: rgba(var(--blueRGB), 0.15);
+}
+
+.swiperHomeElectric .coupon__wrap .coupon__btn a {
+    background-color: var(--blue);
+}
+
+.swiperHomeElectric .coupon__wrap .coupon__border {
+    border-left: 1px dashed var(--blue);
+}
+
+.swiperHomeLife .coupon__wrap {
+    border: 1px solid var(--green);
+    background-color: rgba(var(--greenRGB), 0.1);
+}
+
+.swiperHomeLife .coupon__wrap .coupon__title:before,
+.swiperHomeLife .coupon__wrap .coupon__detail:before {
+    border: 1px solid var(--green);
+}
+
+.swiperHomeLife .coupon__wrap .coupon__max,
+.swiperHomeLife .coupon__wrap .couple__category {
+    color: var(--green);
+}
+
+.swiperHomeLife .coupon__wrap .coupon__price {
+    color: var(--green);
+}
+
+.swiperHomeLife .coupon__wrap .coupon__info span {
+    color: var(--green);
+}
+
+.swiperHomeLife .coupon__wrap .coupon__condition a {
+    color: var(--green);
+    background-color: rgba(var(--greenRGB), 0.15);
+}
+
+.swiperHomeLife .coupon__wrap .coupon__btn a {
+    background-color: var(--green);
+}
+
+.swiperHomeLife .coupon__wrap .coupon__border {
+    border-left: 1px dashed var(--green);
+}
+
+.swiperFashion .coupon__wrap {
+    border: 1px solid var(--red);
+    background-color: rgba(var(--redRGB), 0.1);
+}
+
+.swiperFashion .coupon__wrap .coupon__title:before,
+.swiperFashion .coupon__wrap .coupon__detail:before {
+    border: 1px solid var(--red);
+}
+
+.swiperFashion .coupon__wrap .coupon__max,
+.swiperFashion .coupon__wrap .couple__category {
+    color: var(--red);
+}
+
+.swiperFashion .coupon__wrap .coupon__price {
+    color: var(--red);
+}
+
+.swiperFashion .coupon__wrap .coupon__info span {
+    color: var(--red);
+}
+
+.swiperFashion .coupon__wrap .coupon__condition a {
+    color: var(--red);
+    background-color: rgba(var(--redRGB), 0.15);
+}
+
+.swiperFashion .coupon__wrap .coupon__btn a {
+    background-color: var(--red);
+}
+
+.swiperFashion .coupon__wrap .coupon__border {
+    border-left: 1px dashed var(--red);
+}
+
+.swiperMotherBaby .coupon__wrap {
+    border: 1px solid var(--pink);
+    background-color: rgba(var(--pinkRGB), 0.1);
+}
+
+.swiperMotherBaby .coupon__wrap .coupon__title:before,
+.swiperMotherBaby .coupon__wrap .coupon__detail:before {
+    border: 1px solid var(--pink);
+}
+
+.swiperMotherBaby .coupon__wrap .coupon__max,
+.swiperMotherBaby .coupon__wrap .couple__category {
+    color: var(--pink);
+}
+
+.swiperMotherBaby .coupon__wrap .coupon__price {
+    color: var(--pink);
+}
+
+.swiperMotherBaby .coupon__wrap .coupon__info span {
+    color: var(--pink);
+}
+
+.swiperMotherBaby .coupon__wrap .coupon__condition a {
+    color: var(--pink);
+    background-color: rgba(var(--pinkRGB), 0.15);
+}
+
+.swiperMotherBaby .coupon__wrap .coupon__btn a {
+    background-color: var(--pink);
+}
+
+.swiperMotherBaby .coupon__wrap .coupon__border {
+    border-left: 1px dashed var(--pink);
+}
+
+.swiperBeauty .coupon__wrap {
+    border: 1px solid var(--purple);
+    background-color: rgba(var(--purpleRGB), 0.1);
+}
+
+.swiperBeauty .coupon__wrap .coupon__title:before,
+.swiperBeauty .coupon__wrap .coupon__detail:before {
+    border: 1px solid var(--purple);
+}
+
+.swiperBeauty .coupon__wrap .coupon__max,
+.swiperBeauty .coupon__wrap .couple__category {
+    color: var(--purple);
+}
+
+.swiperBeauty .coupon__wrap .coupon__price {
+    color: var(--purple);
+}
+
+.swiperBeauty .coupon__wrap .coupon__info span {
+    color: var(--purple);
+}
+
+.swiperBeauty .coupon__wrap .coupon__condition a {
+    color: var(--purple);
+    background-color: rgba(var(--purpleRGB), 0.15);
+}
+
+.swiperBeauty .coupon__wrap .coupon__btn a {
+    background-color: var(--purple);
+}
+
+.swiperBeauty .coupon__wrap .coupon__border {
+    border-left: 1px dashed var(--purple);
+}
+
+.content {
+    margin-bottom: 30px;
+}
+
+.content h1 {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.content p {
+    text-align: center;
+}
+
+.
+    /* Định dạng cơ bản cho nút Collect */
+.collect-btn {
+    background-color: #4CAF50; /* Màu nền xanh */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+/* Đổi màu khi hover */
+.collect-btn:hover {
+    background-color: #45a049;
+}
+
+/* Khi nút bị vô hiệu hóa */
+.collect-btn:disabled {
+    background-color: #ddd; /* Màu nền xám khi disabled */
+    color: #aaa;
+    cursor: not-allowed;
+    transform: scale(0.98); /* Thêm hiệu ứng co lại khi disabled */
+}
+
+/* Khi nút đã được chọn (collected) */
+.collect-btn.selected {
+    background-color: #28a745; /* Màu nền khi đã được chọn */
+    color: white;
+    cursor: not-allowed; /* Không thể chọn lại */
+}
+
+.coupon__condition span p {
+    font-size: 10px;
+    color: #666;
+}
+
+/* Đặt flexbox cho toàn bộ khu vực chứa */
+
+/* Giá trị chi tiết */
+.price-area {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.price-area ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.price-area li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.price-title {
+    font-size: 16px;
+    color: #333;
+}
+
+.fee-title {
+    font-size: 14px;
+    color: #666;
+}
+
+.price {
+    font-size: 16px;
+    color: #333;
+}
+
+.dev-menu-subtotal,
+.dev-menu-charges,
+.dev-menu-grtotal {
+    font-weight: bold;
+    color: #000;
+}
+
+.total-price {
+    font-size: 18px;
+    font-weight: 700;
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 2px solid #ddd;
+}
+
+.total-words {
+    font-size: 12px;
+    color: #007bff;
+}
+
+/* Phần phương thức thanh toán */
+.pay-option {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.list_payment_method {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list_payment_method li {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.list_payment_method input[type="radio"] {
+    margin-right: 10px;
+}
+
+.list_payment_method label {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.list_payment_method i {
+    margin-right: 10px;
+}
+
+/* Cảnh báo lỗi */
+.text-danger {
+    font-size: 14px;
+    color: red;
+    margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column; /* Chuyển sang dạng cột trên thiết bị di động */
+    }
+
+    .price-area,
+    .pay-option {
+        width: 100%; /* Đảm bảo chiều rộng 100% */
+        margin-bottom: 20px; /* Thêm khoảng cách dưới */
+    }
+}
+
+.error {
+    color: red;
+    font-size: 0.875rem;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.alert-danger {
+    color: red;
+    background-color: #ffe6e6;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid red;
+    border-radius: 4px;
+}
+
+.user-confirmation {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.user-confirmation .form-group {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+}
+
+.user-confirmation .form-group label {
+    font-weight: bold;
+    color: #333;
+}
+
+.user-confirmation .form-group span {
+    color: #555;
+    font-weight: normal;
 }

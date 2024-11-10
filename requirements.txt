@@ -53,3 +53,5 @@ haversine~=2.8.1
 
 django_extensions
 haversine==2.8.1
+
+geopy~=2.4.1
