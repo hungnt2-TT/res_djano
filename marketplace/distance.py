@@ -17,6 +17,8 @@ def calculate_shipping_cost(distance_km):
 
 
 def cost_distance_km(distance_km):
+    if distance_km is None:
+        return 15000
     if isinstance(distance_km, str):
         distance_km = float(distance_km.split()[0])
 

@@ -158,12 +158,12 @@
             <!-- Main Search End -->
             <div class="page-section nopadding cs-nomargin"
                  style="margin-top: 0px;padding-top: 60px;padding-bottom: 0px;margin-bottom: 0px;">
-                <div class="container">
+                <div class="container" style="        max-width: 1774px;">
                     <div class="row">
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                             <div class="flash-sale-container">
                                 <div class="flash-sale-title">
-                                    <h3>Recommended</h3>
+                                    <h3>Recommended Food {{ time_range }}</h3>
                                 </div>
                                 {#                                <div class="countdown" id="countdown">#}
                                 {#                                    <div class="countdown-box" id="hours">00</div>#}
@@ -232,6 +232,7 @@
                                         {% for item in food_items %}
                                             <div class="container-item">
                                                 <div class="item">
+                                                    <!-- Nội dung sản phẩm, bao gồm ảnh, tên sản phẩm và giá -->
                                                     <div class="item-info">
                                                         <div class="item-image"
                                                              style="background: url('{{ item.image.url }}') no-repeat center center; background-size: cover;"></div>

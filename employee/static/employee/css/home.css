@@ -1,3 +1,4 @@
+/* Cấu hình chung cho container */
 .slider-container {
     position: relative;
     width: 100%;
@@ -249,4 +250,9 @@
 .vendor-name-link:hover {
     text-decoration: underline;
     color: #fff9e6;
+}
+
+.disabled {
+    pointer-events: none;
+    opacity: 0.5; /* Tùy chọn, để làm mờ các nút đã vô hiệu hóa */
 }

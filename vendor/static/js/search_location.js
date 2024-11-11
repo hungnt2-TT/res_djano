@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
         slider.style.transform = `translateX(-${(currentIndex * (100 / itemsPerSlide))}%)`;
     }
 
+    // Sự kiện khi nhấn nút Next
     nextBtn.addEventListener('click', function () {
         if (currentIndex < Math.floor(totalItems / itemsPerSlide) - 1) {
             currentIndex++;
@@ -64,12 +65,14 @@ document.addEventListener('DOMContentLoaded', function () {
         if (currentIndex > 0) {
             currentIndex--;
         } else {
-            currentIndex = Math.floor(totalItems / itemsPerSlide) - 1;
+            // currentIndex = Math.floor(totalItems / itemsPerSlide) - 1;
+            currentIndex = totalItems - itemsPerSlide; // Quay lại nhóm cuối cùng
         }
         updateSlider();
     });
     updateSlider();
 });
+
 window.onload = function () {
     initSearchLocation();
 }

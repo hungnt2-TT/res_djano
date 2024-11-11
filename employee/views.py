@@ -1,4 +1,5 @@
 import os
+from django.db.models import Q
 
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
@@ -57,8 +58,8 @@ def home(request):
         'vendors': vendors.count(),
         'profile': profile.count()
     }
-
-    current_hour = datetime.now().hour
+    current_hour = datetime.now().hour + 7
+    print('current_hour', current_hour)
     if 6 <= current_hour < 12:
         time_range = 'morning'
     elif 12 <= current_hour < 18:
@@ -116,8 +117,9 @@ def home(request):
         'lng': lng,
         'information': information,
         'food_items': food_items,
-        'vendors_premium': vendors_premium
+        'vendors_premium': vendors_premium,
 
+        'time_range': time_range
     }
     print('context', context)
     return render(request, 'home.html', context)
@@ -156,29 +158,26 @@ def verification_checks(request, phone_number):
     return verification_check
 
 
-# def twilio_send_sms():
+def send_sms_view(request, phone_number):
+    phone_number_vn = '+84' + phone_number
+    if request.method == 'POST':
+        code_list = request.POST.getlist('code')
+        code = ''.join(code_list)
+        print('code', code)
+        verify = verification_checks(request, phone_number)
+        if verify.status == 'approved' or verify.valid == 'true':
+            user = Profile.objects.get(email=request.user.email)
+            user.phone_number_verified = True
+            user.save()
+            return render(request, 'account/register_save.html')
+    sms_sid = broadcast_sms(phone_number)
 
-
-# def send_sms_view(request):
-#     phone_number_vn = '+84' + phone_number
-#
-#     if request.method == 'POST':
-#         print('request.POST', request.POST)
-#         code_list = request.POST.getlist('code')
-#         code = ''.join(code_list)
-#         print('code', code)
-#         phone_number = request.POST.get('phone_number')
-#         verification_checks(phone_number)
-#
-#     sms_sid = broadcast_sms(phone_number, code)
-#     if sms_sid.status == 'pending':
-#         if sms_sid.valid == 'false':
-#             messages.error(request, 'Invalid phone number')
-#             return 'Invalid phone number'
-#         elif sms_sid.status == 'approved' and sms_sid.valid == 'true':
-#             return render(request, 'error.html')
-#     return render(request, 'send_sms_form.html')
-
+    if sms_sid.status == 'pending':
+        messages.success(request, 'Code has been sent. Please check your phone.')
+        return render(request, 'send_sms_form.html', {'phone_number': phone_number})
+    else:
+        messages.error(request, 'Failed to send code.')
+    return render(request, 'send_sms_form.html')
 
 def register_user(request):
     form = RegisterForm(request.POST or None)

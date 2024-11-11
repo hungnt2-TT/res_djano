@@ -1,5 +1,7 @@
 import math
 from collections import defaultdict
+from decimal import Decimal, InvalidOperation
+from http.client import responses
 from unicodedata import category
 
 import requests
@@ -12,6 +14,7 @@ from django.contrib.gis.measure import D
 from django.db.models import Prefetch, Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from employee.models import EmployeeProfile, Profile
@@ -20,7 +23,7 @@ from marketplace.distance import calculate_distance, estimate_time, calculate_sh
 from marketplace.forms import ReservationForm
 from marketplace.models import Cart
 from marketplace.templatetags.custom_filters import to_vnd_words
-from menu.models import Category, FoodItem, Size
+from menu.models import Category, FoodItem, Size, Coupon
 from orders.forms import OrderForm
 from vendor.models import Vendor
 
@@ -39,7 +42,6 @@ def marketplace(request):
 @csrf_exempt
 def vendor_detail(request, vendor_slug):
     vendor = Vendor.objects.get(vendor_slug=vendor_slug)
-    print('vendor_slug = ', vendor.vendor_slug)
     vendor_id = vendor.id
     vendor_slug = vendor.vendor_slug
     user = Profile.objects.get(email=request.user.email)
@@ -174,27 +176,7 @@ def get_distance_and_time(api_key, origin, destination, mode="driving"):
 def cart(request):
     user_profile = Profile.objects.get(email=request.user.email)
     profile = EmployeeProfile.objects.get(user=request.user)
-    if request.method == 'POST':
-        default_data = {
-            'first_name': user_profile.first_name,
-            'last_name': user_profile.last_name,
-            'username': user_profile.username,
-            'email': user_profile.email,
-            'phone': user_profile.phone_number,
-            'country': 'Viet Nam',
-            'pin_code': profile.pincode,
-            'city': profile.city,
-            'address': profile.address_line_2
-        }
-        form = OrderForm(initial=default_data)
 
-        print('profile ===', profile)
-        context = {
-            'profile': profile,
-            'form': form
-        }
-        print('cart', request.POST)
-        return render(request, 'checkout.html', context)
     cart_items = Cart.objects.filter(user=request.user, is_ordered=False).order_by('-created_at')
     profile_lat, profile_lng = profile.latitude, profile.longitude
     destination = f"{profile_lat},{profile_lng}"
@@ -222,17 +204,16 @@ def cart(request):
         lat, lng = vendor_obj.latitude, vendor_obj.longitude
         origin = f"{lat},{lng}"
         distance, duration = get_distance_and_time(api_key, origin, destination)
-        # shipping_cost = calculate_shipping_cost(distance)
-        shipping_cost = 15000
+        shipping_cost = calculate_shipping_cost(distance)
+        # shipping_cost = 15000
         data['shipping_cost'] = shipping_cost
-        # data['time_to_deliver'] = math.ceil(duration)
-        data['time_to_deliver'] = 30
+        data['time_to_deliver'] = math.ceil(duration)
+        # data['time_to_deliver'] = 30
         vendor_total_price = data['total_price'] + shipping_cost
         data['total_with_shipping'] = vendor_total_price
         total_shipping_cost += shipping_cost
 
     final_grand_total = grand_total + total_shipping_cost
-
     context = {
         'grouped_cart_items': grouped_cart_items.items(),
         'profile': profile,
@@ -334,6 +315,53 @@ def food_item_detail(request, id):
         'sizes': sizes
     }
     return render(request, 'food_item_detail.html', contex)
+
+
+@csrf_exempt
+def apply_coupon_discount(request):
+    if request.method == 'POST':
+        try:
+            coupon_id = request.POST.get('coupon_id')
+            subtotal = int(request.POST.get('subtotal'))
+            tax = int(request.POST.get('tax'))
+            shipping = int(request.POST.get('shipping'))
+            total = int(request.POST.get('total'))
+
+            coupon = get_object_or_404(Coupon, id=coupon_id)
+
+            if coupon.is_valid():
+                discount = coupon.apply_discount(total, shipping)
+
+                new_total = total - discount['discount']
+                if coupon.type_of_discount == Coupon.REFUND_COIN:
+                    response_data = {
+                        'discount': discount,
+                        'new_total': new_total,
+                        'refund_coin': discount['refund_coin'],
+                        'message': 'Coupon applied successfully. Refund coin will be credited to your account.',
+                        'status': 'success'
+                    }
+                else:
+                    response_data = {
+                        'discount': discount,
+                        'new_total': new_total,
+                        'refund_coin': 0,
+                        'message': 'Coupon applied successfully.',
+                        'status': 'success'
+                    }
+            else:
+                response_data = {
+                    'discount': 0,
+                    'new_total': total,
+                    'refund_coin': 0,
+                    'message': 'Coupon is not valid.',
+                    'status': 'error'
+                }
+
+            return JsonResponse(response_data)
+        except (InvalidOperation, ValueError) as e:
+            return JsonResponse({'error': 'Invalid input data.'}, status=400)
+    return JsonResponse({'error': 'Invalid request method.'}, status=400)
 
 
 @csrf_exempt
