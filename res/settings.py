@@ -59,12 +59,14 @@ elif ENVIRONMENT == 'development':
 else:
     ALLOWED_HOSTS = [
         '127.0.0.1',
-        'snail-tight-albacore.ngrok-free.app'
+        'snail-tight-albacore.ngrok-free.app',
+        'adequate-zebra-major.ngrok-free.app',
+        'localhost',
     ]
 
     SITE_ID = 1
 
-CSRF_TRUSTED_ORIGINS = ['https://snail-tight-albacore.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = ['https://snail-tight-albacore.ngrok-free.app', 'https://adequate-zebra-major.ngrok-free.app']
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -226,7 +228,7 @@ CELERY_TIMEZONE = TIME_ZONE
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY")
-
+GOOGLE_API_KEY_BY_IP = os.getenv("GOOGLE_API_KEY_BY_IP", "AIzaSyD-9tSrke72PouQMSSX-a7eZSW0jkFMBWY")
 # LOGIN redirections
 LOGIN_REDIRECT_URL = '/employee/home/'
 LOGOUT_REDIRECT_URL = '/employee/home/'

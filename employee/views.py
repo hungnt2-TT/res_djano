@@ -1,4 +1,5 @@
 import os
+from django.db.models import Q
 
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
@@ -36,6 +37,7 @@ from datetime import datetime
 
 from twilio.rest import Client
 
+
 def home(request):
     print('home', request)
     lat = request.GET.get('lat')
@@ -46,7 +48,8 @@ def home(request):
         'vendors': vendors.count(),
         'profile': profile.count()
     }
-    current_hour = datetime.now().hour
+    current_hour = datetime.now().hour + 7
+    print('current_hour', current_hour)
     if 6 <= current_hour < 12:
         time_range = 'morning'
     elif 12 <= current_hour < 18:
@@ -55,15 +58,21 @@ def home(request):
         time_range = 'evening'
     else:
         time_range = 'night'
-
-    food_items = FoodItem.objects.filter(time_range=time_range)
+    print('time_range', time_range)
+    food_items = FoodItem.objects.filter(Q(time_range=time_range) | Q(time_range='all_day'))
+    vendors_list = []  # Initialize vendors_list
     if lat and lng:
         lat = float(lat)
         lng = float(lng)
         user_location = Point(lng, lat, srid=4326)
+        employee_profile = EmployeeProfile.objects.get(user=request.user)
+        employee_profile.latitude = lat
+        employee_profile.longitude = lng
+        employee_profile.save()
         districts = District.objects.filter(geom__contains=user_location).first()
         print('districts', districts)
         if vendors:
+            print('vendors', vendors)
             vendor_district = vendors.filter(name_district=districts)
             print('vendors', vendors)
             vendors_list = list(vendor_district.values())
@@ -72,19 +81,18 @@ def home(request):
 
         districts_dict = districts and {
             'id': districts.id,
-            'city_name': districts.city_name,
             'ten_tinh': districts.ten_tinh,
             'ten_huyen': districts.ten_huyen,
             'dan_so': districts.dan_so,
             'nam_tk': districts.nam_tk,
             'code_vung': districts.code_vung,
         }
-        print('vendors_list', vendors_list)
         return JsonResponse({
-            'vendors': vendors_list,
+            'vendors': vendors_list if vendors_list else [],
             'information': information,
             'districts': districts_dict,
-            'status': 'success'
+            'status': 'success',
+            'time_range': time_range,
         })
     else:
         districts = None
@@ -97,7 +105,7 @@ def home(request):
         'lng': lng,
         'information': information,
         'food_items': food_items,
-
+        'time_range': time_range
     }
     print('context', context)
     return render(request, 'home.html', context)
@@ -109,10 +117,13 @@ def register(request):
 
 def broadcast_sms(phone_number):
     phone_number_vn = '+84' + phone_number
+    print('phone_number_vn', phone_number_vn)
     try:
         client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+        print('client', client)
         verification = client.verify.v2.services(settings.SECRET_KEY_TWILIO).verifications.create(to=phone_number_vn,
                                                                                                   channel='sms')
+
 
         print('verification_check', verification)
     except Exception as e:
@@ -137,29 +148,26 @@ def verification_checks(request, phone_number):
     return verification_check
 
 
-# def twilio_send_sms():
+def send_sms_view(request, phone_number):
+    phone_number_vn = '+84' + phone_number
+    if request.method == 'POST':
+        code_list = request.POST.getlist('code')
+        code = ''.join(code_list)
+        print('code', code)
+        verify = verification_checks(request, phone_number)
+        if verify.status == 'approved' or verify.valid == 'true':
+            user = Profile.objects.get(email=request.user.email)
+            user.phone_number_verified = True
+            user.save()
+            return render(request, 'account/register_save.html')
+    sms_sid = broadcast_sms(phone_number)
 
-
-# def send_sms_view(request):
-#     phone_number_vn = '+84' + phone_number
-#
-#     if request.method == 'POST':
-#         print('request.POST', request.POST)
-#         code_list = request.POST.getlist('code')
-#         code = ''.join(code_list)
-#         print('code', code)
-#         phone_number = request.POST.get('phone_number')
-#         verification_checks(phone_number)
-#
-#     sms_sid = broadcast_sms(phone_number, code)
-#     if sms_sid.status == 'pending':
-#         if sms_sid.valid == 'false':
-#             messages.error(request, 'Invalid phone number')
-#             return 'Invalid phone number'
-#         elif sms_sid.status == 'approved' and sms_sid.valid == 'true':
-#             return render(request, 'error.html')
-#     return render(request, 'send_sms_form.html')
-
+    if sms_sid.status == 'pending':
+        messages.success(request, 'Code has been sent. Please check your phone.')
+        return render(request, 'send_sms_form.html', {'phone_number': phone_number})
+    else:
+        messages.error(request, 'Failed to send code.')
+    return render(request, 'send_sms_form.html')
 
 def register_user(request):
     form = RegisterForm(request.POST or None)
@@ -247,9 +255,11 @@ class LoginResView(LoginView):
 
         if form.is_valid():
             user = form.get_user()
+            print('user ====', user)
             if user.employee_type == 1:
                 try:
                     vendor = get_object_or_404(Vendor, user=user)
+                    print('vendor', vendor)
                     if not vendor.is_approved:
                         messages.warning(self.request, 'Your account is not approved yet')
                         raise PermissionDenied
@@ -563,3 +573,20 @@ def register_by_email(request):
     #         else:
     #             messages.error(request, 'Invalid code.')
     #             return render(request, 'send_sms_form.html', {'form': form})
+
+
+def update_location(request):
+    if request.method == 'POST':
+        lat = request.POST.get('lat')
+        lng = request.POST.get('lng')
+        address = request.POST.get('address')
+        user = request.user
+        if user:
+            profile = EmployeeProfile.objects.get(user=user)
+            profile.latitude = lat
+            profile.longitude = lng
+            profile.address_line_1 = address
+            profile.save()
+            return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'failed'})
+

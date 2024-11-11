@@ -6,12 +6,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/lightgallery.css' %}">
 
 {% endblock %}
-{% block script %}
-    <script src="{% static 'js/lightslider.js' %}"></script>
 
-    <script src="{% static 'js/functions_vendor.js' %}"></script>
-
-{% endblock %}
 {% block title %} Register Vendor | {{ block.super }} {% endblock %}
 {% block content %}
     <div class="main-section">
@@ -75,20 +70,61 @@
                                                                             {{ form.nickname }}
                                                                         </div>
                                                                     </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>ID Card</label>
+                                                                            {{ vendor_form.vendor_tax_code }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- Section for CMND/CCCD -->
+                                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                        <div class="restaurant-info">
+                                                                            <div class="img-holder">
+                                                                                <!-- Gallery container with data attribute for dynamic identification -->
+                                                                                <ul class="foodbakery-gallery-holder" id="imageGalleryIDCard"
+                                                                                    data-gallery-id="imageGalleryIDCard">
+                                                                                    <li class="gal-img">
+                                                                                        <div class="drag-list">
+                                                                                            <div class="item-thumb">
+                                                                                                <!-- Preview image with a data attribute for unique identification -->
+                                                                                                <img class="thumbnail"
+                                                                                                     data-preview-id="imagePreviewIDCard"
+                                                                                                     id="imagePreviewIDCard"
+                                                                                                     src=""
+                                                                                                     alt="Preview">
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                            <div class="text-holder">
+                                                                                <label>Update CMND/CCCD</label>
+                                                                                <div class="upload-gallery">
+                                                                                    <!-- File input with data attributes for preview and gallery identification -->
+                                                                                    <input type="file"
+                                                                                           class="btn btn-info image-upload"
+                                                                                           data-preview-id="imagePreviewIDCard"
+                                                                                           data-gallery-id="imageGalleryIDCard"
+                                                                                           name="vendor_id_card">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
 
+                                                                    <!-- Section for License -->
                                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                                         <div class="restaurant-info">
                                                                             <div class="img-holder">
                                                                                 <ul class="foodbakery-gallery-holder"
-                                                                                    id="imageGallery">
+                                                                                    data-gallery-id="imageGalleryLicense">
                                                                                     <li class="gal-img">
                                                                                         <div class="drag-list">
                                                                                             <div class="item-thumb">
                                                                                                 <img class="thumbnail"
-                                                                                                     id="imagePreview"
-                                                                                                     onclick=""
+                                                                                                     data-preview-id="imagePreviewLicense"
+                                                                                                     id="imagePreviewLicense"
                                                                                                      src=""
-                                                                                                     alt="">
+                                                                                                     alt="Preview">
                                                                                             </div>
                                                                                         </div>
                                                                                     </li>
@@ -98,17 +134,15 @@
                                                                                 <label>Update License</label>
                                                                                 <div class="upload-gallery">
                                                                                     <input type="file"
-
-                                                                                           class="btn btn-info"
-                                                                                           id="imageUpload"
+                                                                                           class="btn btn-info image-upload"
+                                                                                           data-preview-id="imagePreviewLicense"
+                                                                                           data-gallery-id="imageGalleryLicense"
                                                                                            name="vendor_license">
-                                                                                    <label for="imageUpload"></label>
-
-                                                                                    {#                                                                                    {{ vendor_form.vendor_license }}#}
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
+
                                                             </ul>
                                                         </div>
 
@@ -243,7 +277,8 @@
                                             <div class="row">
                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                     <div class="field-holder">
-                                                        <div class="payment-holder ">
+                                                        <div class="payment-holder"
+                                                             style="margin: 0 25% 15px !important;">
                                                             <div class="btnArea">
                                                                 <button type="submit" class="btn-primary key"
                                                                         name="next" value="confirm">Next
@@ -270,7 +305,7 @@
 {% endblock %}
 {% block extra_scripts %}
     <script src="{% static 'js/init_google_map_plf.js' %}"></script>
+    <script src="{% static 'js/lightslider.js' %}"></script>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&loading=async&libraries=places&callback={{ initAutocomplete }}"
-    ></script>
+    <script src="{% static 'js/functions_vendor.js' %}"></script>
 {% endblock %}

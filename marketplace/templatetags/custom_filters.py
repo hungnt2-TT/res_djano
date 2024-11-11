@@ -38,3 +38,10 @@ def to_vnd_words(value):
         return result
     except (ValueError, TypeError):
         return value
+
+
+@register.filter
+def truncate_chars(value, max_length):
+    if len(value) > max_length:
+        return value[:max_length] + '...'
+    return value

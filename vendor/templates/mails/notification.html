@@ -1,0 +1,16 @@
+{% autoescape off %}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{{ subject }}</title>
+    </head>
+    <body>
+    <h1>Order Status Update</h1>
+    <p>Dear {{ user }},</p>
+    <p>{{ message }}</p>
+    <p>Order name is {{ order_number }}</p>
+    <p>Thank you for your order!</p>
+    </body>
+    </html>
+{% endautoescape %}

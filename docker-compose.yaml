@@ -15,18 +15,18 @@ services:
     ports:
       - "6379:6379"
 
-#  celery:
-#    build: .
-#    command: [ 'celery', '-A', 'res', 'worker','-l', 'info' ]
-#    volumes:
-#      - .:/res
-#    depends_on:
-#      - db
-#      - redis
-#    environment:
-#      - C_FORCE_ROOT=true
-#      - BROKER_URL=redis://redis:6379/0
-#      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+  celery:
+    build: .
+    command: [ 'celery', '-A', 'res', 'worker','-l', 'info' ]
+    volumes:
+      - .:/res
+    depends_on:
+      - db
+      - redis
+    environment:
+      - C_FORCE_ROOT=true
+      - BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
 #  web:
 #    build: .
 #    command: python3 manage.py runserver 0.0.0.0:8000
@@ -39,14 +39,14 @@ services:
 #      - redis
 #    env_file:
 #      - ./res/.env
-#  celery-beat:
-#    build: .
-#    command: celery -A res beat --loglevel=info
-#    volumes:
-#      - .:/app
-#    depends_on:
-#      - db
-#      - redis
+  celery-beat:
+    build: .
+    command: celery -A res beat --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
 networks:
   default:
     external:

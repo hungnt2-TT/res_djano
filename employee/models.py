@@ -8,6 +8,8 @@ from django.contrib.gis.geos import Point
 from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.db import models as gis_models
 
+from employee.mails import send_mail
+
 
 class UserManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email, password=None):
@@ -101,6 +103,17 @@ class Profile(AbstractBaseUser):
     def is_user(self):
         return self.employee_type == 2
 
+    def send_email_notification(self, order_number, status):
+        subject = "Order Status Update"
+        message = "Your order has been updated to " + status
+        context = {
+            'user': self.nickname,
+            'message': message,
+            'subject': subject,
+            'order_number': order_number,
+            'status': status
+        }
+        send_mail(subject, 'mails/notification.html', context)
 
 class EmployeeProfile(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE, blank=True, null=True)
@@ -110,6 +123,7 @@ class EmployeeProfile(models.Model):
     pincode = models.CharField(max_length=10, blank=True, null=True)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
+    state = models.CharField(max_length=255, blank=True, null=True)
     location = gis_models.PointField(geography=True, default=Point(0.0, 0.0), srid=4326)
     address_line_1 = models.CharField(max_length=255, blank=True, null=True)
     address_line_2 = models.CharField(max_length=255, blank=True, null=True)
@@ -137,7 +151,7 @@ class CustomProfile(AbstractUser):
 
 
 class District(models.Model):
-    city_name = models.CharField(max_length=255)
+    # city_name = models.CharField(max_length=255)
     geom = gis_models.MultiPolygonField(geography=True, srid=4326)
     objectid = models.IntegerField()
     f_code = models.CharField(max_length=255, blank=True, null=True)

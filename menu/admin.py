@@ -16,7 +16,7 @@ class FoodItemAdmin(admin.ModelAdmin):
 
 
 class CouponAdmin(admin.ModelAdmin):
-    list_display = ['coupon_code', 'description', 'min_order_value', 'max_discount', 'usage_limit', 'created_by', 'current_usage']
+    list_display = ['coupon_code', 'description', 'min_order_value', 'max_discount', 'usage_limit', 'current_usage']
     search_fields = ['coupon_code']
 
 

@@ -1,5 +1,9 @@
+from decimal import Decimal
+from traceback import print_tb
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.forms import inlineformset_factory
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.text import slugify
@@ -12,12 +16,14 @@ from employee.consts import PAGE
 from employee.forms import RegisterForm
 from employee.models import EmployeeProfile, Profile
 from employee.paginations import paginate_data
-from menu.forms import CategoryForm, FoodItemForm
-from menu.models import Category, FoodItem
+from menu.forms import CategoryForm, FoodItemForm, SizeForm
+from menu.models import Category, FoodItem, Size
 from vendor.forms import VendorForm, VendorUpdateForm, VendorUpdateMapForm
 from django.conf import settings
 from vendor.models import Vendor
 from wallet.models import Wallet
+from django.db import transaction
+from django.http import HttpResponseServerError
 
 import os
 import json
@@ -90,42 +96,49 @@ def handle_next_payment(request, form, vendor_form):
 
 
 def handle_send(request):
-    form_data = request.session.get('form_data', {})
-    print('form_data', form_data)
-    if form_data:
-        user = Profile.objects.create_user(
-            username=form_data.get('username', ''),
-            email=form_data.get('email', ''),
-            password=form_data.get('password1', ''),
-            first_name=form_data.get('first_name', ''),
-            last_name=form_data.get('last_name', ''),
-        )
-        user.is_active = True
-        user.employee_type = 2
-        user.save()
+    try:
+        form_data = request.session.get('form_data', {})
+        print('form_data', form_data)
+        if form_data:
+            with transaction.atomic():
+                user = Profile.objects.create_user(
+                    username=form_data.get('username', ''),
+                    email=form_data.get('email', ''),
+                    password=form_data.get('password1', ''),
+                    first_name=form_data.get('first_name', ''),
+                    last_name=form_data.get('last_name', ''),
+                )
+                user.is_active = True
+                user.employee_type = 1
+                user.save()
 
-        Wallet.objects.create(user=user, balance=0)
-        employee = EmployeeProfile.objects.filter(user=user).first()
-        employee.success_privacy_policy = True
-        employee.save()
-        Vendor.objects.create(
-            user=user,
-            user_profile=employee,
-            vendor_name=form_data.get('vendor_name', ''),
-            fax_number=form_data.get('fax_number', ''),
-            vendor_type=form_data.get('vendor_type', ''),
-            vendor_license=form_data.get('upload_file_url', ''),
-            is_approved=False,
-            address_line_1=form_data.get('address_line_1', ''),
-            state=form_data.get('state', ''),
-            city=form_data.get('city', ''),
-            longitude=form_data.get('foodbakery_post_loc_longitude_restaurant', ''),
-            latitude=form_data.get('foodbakery_post_loc_latitude_restaurant', ''),
-        )
-        return render(request, 'vendor/register_vendor_send.html', {
-            "form_data": form_data,
-        })
-    return redirect('vendor:register_vendor')
+                employee = EmployeeProfile.objects.filter(user=user).first()
+                employee.success_privacy_policy = True
+                employee.save()
+                Vendor.objects.create(
+                    user=user,
+                    user_profile=employee,
+                    vendor_name=form_data.get('vendor_name', ''),
+                    fax_number=form_data.get('fax_number', ''),
+                    vendor_type=form_data.get('vendor_type', ''),
+                    vendor_license=form_data.get('upload_file_url', ''),
+                    is_approved=False,
+                    address_line_1=form_data.get('address_line_1', ''),
+                    state=form_data.get('state', ''),
+                    city=form_data.get('city', ''),
+                    longitude=form_data.get('foodbakery_post_loc_longitude_restaurant', ''),
+                    latitude=form_data.get('foodbakery_post_loc_latitude_restaurant', ''),
+                )
+            messages.info(request, 'Please check your email to confirm your account')
+            return render(request, 'vendor/register_vendor_send.html', {
+                "form_data": form_data,
+            })
+        return redirect('vendor:register_vendor')
+
+    except Exception as e:
+        print('error', e)
+        messages.error(request, 'Vendor not added')
+        return HttpResponseServerError('Internal Server Error')
 
 
 def register_vendor(request):
@@ -135,9 +148,7 @@ def register_vendor(request):
     print('request', request)
     upload_file_url = upload_file(request.FILES.get('vendor_license'))
     form = RegisterForm(request.POST or None)
-    print('form', form.errors)
     vendor_form = VendorForm(request.POST or None)
-    print('vendor_form', vendor_form.errors)
     if request.method == 'POST':
         next_action = request.POST.get('next', '')
         if next_action == 'confirm':
@@ -187,8 +198,11 @@ def get_menu(request, form=None, type_data=None, *args, **kwargs):
         food_items = FoodItem.objects.filter(category__id=F('category_id'),
                                              vendor__id=F('category__vendor__id')).select_related('category').order_by(
             'created_at')
+        sizes = Size.objects.filter(food_item__id=F('food_item_id')).select_related('food_item')
+        size_edit = Size.objects.all()
         category_ids = food_items.values_list('category_id', flat=True).distinct()
         categories = Category.objects.filter(vendor=vendor, id__in=category_ids)
+        print('categories', categories)
         menus_pagination = paginate_data(categories, page_size, page)
 
         context = {
@@ -197,6 +211,7 @@ def get_menu(request, form=None, type_data=None, *args, **kwargs):
             'food_form': form,
             'foods': food_items,
             'category_food': categories,
+            'sizes': sizes,
         }
         return context
     else:
@@ -240,14 +255,20 @@ def menu_builder(request):
 @csrf_exempt
 @login_required
 def food_menu(request):
+    SizeFormSet = inlineformset_factory(FoodItem, Size, form=SizeForm, extra=3)
     if request.method == 'POST':
+        print('request.POST', request.POST)
         food_form = FoodItemForm(request.POST or None, request.FILES)
-        if food_form.is_valid():
+        size_formset = SizeFormSet(request.POST, instance=food_form.instance)
+        print('food_form', food_form)
+        if food_form.is_valid() and size_formset.is_valid():
             food = food_form.save(commit=False)
-            food.category = Category.objects.get(pk=request.POST.get('category_food'))
+            food.category = Category.objects.get(pk=request.POST.get('category'))
             food.vendor = Vendor.objects.get(user=request.user)
             food.slug = slugify(food.food_name) + '-' + str(food.id)
             food.save()
+            size_formset.instance = food
+            size_formset.save()
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return JsonResponse({'message': 'Food added successfully!', 'alert': 'success'}, status=200)
             messages.success(request, 'Food added successfully')
@@ -261,9 +282,11 @@ def food_menu(request):
             return redirect('food_menu')
     else:
         food_form = FoodItemForm()
+        size_formset = SizeFormSet(instance=FoodItem())
+        print('size_formset', size_formset)
         context = get_menu(request, food_form, 'food')
-        print('context', context)
         context['ckeditor_config'] = settings.CKEDITOR_5_CONFIGS['extends']
+        context['size_formset'] = size_formset
         return render(request, 'vendor/vendor_food.html', context)
 
 
@@ -272,6 +295,7 @@ def food_menu(request):
 @require_http_methods(["PATCH"])
 def menu_edit_detail(request, pk):
     try:
+        print('request.body', request.body)
         category = Category.objects.get(pk=pk)
         data = json.loads(request.body)
         category.category_name = data.get('category_name')
@@ -303,18 +327,46 @@ def menu_delete_detail(request, pk):
 
 @csrf_exempt
 @login_required
-@require_http_methods(["PATCH"])
+@require_http_methods(["POST"])
 def food_item_detail(request, pk):
     try:
+        print('request.body', request.POST)
         food = FoodItem.objects.get(pk=pk)
-        data = json.loads(request.body)
-        food.food_name = data.get('food_name')
-        food.description = data.get('description')
-        food.price = data.get('price')
+
+        # Lấy các trường từ request.POST
+        food.food_name = request.POST.get('food_name')
+        food.food_title = request.POST.get('food_title')
+        food.sub_food_title = request.POST.get('food_sub_title')
+        food.description = request.POST.get('description')
+        food.price = Decimal(request.POST.get('price', '0'))
+        food.is_available = request.POST.get('is_available') == 'true'
+
+        if 'image' in request.FILES:
+            food.image = request.FILES['image']
+
         food.save()
+
+        sizes = []
+        size_keys = [key for key in request.POST.keys() if key.startswith('sizes[')]
+        for key in size_keys:
+            index = key.split('[')[1].split(']')[0]
+            size_id = request.POST.get(f'sizes[{index}][size_id]')
+            price = request.POST.get(f'sizes[{index}][price]')
+            sizes.append({'size_id': size_id, 'price': price})
+        print('sizes', sizes)
+        for size_data in sizes:
+            size_id = size_data['size_id']
+            price = size_data['price']
+            Size.objects.update_or_create(
+                id=size_id,
+                defaults={'price': price, 'food_item': food}
+            )
+
         return JsonResponse({'message': 'Food updated successfully!', 'alert': 'success'}, status=200)
     except FoodItem.DoesNotExist:
         return JsonResponse({'message': 'Food not found!', 'alert': 'danger'}, status=404)
+    except Exception as e:
+        return JsonResponse({'message': str(e), 'alert': 'danger'}, status=500)
 
 
 @csrf_exempt
@@ -322,6 +374,9 @@ def food_item_detail(request, pk):
 def food_item_delete(request, pk):
     if request.method == 'DELETE':
         food = FoodItem.objects.get(pk=pk)
+        size = Size.objects.filter(food_item=food)
+        for s in size:
+            s.delete()
         food.delete()
         messages.success(request, 'Food deleted successfully')
     return JsonResponse({'message': 'Food deleted successfully!', 'alert': 'success'}, status=200)

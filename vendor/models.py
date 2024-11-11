@@ -49,6 +49,8 @@ class Vendor(models.Model):
     vendor_type = models.IntegerField(choices=VENDOR_TYPE_CHOICES, default=VENDOR_TYPE_UNKNOWN)
     vendor_description = models.TextField()
     vendor_license = models.ImageField(upload_to='vendor/license', blank=True, null=True)
+    vendor_id_card = models.ImageField(upload_to='vendor/id_card', blank=True, null=True)
+    vendor_tax_code = models.CharField(max_length=50, blank=True, null=True)
     vendor_slug = models.SlugField(max_length=50, blank=True, null=True, unique=True)
     is_approved = models.BooleanField(default=False)
     street_number = models.CharField(max_length=50, blank=True, null=True)

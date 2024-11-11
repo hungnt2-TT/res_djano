@@ -1,17 +1,48 @@
 <div class="user-account-nav user-account-sidebar">
     <div class="user-nav-list">
         <ul>
-            <li class="{% if 'customer_dashboard' in request.path  or '/customers/customer/' == request.path%} active {% endif %}"><a
-                    href="{% url 'customer_dashboard' %}"><i class="icon-dashboard3"></i>Dashboard</a></li>
-            <li class="{% if 'profile' in request.path  or 'vendor_map' in request.path%}
+            <h4 class="box-label">Activity</h4>
+            <li class="{% if 'customer_dashboard' in request.path  or '/customers/customer/' == request.path %} active {% endif %}">
+                <a
+                        href="{% url 'customer_dashboard' %}"><i class="icon-dashboard3"></i>Dashboard</a></li>
+            <li class="{% if 'profile' in request.path  or 'vendor_map' in request.path %}
             	active
             {% endif %} "><a href="{% url 'profile' %}"><i class="icon-building"></i>My Restaurant</a></li>
-            <li class="{% if 'menu_build' in request.path or 'food_menu' in request.path %}active  {% endif %}"><a href="{% url 'menu_builder' %}"><i
+            <li class="{% if 'menu_build' in request.path or 'food_menu' in request.path %}active  {% endif %}"><a
+                    href="{% url 'menu_builder' %}"><i
                     class="icon-menu5"></i>Menu Builder</a></li>
             <li><a href="restaurant-orders.html"><i class="icon-add_shopping_cart"></i>Orders</a></li>
             <li><a href="restaurant-earnings.html"><i class="icon-money"></i>Earnings</a></li>
             <li><a href="restaurant-statement.html"><i class="icon-file-text22"></i>Statement</a></li>
             <li><a href="restaurant-change-password.html"><i class="icon-unlock-alt"></i>Change Password</a></li>
+        </ul>
+    </div>
+    <div class="user-nav-list box">
+        <ul>
+            <h4 class="box-label">ONLINE ORDERING</h4>
+
+            <li class="{% if '/customers/customer/' == request.path %}active{% endif %}"><a
+                    href="{% url 'customer_dashboard' %}"><i class="icon-address"></i>My addresses</a></li>
+        </ul>
+    </div>
+    <div class="user-nav-list box">
+        <ul>
+            <h4 class="box-label">PAYMENTS</h4>
+
+            <li class="{% if '/wallet/setting_wallet/' == request.path %}active{% endif %}"><a
+                    href="{% url 'setting_wallet' %}"><i class="icon-wallet"></i>Wallet</a></li>
+            <li class="{% if '/wallet/payment/' == request.path %}active{% endif %}"><a
+                    href="{% url 'payment_paypal' %}"><i class="icon-paypal"></i>Cards</a></li>
+            <li><a href="{% url 'index' %}"><i class="icon-credit-card"></i>Vnpay</a></li>
+
+        </ul>
+    </div>
+    <div class="user-nav-list box">
+        <ul>
+            <h4 class="box-label">ACCOUNT SETTINGS</h4>
+
+            <li class="{% if '/customers/customer/' == request.path %}active{% endif %}"><a
+                    href="{% url 'customer_dashboard' %}"><i class="icon-delete_forever"></i>Delete Account</a></li>
         </ul>
     </div>
 </div>

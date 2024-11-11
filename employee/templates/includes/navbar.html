@@ -79,7 +79,7 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
                     <div class="login-option" style="padding-top: 9px">
                         {% if user.is_authenticated %}
                             <a href="{% url 'cart_store' %}" class="nav-bar-cart">
-                                <i class="fa fa-shopping-cart text-danger fa-2x"></i>
+                                <i class="fa fa-shopping-cart text-danger fa-2x" style="font-size: 2em"></i>
                                 <span class="badge badge-warning " id="cart_counter"
                                       style="">{{ cart_count }}</span>
 
@@ -169,5 +169,4 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
     <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&defer"></script>
 
     <script src="{% static 'employee/js/location.js' %}"></script>
-    <script src="{% static 'js/search_location.js' %}"></script>
 {% endblock %}

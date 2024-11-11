@@ -1,245 +1,411 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block css %}
-    <link href="{% static 'css/customer_setting.css' %}" rel="stylesheet">
+    <link href="{% static 'css/customer_setting.css' %}" rel="stylesheet" xmlns="http://www.w3.org/1999/html">
 
 {% endblock %}
+{% load static %}
+
+
+{% block extra_scripts %}
+    <script src="{% static 'js/checkout.js' %}"></script>
+{% endblock %}
+
 {% block content %}
     <div class="main-section">
-    {% include 'includes/cover.html' %}
-    <div class="page-section account-header buyer-logged-in">
-        <div class="container">
-            <div class="row" style="display: block">
-                <form action="{% url 'place-order' %}" method="post">
-                    {% csrf_token %}
-                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
-                        <div class="user-sidebar">
-                            <div class="user">
+        <div class="page-section account-header buyer-logged-in">
+            <form id="menu-order-confirm" action="{% url 'checkout' %}" method='POST'>
+                {% csrf_token %}
+                <div class="container">
+                    <div class="row" style="display: block">
+                        <div action="" method="post">
+                            {% csrf_token %}
+                            <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
+                                <div class="tabs-holder horizontal">
+                                    <ul class="stickynav-tabs nav nav-tabs">
+                                        <li class="active"><a data-toggle="tab" href="#home"> <i
+                                                class="fa fa-shopping-cart text-danger fa-2x"></i>Address</a></li>
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div id="home" class="tab-pane in active">
+                                            <div class="menu-itam-holder" style="padding:8px 30px">
+                                                <div class="user-sidebar">
+                                                    <div class="tabs-holder horizontal">
+                                                        <div class="tab-content">
+                                                            <div id="home" class="tab-pane in active">
+                                                                {% if form.non_field_errors %}
+                                                                    <div class="alert alert-danger">
+                                                                        {% for error in form.non_field_errors %}
+                                                                            <p>{{ error }}</p>
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                {% endif %}
+                                                                <div class="user">
+                                                                    <div class="row">
+                                                                        <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                                            First Name : {{ form.first_name }}
+                                                                            {% if form.first_name.errors %}
+                                                                                <span class="error">
+                            {% for error in form.first_name.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </span>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                        <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                                            Last Name : {{ form.last_name }}
+                                                                            {% if form.last_name.errors %}
+                                                                                <span class="error">
+                            {% for error in form.last_name.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </span>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                                            Phone : {{ form.phone }}
+                                                                            {% if form.phone.errors %}
+                                                                                <span class="error">
+                            {% for error in form.phone.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </span>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                        <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                                            Email : {{ form.email }}
+                                                                            {% if form.email.errors %}
+                                                                                <span class="error">
+                            {% for error in form.email.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </span>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                                            Country : {{ form.country }}
+                                                                            {% if form.country.errors %}
+                                                                                <span class="error">
+                                                                            {% for error in form.country.errors %}
+                                                                                {{ error }}
+                                                                            {% endfor %}
+                                                                        </span>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                        <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                                            Postcode : {{ form.pin_code }}
+                                                                            {% if form.pin_code.errors %}
+                                                                                <span class="error">
+                                                                                        {% for error in form.pin_code.errors %}
+                                                                                            {{ error }}
+                                                                                        {% endfor %}
+                                                                                    </span>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                                            City : {{ form.city }}
+                                                                            {% if form.city.errors %}
+                                                                                <span class="error">
+                                                                                    {% for error in form.city.errors %}
+                                                                                        {{ error }}
+                                                                                    {% endfor %}
+                                                                                </span>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                        <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                                            Address : {{ form.address }}
+                                                                            {% if form.address.errors %}
+                                                                                <span class="error">
+                            {% for error in form.address.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </span>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="form-group col-md-6 col-sm-12 col-lg-6">
+                                                                            State : {{ form.state }}
+                                                                            {% if form.state.errors %}
+                                                                                <span class="error">
+                            {% for error in form.state.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </span>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
-                                <div class="row">
-                                    <div class="form-group col-md-6 col-sm-12 col-lg-6">
-                                        First Name : {{ form.first_name }}
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="form-group col-md-6 col-sm-12 col-lg-6">
-                                        Last Name : {{ form.last_name }}
-                                    </div>
+
+
                                 </div>
-                                <div class="row">
-                                    <div class="form-group col-md-6 col-sm-12 col-lg-6">
-                                        Phone : {{ form.phone }}
-                                    </div>
-                                    <div class="form-group col-md-6 col-sm-12 col-lg-6">
-                                        Last Name : {{ form.email }}
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="form-group col-md-6 col-sm-12 col-lg-6">
-                                        Country : {{ form.country }}
-                                    </div>
-                                    <div class="form-group col-md-6 col-sm-12 col-lg-6">
-                                        Postcode : {{ form.pin_code }}
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="form-group col-md-6 col-sm-12 col-lg-6">
-                                        City : {{ form.city }}
-                                    </div>
-                                    <div class="form-group col-md-6 col-sm-12 col-lg-6">
-                                        Address : {{ form.address }}
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="form-group col-md-6 col-sm-12 col-lg-6">
-                                        State : {{ form.state }}
+                            </div>
+                            <div class="sticky-sidebar col-lg-5 col-md-5 col-sm-12 col-xs-12"
+                                 style="max-height: 507px; overflow: scroll;">
+                                <div class="user-order-holder">
+                                    <div class="user-order">
+                                        <h6><i class="icon-sticky-note"></i>Coupon</h6>
+                                        {% for coupon in coupons %}
+                                            <div class="swiper mySwiper" thumbsSlider="">
+                                                <div class="swiper-wrapper">
+                                                    <div class="swiper-slide">
+                                                        <div class="swiper mySwiperNested
+                                                        {% if coupon.type_of_discount == 'Percentage' %}  swiperHomeElectric
+                                                        {% elif coupon.type_of_discount == 'Free Delivery' %}swiperHomeLife
+                                                        {% elif coupon.type_of_discount == 'Refund Coin' %}swiperFashion
+                                                        {% else %}swiperHomeFashion
+                                                        {% endif %}
+                                                        ">
+                                                            <div class="swiper-wrapper"
+                                                                 style="flex-flow: column;   margin-left: 8px  ">
+                                                                <div class="swiper-slide">
+                                                                    <div class="coupon__wrap">
+                                                                        <div class="coupon__title">
+                                                                            <div class="couple__category">{{ coupon.coupon_code }}</div>
+                                                                            <div class="coupon__max">
+                                                                                Maximum {{ coupon.max_discount }} VND
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="coupon__detail">
+                                                                            <div class="coupon__price">
+                                                                                {% if coupon.type_of_discount == 'Percentage' %}
+                                                                                    {{ coupon.discount_value }}%
+                                                                                {% elif coupon.type_of_discount == 'Free Delivery' %}
+                                                                                    {{ coupon.discount_value }} VND
+                                                                                {% elif coupon.type_of_discount == 'Refund Coin' %}
+                                                                                    {{ coupon.discount_value }} Coin
+                                                                                {% else %}
+                                                                                    {{ coupon.discount_value }}
+                                                                                {% endif %}
+                                                                                Discount
+                                                                            </div>
+                                                                            <div class="coupon__info">
+                                                                                <span>Orders from {{ coupon.min_order_value }} VND</span>
+                                                                                <span>Thời hạn: {{ coupon.coupon_creation_date|date:"F d" }} - {{ coupon.coupon_expiry_date|date:"d, Y" }}</span>
+                                                                            </div>
+                                                                            <div class="coupon__footer">
+                                                                                <div class="coupon__condition">
+                                                                                <span style="font-size: 9px"
+                                                                                      class="error-message pre-order-msg">{{ coupon.description|truncatechars:30|safe }}</span>
+                                                                                </div>
+                                                                                <div class="coupon__btn">
+                                                                                    <button type="button"
+                                                                                            onclick="selectCoupon({{ coupon.id }})"
+                                                                                            data-id="{{ coupon.id }}"
+                                                                                            class="btn btn-primary collect-btn">
+                                                                                        Collect
+                                                                                    </button>
+                                                                                    <input type="hidden"
+                                                                                           id="selected_coupon_id"
+                                                                                           name="coupon_id" value="">
+
+
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="coupon__border"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
-                    <div class="sticky-sidebar col-lg-5 col-md-5 col-sm-12 col-xs-12">
+                    <div class="sticky-sidebar col-lg-12 col-md-12 col-sm-12 col-xs-12">
                         <div class="user-order-holder">
                             <div class="user-order">
                                 <h6><i class="icon-shopping-basket"></i>Your Order</h6>
-                                <span class="error-message pre-order-msg">This restaurant allows Pre orders.</span>
-                                <span class="discount-info" style="display: block;">If you have a discount code,<br>
-											you will
-											be able to input it<br> at the payments stage.</span>
-                                <div class="select-option dev-select-fee-option">
-                                    <ul>
-                                        <li>
-                                            <input id="order-pick-up-fee" type="radio" name="order_fee_type">
-                                            <label for="order-pick-up-fee">Pick-Up</label>
-                                            <span>£15.00</span>
-                                        </li>
-                                        <li>
-                                            <input id="order-delivery-fee" checked="checked" type="radio"
-                                                   name="order_fee_type">
-                                            <label for="order-delivery-fee">Delivery</label>
-                                            <span>£10.00</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div id="dev-menu-orders-list">
-                                    <ul class="categories-order">
-                                        <li>
-                                            <a href="#" class="btn-cross dev-remove-menu-item"><i
-                                                    class=" icon-cross3"></i></a>
-                                            <a>Chicken Tandoori Special 12" Deep Pan</a>
-                                            <span class="category-price">£4.50</span>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="btn-cross dev-remove-menu-item"><i
-                                                    class=" icon-cross3"></i></a>
-                                            <a>Chicken Tandoori Special 09" Deep Pan</a>
-                                            <span class="category-price">£6.50</span>
+                                {% for vendor, data in grouped_cart_items %}
+
+                                    <div id="dev-menu-orders-list">
+                                        <ul class="categories-order">
+                                            {% for cart_item in data.items %}
+                                                <li id="cart-item-{{ cart_item.id }}"
+                                                    data-item-id="{{ cart_item.id }}"
+                                                    class="cart-item">
+                                                    <a>{{ cart_item }}</a>
+
+                                                    <div class="badge badge-primary"
+                                                         data-size-id="{{ cart_item.size.id }}"
+                                                         id="size_option_{{ cart_item.food_item.id }}">{{ cart_item.size.size }}</div>
+                                                    <span class="category-quantity">x{{ cart_item.quantity }}</span>
+                                                    <span class="category-price">{{ cart_item.size.price }} VND</span>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+
+                                    </div>
+                                {% endfor %}
+                                <div class="row">
+                                    <!-- Giá trị -->
+                                    <div class="col-md-6">
+                                        <div class="price-area dev-menu-price-con">
                                             <ul>
-                                                <li>Drinks - chillies : <span class="category-price">£3.50</span>
+                                                <li><span class="price-title">Subtotal</span><span class="price"
+                                                                                                   id="subtotal_all"><em
+                                                        class="dev-menu-subtotal">{{ subtotal }} VND</em></span></li>
+                                                <li class="restaurant-fee-con">
+                                                    <span class="fee-title">TAX</span>
+                                                    <span class="price" id="tax"><em
+                                                            class="dev-menu-charges">{{ tax }} VND</em></span>
+                                                </li>
+                                                <li class="restaurant-fee-con">
+                                                    <span class="fee-title">Ship</span>
+                                                    <span class="price"><em class="dev-menu-charges"
+                                                                            id="total_shipping_cost">{{ total_shipping_cost }} VND</em></span>
+                                                </li>
+                                                <li class="restaurant-fee-con">
+                                                    <span class="fee-title">Coupon</span>
+                                                    <span class="price"><em class="dev-menu-charges"
+                                                                            id="coupon">0 VND</em></span>
+                                                    <input type="hidden" id="selected_coupon_amount" name="coupon"
+                                                           class="coupon" value="0"></li>
+                                            </ul>
+                                            <p class="total-price">Total <span class="price" id="grand_total"><em
+                                                    class="dev-menu-grtotal">{{ final_grand_total }} VND</em></span></p>
+                                            <input type="hidden" id="new_total" name="new_total"
+                                                   class="final_grand_total" value="0">
+                                            <span class="total-price total-words" style="font-size: 11px">
+                    {% if final_grand_total %}
+                        {% load custom_filters %}
+                        <span>{{ final_grand_total|to_vnd_words }}</span>
+                    {% else %}
+                        <span>...</span>
+                    {% endif %}
+                </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="pay-option dev-order-pay-options">
+                                            <ul class="list_payment_method">
+                                                <li>
+                                                    <input id="order-cash-payment" type="radio" name="payment_method"
+                                                           value="Cash">
+                                                    <label for="order-cash-payment"><i
+                                                            class="icon-coins"></i>Cash</label>
+                                                </li>
+                                                <li>
+                                                    <input id="order-card-payment" type="radio" value="Wallet"
+                                                           name="payment_method">
+                                                    <label for="order-card-payment"><i
+                                                            class="icon-account_balance_wallet"></i>Wallet</label>
+                                                </li>
+                                                <li>
+                                                    <input id="order-card-payment" type="radio" value="PayPal"
+                                                           name="payment_method">
+                                                    <label for="order-card-payment"><i
+                                                            class="icon-paypal"></i>Paypal</label>
+                                                </li>
+                                                <li>
+                                                    <input id="order-card-payment" type="radio" value="VnPay"
+                                                           name="payment_method">
+                                                    <label for="order-card-payment"><i
+                                                            class="icon-credit-card4"></i>Vnpay</label>
                                                 </li>
                                             </ul>
-                                            <a href="#" data-toggle="modal" data-target="#extras-0-1"
-                                               class="update-menu dev-update-menu-btn">Edit</a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="btn-cross dev-remove-menu-item"><i
-                                                    class=" icon-cross3"></i></a>
-                                            <a>Margherita 12" Deep Pan</a>
-                                            <span class="category-price">£5.50</span>
-                                        </li>
-                                    </ul>
-                                    <div class="price-area dev-menu-price-con">
-                                        <ul>
-                                            <li>Subtotal <span class="price">£<em
-                                                    class="dev-menu-subtotal">20.00</em></span></li>
-                                            <li class="restaurant-fee-con">
-                                                <span class="fee-title">Pick-Up</span>
-                                                <span class="price">£<em class="dev-menu-charges">15.00</em></span>
-                                            </li>
-                                            <li>VAT (13%) <span class="price">£<em
-                                                    class="dev-menu-vtax">4.55</em></span></li>
-                                        </ul>
-                                        <p class="total-price">Total <span class="price">£<em class="dev-menu-grtotal">39.55</em></span>
-                                        </p>
+                                            <span class="text-danger" id="payment_method-error"></span>
+
+                                        </div>
+                                        <button
+                                                class="menu-order-confirm text-uppercase font-weight-bold"
+                                                type="submit">
+                                            PROCEED
+                                            TO CHECKOUT
+                                        </button>
                                     </div>
                                 </div>
-                                <div id="dev-no-menu-orders-list">
-                                    <span class="success-message">There are no items in your basket.</span>
-                                </div>
-                                <div class="pay-option dev-order-pay-options ">
-                                    <ul class="list_payment_method">
-                                        <li>
-                                            <input id="order-cash-payment" type="radio" name="payment_method" value="PayPal">
-                                            <label for="order-cash-payment"><i class="icon-coins"></i>Cash</label>
-                                        </li>
-                                        <li>
-                                            <input id="order-card-payment" type="radio" value="Wallet"
-                                                   name="payment_method">
-                                            <label for="order-card-payment"><i
-                                                    class="icon-account_balance_wallet"></i>Wallet</label>
-                                        </li>
-                                        <li>
-                                            <input id="order-card-payment" type="radio" value="PayPal"
-                                                   name="payment_method">
-                                            <label for="order-card-payment"><i
-                                                    class="icon-paypal"></i>Paypal</label>
-                                        </li>
-                                        <li>
-                                            <input id="order-card-payment" type="radio" value="VnPay"
-                                                   name="payment_method">
-                                            <label for="order-card-payment"><i
-                                                    class="icon-credit-card4"></i>Vnpay</label>
-                                        </li>
-                                    </ul>
-                                    <span class="text-danger" id="payment_method-error"></span>
 
-                                </div>
-{#                                <a href="#" class="menu-order-confirm">Confirm Order</a>#}
-                                                                <button onclick="return payMethodConfirm();" type="submit"
-                                        class="menu-order-confirm text-uppercase font-weight-bold" type="submit">
-                                    PROCEED
-                                    TO CHECKOUT
-                                </button>
+                                {#                                <a href="#" class="menu-order-confirm">Confirm Order</a>#}
+
                                 <span class="menu-loader"></span>
                             </div>
                         </div>
                     </div>
 
-{#                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">#}
-{#                        <div class="user-dashboard loader-holder">#}
-{#                            <div class="user-holder">#}
-{#                                <div class="user-profile">#}
-{#                                    <div class="element-title has-border">#}
-{#                                        <ul>#}
-{#                                            <li style="list-style-type: none; font-weight: 600;">#}
-{#                                                TOTAL#}
-{#                                                <span class="price float-right">#}
-{#                                            <span id="total">20000</span>#}
-{#                                            <span class="currency">VND</span>#}
-{#                                        </span>#}
-{#                                            </li>#}
-{#                                            <h5>SELECT PAYMENT METHOD</h5>#}
-{#                                            <div class="payment-method">#}
-{#                                                <label>#}
-{#                                                    <input type="radio" name="payment_method" value="PayPal">#}
-{#                                                    <img src="{% static 'employee/img/paypal-784404_640.png' %}"#}
-{#                                                         alt="Paypal" style="width: 166px">#}
-{#                                                </label>#}
-{#                                                &emsp;#}
-{#                                                <label>#}
-{#                                                    <input type="radio" name="payment_method" value="VnPay">#}
-{#                                                    <img src="{% static 'img/vnpay-logo.jpg' %}" alt="Paypal"#}
-{#                                                         style="width: 166px">#}
-{#                                                </label>#}
-{#                                                &emsp;#}
-{#                                                <label>#}
-{#                                                    <input type="radio" name="payment_method" value="Wallet">#}
-{#                                                    <img src="{% static 'img/Blue Flat Illustrated Finance Company Logo.png' %}"#}
-{#                                                         alt="Paypal" style="width: 166px">#}
-{#                                                </label>#}
-{#                                                <label>#}
-{#                                                    <input type="radio" name="payment_method" value="COD">#}
-{#                                                    <img src="{% static 'img/phi-cod.png' %}"#}
-{#                                                         alt="Paypal" style="width: 166px">#}
-{#                                                </label>#}
-{#                                            </div>#}
-{#                                        </ul>#}
-{#                                    </div>#}
-{#                                    <span class="text-danger" id="payment_method-error"></span>#}
-{##}
-{#                                </div>#}
-{#                                <button onclick="return payMethodConfirm();" type="submit"#}
-{#                                        class="btn btn-outline-danger text-uppercase font-weight-bold" type="submit">#}
-{#                                    PROCEED#}
-{#                                    TO CHECKOUT#}
-{#                                </button>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-                </form>
-            </div>
+                    {#                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">#}
+                    {#                        <div class="user-dashboard loader-holder">#}
+                    {#                            <div class="user-holder">#}
+                    {#                                <div class="user-profile">#}
+                    {#                                    <div class="element-title has-border">#}
+                    {#                                        <ul>#}
+                    {#                                            <li style="list-style-type: none; font-weight: 600;">#}
+                    {#                                                TOTAL#}
+                    {#                                                <span class="price float-right">#}
+                    {#                                            <span id="total">20000</span>#}
+                    {#                                            <span class="currency">VND</span>#}
+                    {#                                        </span>#}
+                    {#                                            </li>#}
+                    {#                                            <h5>SELECT PAYMENT METHOD</h5>#}
+                    {#                                            <div class="payment-method">#}
+                    {#                                                <label>#}
+                    {#                                                    <input type="radio" name="payment_method" value="PayPal">#}
+                    {#                                                    <img src="{% static 'employee/img/paypal-784404_640.png' %}"#}
+                    {#                                                         alt="Paypal" style="width: 166px">#}
+                    {#                                                </label>#}
+                    {#                                                &emsp;#}
+                    {#                                                <label>#}
+                    {#                                                    <input type="radio" name="payment_method" value="VnPay">#}
+                    {#                                                    <img src="{% static 'img/vnpay-logo.jpg' %}" alt="Paypal"#}
+                    {#                                                         style="width: 166px">#}
+                    {#                                                </label>#}
+                    {#                                                &emsp;#}
+                    {#                                                <label>#}
+                    {#                                                    <input type="radio" name="payment_method" value="Wallet">#}
+                    {#                                                    <img src="{% static 'img/Blue Flat Illustrated Finance Company Logo.png' %}"#}
+                    {#                                                         alt="Paypal" style="width: 166px">#}
+                    {#                                                </label>#}
+                    {#                                                <label>#}
+                    {#                                                    <input type="radio" name="payment_method" value="COD">#}
+                    {#                                                    <img src="{% static 'img/phi-cod.png' %}"#}
+                    {#                                                         alt="Paypal" style="width: 166px">#}
+                    {#                                                </label>#}
+                    {#                                            </div>#}
+                    {#                                        </ul>#}
+                    {#                                    </div>#}
+                    {#                                    <span class="text-danger" id="payment_method-error"></span>#}
+                    {##}
+                    {#                                </div>#}
+                    {#                                <button onclick="return payMethodConfirm();" type="submit"#}
+                    {#                                        class="btn btn-outline-danger text-uppercase font-weight-bold" type="submit">#}
+                    {#                                    PROCEED#}
+                    {#                                    TO CHECKOUT#}
+                    {#                                </button>#}
+                    {#                            </div>#}
+                    {#                        </div>#}
+                    {#                    </div>#}
+                </div>
+            </form>
         </div>
     </div>
+    </div>
     <script>
-        function payMethodConfirm() {
-            var payment_method = $('input[name="payment_method"]:checked').val();
-            console.log(payment_method);
-            if (!payment_method) {
-                console.log('Please select payment method');
-                $('#payment_method-error').html('Please select payment method');
-                return false;
-            } else {
-                var confirm = window.confirm('Are you sure to proceed to checkout?' + payment_method + 'as payment method. \nClick OK to proceed');
-                if (confirm == true) {
-                    return true;
-                } else {
-                    return false;
-                }
-
-            }
+        function selectCoupon(couponId) {
+            document.getElementById('selected_coupon_id').value = couponId;
         }
 
-        $('input[name="payment_method"]').on('change', function () {
-            $('#payment_method-error').html('');
-        });
+        var convertToWordsUrl = "{% url 'convert_to_words' %}";
+
     </script>
 {% endblock %}
+

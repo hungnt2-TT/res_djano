@@ -15,7 +15,7 @@ class VendorForm(forms.ModelForm):
 
     class Meta:
         model = Vendor
-        fields = ['vendor_license', 'fax_number', 'state', 'city', 'longitude', 'latitude', 'address_line_1']
+        fields = ['vendor_license', 'fax_number', 'state', 'city', 'longitude', 'latitude', 'address_line_1', 'vendor_tax_code', 'vendor_id_card']
 
     def clean(self):
         cleaned_data = super().clean()

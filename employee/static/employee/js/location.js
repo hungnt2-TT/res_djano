@@ -1,67 +1,86 @@
-document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('loading_spinner').classList.remove('d-none');
-    document.getElementById('loadingArea').classList.remove('d-none');
-    console.log('Getting location...');
-    if (navigator.geolocation) {
+document.addEventListener('DOMContentLoaded', () => {
+    const isHomePage = window.location.pathname === '/employee/home/';
 
-        navigator.geolocation.getCurrentPosition(function (position) {
-                const lat = position.coords.latitude;
-                const lng = position.coords.longitude;
-                console.log('Latitude:', lat);
-                if (lat && lng) {
-                    console.log('Updating location...', lat, lng);
-                    updateDeliveryLocation(lat, lng);
-                    fetch(`/employee/home/?lat=${lat}&lng=${lng}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            updateRestaurantList(data.vendors);
-                            document.getElementById('loading_spinner').style.display = 'none';
-                            document.getElementById('loadingArea').style.display = 'none';
-                        })
-                        .catch(error => console.error('Error:', error));
-                }
-            }, function (error) {
-                console.error('Geolocation error:', error);
-                document.getElementById('loading').textContent = 'Không thể xác định được vị trí của bạn.';
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 5000,
-                maximumAge: 0
-            }
-        );
+    if (isHomePage) {
+        showLoading();
+        initializeLocation();
     }
 });
+
+function initializeLocation() {
+    const savedLat = localStorage.getItem('latitude');
+    const savedLng = localStorage.getItem('longitude');
+
+    if (savedLat && savedLng) {
+        console.log('Using saved location...');
+        updateLocationAndFetchRestaurants(savedLat, savedLng);
+    } else {
+        console.log('Getting location...');
+        getCurrentLocation()
+            .then(({ lat, lng }) => {
+                console.log('Updating location...', lat, lng);
+                localStorage.setItem('latitude', lat);
+                localStorage.setItem('longitude', lng);
+                updateLocationAndFetchRestaurants(lat, lng);
+            })
+            .catch(error => {
+                console.error('Geolocation error:', error);
+                document.getElementById('loading').textContent = 'Không thể xác định được vị trí của bạn.';
+            });
+    }
+}
+
+function getCurrentLocation() {
+    return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+            return reject(new Error('Geolocation not supported'));
+        }
+        navigator.geolocation.getCurrentPosition(
+            position => resolve({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            }),
+            reject,
+            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+        );
+    });
+}
+
+function updateLocationAndFetchRestaurants(lat, lng) {
+    updateDeliveryLocation(lat, lng);
+    fetchRestaurants(lat, lng);
+    updateLocationProfile(lat, lng);
+}
+
+function fetchRestaurants(lat, lng) {
+    fetch(`/employee/home/?lat=${lat}&lng=${lng}`)
+        .then(response => response.json())
+        .then(data => {
+            updateRestaurantList(data.vendors);
+            hideLoading();
+        })
+        .catch(error => console.error('Error:', error));
+}
 
 function updateRestaurantList(vendors) {
     const vendorList = document.getElementById('vendorList');
     const restaurantList = document.getElementById('restaurantList');
-
-    // Xóa nội dung cũ
     vendorList.innerHTML = '';
     restaurantList.innerHTML = '';
 
-    // Nếu có vendors, hiển thị danh sách
     if (vendors.length > 0) {
-        vendorList.style.display = 'block';  // Hiển thị vendor list nếu có vendor
-
+        vendorList.style.display = 'block';
         vendors.forEach(vendor => {
-            // Kiểm tra xem user_profile có tồn tại không
-            const profilePicture = vendor.user_profile && vendor.user_profile.profile_picture
-                ? vendor.user_profile.profile_picture.url
-                : '/static/employee/img/download.png';
+            const profilePicture = vendor.user_profile?.profile_picture?.url || '/static/employee/img/download.png';
 
-            // Thêm vào ul#vendorList
             const vendorItem = `
                 <li class="has-border">
                     <figure>
                         <a href="#"><img src="${profilePicture}" class="attachment-full size-full wp-post-image" alt=""></a>
                     </figure>
-                </li>
-            `;
+                </li>`;
             vendorList.insertAdjacentHTML('beforeend', vendorItem);
 
-            // Thêm vào ul#restaurantList
             const restaurantItem = `
                 <li class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                     <div class="list-post featured">
@@ -91,31 +110,43 @@ function updateRestaurantList(vendors) {
                             </address>
                         </div>
                     </div>
-                </li>
-            `;
+                </li>`;
             restaurantList.insertAdjacentHTML('beforeend', restaurantItem);
         });
     } else {
-        vendorList.innerHTML = '<li>Không có nhà hàng nào gần bạn.</li>';
-        restaurantList.innerHTML = '<li>Không có nhà hàng nào gần bạn.</li>';
+        const noVendorsMessage = '<li>Không có nhà hàng nào gần bạn.</li>';
+        vendorList.innerHTML = noVendorsMessage;
+        restaurantList.innerHTML = noVendorsMessage;
     }
 }
 
 function updateDeliveryLocation(lat, lng) {
     const geocoder = new google.maps.Geocoder();
-    const latlng = {lat: parseFloat(lat), lng: parseFloat(lng)};
-    geocoder.geocode({location: latlng}, (results, status) => {
+    const latlng = { lat: parseFloat(lat), lng: parseFloat(lng) };
+
+    geocoder.geocode({ location: latlng }, (results, status) => {
+        const addressInput = document.getElementById('id_address');
+
         if (status === 'OK' && results[0]) {
             console.log('Address:', results[0].formatted_address);
-            const addressInput = document.getElementById('id_address');
             addressInput.value = results[0].formatted_address;
             addressInput.classList.add('highlight');
-
-            setTimeout(() => {
-                addressInput.classList.remove('highlight');
-            }, 7000);
+            setTimeout(() => addressInput.classList.remove('highlight'), 7000);
         } else {
-            location.textContent = 'Không thể lấy được địa chỉ của bạn.';
+            addressInput.textContent = 'Không thể lấy được địa chỉ của bạn.';
         }
     });
+}
+function updateLocationProfile(lat, lng) {
+
+}
+function hideLoading() {
+    document.getElementById('loading_spinner').style.display = 'none';
+    document.getElementById('loadingArea').style.display = 'none';
+}
+
+function showLoading() {
+    console.log('Loading...');
+    document.getElementById('loading_spinner').classList.remove('d-none');
+    document.getElementById('loadingArea').classList.remove('d-none');
 }
