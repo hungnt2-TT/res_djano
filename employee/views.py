@@ -36,17 +36,28 @@ from datetime import datetime
 
 from twilio.rest import Client
 
+from django.contrib.auth.models import AnonymousUser
+
+from django.core.serializers import serialize
+
+from django.contrib.gis.geos import Point
+
 
 def home(request):
-    print('home', request)
     lat = request.GET.get('lat')
     lng = request.GET.get('lng')
-    vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)
+    if request.user.is_authenticated:
+        vendors = Vendor.objects.filter(is_approved=True, user__is_active=True).exclude(user=request.user)
+    else:
+        vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)
+    vendors_premium = vendors.filter(vendor_type=Vendor.VENDOR_TYPE_PREMIUM)
     profile = Profile.objects.filter(is_active=True)
+
     information = {
         'vendors': vendors.count(),
         'profile': profile.count()
     }
+
     current_hour = datetime.now().hour
     if 6 <= current_hour < 12:
         time_range = 'morning'
@@ -58,15 +69,16 @@ def home(request):
         time_range = 'night'
 
     food_items = FoodItem.objects.filter(time_range=time_range)
-    vendors_list = []  # Initialize vendors_list
+    vendors_list = []
     if lat and lng:
         lat = float(lat)
         lng = float(lng)
         user_location = Point(lng, lat, srid=4326)
-        employee_profile = EmployeeProfile.objects.get(user=request.user)
-        employee_profile.latitude = lat
-        employee_profile.longitude = lng
-        employee_profile.save()
+        if request.user.is_authenticated:
+            employee_profile = EmployeeProfile.objects.get(user=request.user)
+            employee_profile.latitude = lat
+            employee_profile.longitude = lng
+            employee_profile.save()
         districts = District.objects.filter(geom__contains=user_location).first()
         print('districts', districts)
         if vendors:
@@ -84,12 +96,14 @@ def home(request):
             'dan_so': districts.dan_so,
             'nam_tk': districts.nam_tk,
             'code_vung': districts.code_vung,
+            # 'location': {'lat': districts.geom.centroid.y, 'lng': districts.geom.centroid.x} if districts.geom else None
         }
         return JsonResponse({
             'vendors': vendors_list if vendors_list else [],
             'information': information,
             'districts': districts_dict,
-            'status': 'success'
+            'status': 'success',
+            'vendors_premium': list(vendors_premium.values())  # Convert QuerySet to list
         })
     else:
         districts = None
@@ -102,10 +116,11 @@ def home(request):
         'lng': lng,
         'information': information,
         'food_items': food_items,
+        'vendors_premium': vendors_premium
+
     }
     print('context', context)
     return render(request, 'home.html', context)
-
 
 def register(request):
     return render(request, 'account/register.html')

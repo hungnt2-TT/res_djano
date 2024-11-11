@@ -34,43 +34,40 @@ function initSearchLocation() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    const vendorList = document.getElementById("vendorList");
+    if (vendorList) {
+        vendorList.style.display = "block";
+    }
     const slider = document.querySelector('.slider');
     const nextBtn = document.querySelector('.next-btn');
     const prevBtn = document.querySelector('.prev-btn');
 
     const slideItems = document.querySelectorAll('.container-item');
     const totalItems = slideItems.length;
-    const itemsPerSlide = 4; // Số lượng items hiển thị mỗi lần
-    let currentIndex = 0; // Vị trí nhóm hiện tại
+    const itemsPerSlide = 4;
+    let currentIndex = 0;
 
-    // Hàm cập nhật vị trí slider
     function updateSlider() {
-        console.log('Current updateSlider:', currentIndex);
         slider.style.transform = `translateX(-${(currentIndex * (100 / itemsPerSlide))}%)`;
     }
 
-    // Sự kiện khi nhấn nút Next
     nextBtn.addEventListener('click', function () {
-        console.log('Current index:', currentIndex);
         if (currentIndex < Math.floor(totalItems / itemsPerSlide) - 1) {
             currentIndex++;
         } else {
-            currentIndex = 0; // Nếu đã đến cuối thì quay lại đầu
+            currentIndex = 0;
         }
         updateSlider();
     });
 
-    // Sự kiện khi nhấn nút Previous
     prevBtn.addEventListener('click', function () {
         if (currentIndex > 0) {
             currentIndex--;
         } else {
-            currentIndex = Math.floor(totalItems / itemsPerSlide) - 1; // Quay lại nhóm cuối cùng
+            currentIndex = Math.floor(totalItems / itemsPerSlide) - 1;
         }
         updateSlider();
     });
-
-    // Khởi tạo slider ban đầu
     updateSlider();
 });
 window.onload = function () {

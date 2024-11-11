@@ -1,7 +1,19 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block extra_scripts %}
-    <script src="{% static 'js/cart.js' %}"></script>
+
+{% block css %}
+    <style>
+        .field-holder select {
+            padding: 0px 0px 0px 25px !important;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+    </style>
 {% endblock %}
 {% block content %}
     <div class="main-section">
@@ -106,7 +118,13 @@
                                 <li class="active"><a data-toggle="tab" href="#home"><i
                                         class="icon- icon-room_service"></i>Menu</a>
                                 </li>
-
+                                {#                                <li><a data-toggle="tab" href="#menu1"><i class="icon- icon-textsms"></i>Reviews#}
+                                {#                                    (1)</a></li>#}
+                                <li><a data-toggle="tab" href="#menu2"><i class="icon- icon-food"></i>Book a Table
+                                </a></li>
+                                <li><a data-toggle="tab" href="#menu3"><i class="icon- icon-info3"></i>Restaurant
+                                    Info</a>
+                                </li>
                             </ul>
                             <div class="tab-content">
                                 <div id="home" class="tab-pane in active">
@@ -130,16 +148,6 @@
                                                             </div>
                                                             <div class="price-holder">
                                                                 <span class="price">{{ food_item.price }} VND</span>
-                                                                <a href="#" class="decrease_cart"
-                                                                   style="margin-right: 28px"
-                                                                   data-id="{{ food_item.id }}"
-                                                                   data-url="{% url 'remove_from_cart' food_item.id %}"><i
-                                                                        class="icon-minus text-color"></i></a>
-                                                                <label id="qty-{{ food_item.id }}">0</label>
-                                                                <a href="#" class="add_to_cart"
-                                                                   data-id="{{ food_item.id }}"
-                                                                   data-url="{% url 'add_to_cart' food_item.id %}"><i
-                                                                        class="icon-plus4 text-color"></i></a>
                                                                 <span id="add-menu-loader-10"></span>
                                                             </div>
                                                         </li>
@@ -155,7 +163,362 @@
                                         {% endfor %}
                                     </div>
                                 </div>
+                                {#                                <div id="menu1" class="tab-pane fade">#}
+                                {#                                    <div class="reviews-holder">#}
+                                {#                                        <div class="add-new-review-holder" style="display: none;">#}
+                                {#                                            <div class="row">#}
+                                {#                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">#}
+                                {#                                                    <div class="elements-title">#}
+                                {#                                                        <h3>Rate and Write a Review</h3>#}
+                                {#                                                        <a href="#" class="close-post-new-reviews-btn">Close</a>#}
+                                {#                                                    </div>#}
+                                {#                                                </div>#}
+                                {#                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"#}
+                                {#                                                     style="text-align: center;">Please login#}
+                                {#                                                    in order to post review.#}
+                                {#                                                </div>#}
+                                {#                                            </div>#}
+                                {#                                        </div>#}
+                                {#                                        <div class="reviwes-restaurant-holder">#}
+                                {#                                            <div class="over-all-rating-holder">#}
+                                {#                                                <div class="overall-ratings-container">#}
+                                {#                                                    <div class="overall-rating">#}
+                                {#                                                        <h6>Customer Reviews For Food Bakery</h6>#}
+                                {#                                                        <ul class="reviews-box">#}
+                                {#                                                            <li>#}
+                                {#                                                                <em>5.0 </em>#}
+                                {#                                                                <div class="rating-star">#}
+                                {#                                                                    <span class="rating-box"#}
+                                {#                                                                          style="width: 100%;"></span>#}
+                                {#                                                                </div>#}
+                                {#                                                                <span class="reviews-count">(based on 1#}
+                                {#																			reviews)</span>#}
+                                {#                                                            </li>#}
+                                {#                                                            <li>#}
+                                {#                                                                <div class="icon-holder"><i class="icon-smile"></i>#}
+                                {#                                                                </div>#}
+                                {#                                                                <p><span>100%</span> of diners recommend this#}
+                                {#                                                                    restaurant#}
+                                {#                                                                </p>#}
+                                {#                                                            </li>#}
+                                {#                                                        </ul>#}
+                                {#                                                    </div>#}
+                                {#                                                </div>#}
+                                {#                                                <div class="ratings-summary-container">#}
+                                {#                                                    <div class="rating-summary">#}
+                                {#                                                        <h5>Rating summary</h5>#}
+                                {#                                                        <ul>#}
+                                {#                                                            <li>#}
+                                {#                                                                <span class="review-category">Service</span>#}
+                                {#                                                                <div class="rating-star">#}
+                                {#                                                                    <span class="rating-box" style="width:100%"></span>#}
+                                {#                                                                </div>#}
+                                {#                                                            </li>#}
+                                {#                                                            <li>#}
+                                {#                                                                <span class="review-category">Quality</span>#}
+                                {#                                                                <div class="rating-star">#}
+                                {#                                                                    <span class="rating-box" style="width:100%"></span>#}
+                                {#                                                                </div>#}
+                                {#                                                            </li>#}
+                                {#                                                            <li>#}
+                                {#                                                                <span class="review-category">Value</span>#}
+                                {#                                                                <div class="rating-star">#}
+                                {#                                                                    <span class="rating-box" style="width:100%"></span>#}
+                                {#                                                                </div>#}
+                                {#                                                            </li>#}
+                                {#                                                        </ul>#}
+                                {#                                                    </div>#}
+                                {#                                                </div>#}
+                                {#                                            </div>#}
+                                {#                                            <div class="review-listing">#}
+                                {#                                                <div class="elements-title">#}
+                                {#                                                    <h5>Customer Reviews For Restaurant Demo <span>1</span></h5>#}
+                                {#                                                    <div class="sort-by">#}
+                                {#																<span class="ajax-loader-sorty-by"#}
+                                {#                                                                      style="display: none;">#}
+                                {#																	<img src="assets/images/ajax-loader.gif"#}
+                                {#                                                                         alt=""></span>#}
+                                {#                                                        <ul class="reviews-sortby">#}
+                                {#                                                            <li>#}
+                                {#                                                                <span class="active-sort">Newest Reviews</span>#}
+                                {#                                                                <div class="reviews-sort-dropdown">#}
+                                {#                                                                    <form>#}
+                                {#                                                                        <div class="input-reviews">#}
+                                {#                                                                            <div class="radio-field">#}
+                                {#                                                                                <input name="review" id="check-1"#}
+                                {#                                                                                       type="radio" value="newest"#}
+                                {#                                                                                       checked="checked">#}
+                                {#                                                                                <label for="check-1">Newest#}
+                                {#                                                                                    Reviews</label>#}
+                                {#                                                                            </div>#}
+                                {#                                                                            <div class="radio-field">#}
+                                {#                                                                                <input name="review" id="check-2"#}
+                                {#                                                                                       type="radio" value="highest">#}
+                                {#                                                                                <label for="check-2">Highest#}
+                                {#                                                                                    Rating</label>#}
+                                {#                                                                            </div>#}
+                                {#                                                                            <div class="radio-field">#}
+                                {#                                                                                <input name="review" id="check-3"#}
+                                {#                                                                                       type="radio" value="lowest">#}
+                                {#                                                                                <label for="check-3">Lowest#}
+                                {#                                                                                    Rating</label>#}
+                                {#                                                                            </div>#}
+                                {#                                                                        </div>#}
+                                {#                                                                    </form>#}
+                                {#                                                                </div>#}
+                                {#                                                            </li>#}
+                                {#                                                        </ul>#}
+                                {#                                                    </div>#}
+                                {#                                                </div>#}
+                                {#                                                <ul class="review-restaurant">#}
+                                {#                                                    <li class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">#}
+                                {#                                                        <div class="list-holder ">#}
+                                {#                                                            <div class="review-text">#}
+                                {#                                                                <div class="review-title">#}
+                                {#                                                                    <h6>: Best Food </h6>#}
+                                {#                                                                    <div class="rating-holder">#}
+                                {#                                                                        <div class="rating-star">#}
+                                {#                                                                            <span style="width: 100%;"#}
+                                {#                                                                                  class="rating-box"></span>#}
+                                {#                                                                        </div>#}
+                                {#                                                                    </div>#}
+                                {#                                                                </div>#}
+                                {#                                                                <em class="review-date">25 Apr 2018</em>#}
+                                {#                                                                <p>A wonderfull experience. </p>#}
+                                {#                                                            </div>#}
+                                {#                                                        </div>#}
+                                {#                                                    </li>#}
+                                {#                                                    <li class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">#}
+                                {#                                                        <div class="list-holder ">#}
+                                {#                                                            <div class="review-text">#}
+                                {#                                                                <div class="review-title">#}
+                                {#                                                                    <h6>: Best food </h6>#}
+                                {#                                                                    <div class="rating-holder">#}
+                                {#                                                                        <div class="rating-star">#}
+                                {#                                                                            <span style="width: 100%;"#}
+                                {#                                                                                  class="rating-box"></span>#}
+                                {#                                                                        </div>#}
+                                {#                                                                    </div>#}
+                                {#                                                                </div>#}
+                                {#                                                                <em class="review-date">25 Apr 2018</em>#}
+                                {#                                                                <p>I had great food the other day </p>#}
+                                {#                                                            </div>#}
+                                {#                                                        </div>#}
+                                {#                                                    </li>#}
+                                {#                                                </ul>#}
+                                {#                                            </div>#}
+                                {#                                        </div>#}
+                                {#                                    </div>#}
+                                {#                                </div>#}
+                                <div id="menu2" class="tab-pane fade">
+                                    <div class="booking-info-sec">
+                                        <form name="booking-form" id="booking-form" class="booking-form" method="post"
+                                              action="{% url 'reservation_booking' %}">
+                                            <div class="row">
+                                                <div class="booking-info">
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="row">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                <h5>Book This Restaurant</h5>
+                                                                <p class="booking-desc">All kinds of dining experiences
+                                                                    are waiting to be discovered. Check out the best
+                                                                    restaurants and Book Using following Form.</p>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                                <div class="field-holder has-icon">
+                                                                    <i class="icon icon-user"></i>
+                                                                    {{ form.first_name }}
+                                                                    {% if form.first_name.errors %}
+                                                                        <div class="error-message">{{ form.first_name.errors }}</div>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                                <div class="field-holder has-icon">
+                                                                    <i class="icon icon-user"></i>
+                                                                    {{ form.last_name }}
+                                                                    {% if form.last_name.errors %}
+                                                                        <div class="error-message">{{ form.last_name.errors }}</div>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                                <div class="field-holder has-icon">
+                                                                    <i class="icon icon-user-plus"></i>
+                                                                    {{ form.name }}
+                                                                    {% if form.name.errors %}
+                                                                        <div class="error-message">{{ form.name.errors }}</div>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                                <div class="field-holder has-icon">
+                                                                    <i class="icon icon-email"></i>
+                                                                    {{ form.email }}
+                                                                    {% if form.email.errors %}
+                                                                        <div class="error-message">{{ form.email.errors }}</div>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                                <div class="field-holder has-icon">
+                                                                    <i class="icon icon-phone"></i>
+                                                                    {{ form.phone_number }}
+                                                                    {% if form.phone_number.errors %}
+                                                                        <div class="error-message">{{ form.phone_number.errors }}</div>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                                <div class="field-holder has-icon">
+                                                                    <i class="icon icon-users3"></i>
+                                                                    {{ form.guest_number }}
+                                                                    {% if form.guest_number.errors %}
+                                                                        <div class="error-message">{{ form.guest_number.errors }}</div>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                                <div class="field-holder has-icon">
+                                                                    <div class="date-sec">
+                                                                        <i class="icon-event_available"></i>
+                                                                        {{ form.reservation_date }}
+                                                                        {% if form.reservation_date.errors %}
+                                                                            <div class="error-message">{{ form.reservation_date.errors }}</div>
+                                                                        {% endif %}
+                                                                        <script>
+                                                                            jQuery(document).ready(function () {
+                                                                                var disabledDays = [""];
+                                                                                jQuery("#date-of-booking").datepicker({
+                                                                                    showOtherMonths: true,
+                                                                                    firstDay: 1,
+                                                                                    minDate: 0,
+                                                                                    dateFormat: "dd-mm-yy",
+                                                                                    prevText: "",
+                                                                                    nextText: "",
+                                                                                    monthNames: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                                                                                    beforeShow: function (textbox, instance) {
+                                                                                        $(this).parent().append($('#ui-datepicker-div'));
+                                                                                    },
+                                                                                    beforeShowDay: function (date) {
+                                                                                        var day = date.getDay();
+                                                                                        var string = jQuery.datepicker.formatDate("dd-mm-yy", date);
+                                                                                        var isDisabled = (jQuery.inArray(string, disabledDays) != -1);
+                                                                                        return [!isDisabled];
+                                                                                    },
+                                                                                    onSelect: function (date) {
+                                                                                        jQuery("#date-of-booking").val(date);
+                                                                                        load_available_time(date, '6272');
+                                                                                    }
+                                                                                });
+                                                                            });
+                                                                        </script>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                                <div class="field-holder has-icon">
+                                                                    <div class="booking_time_wrapper">
+                                                                        <div id="time-div-time-date-of-booking">
+                                                                            <i class="icon-clock-o"></i>
+                                                                            {{ form.reservation_time }}
+                                                                            {% if form.reservation_time.errors %}
+                                                                                <div class="error-message">{{ form.reservation_time.errors }}</div>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                <div class="field-holder has-icon field-textarea">
+                                                                    <i class="icon icon-mode_edit"></i>
+                                                                    {{ form.reservation_note }}
+                                                                    {% if form.reservation_note.errors %}
+                                                                        <div class="error-message">{{ form.reservation_note.errors }}</div>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            <input type="hidden" name='vendor_slug' id="vendor_slug"
+                                                                   value="{{ vendor.vendor_slug }}">
+                                                            <input type="hidden" name='vendor_id' id="vendor_id"
+                                                                   value="{{ vendor.id }}">
 
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                <div class="field-holder">
+                                                                    <div class="submit-btn">
+                                                                        <button type="submit"
+                                                                                class="field-btn bgcolor booking-submit-btn input-button-loader">
+                                                                            Submit
+                                                                        </button>
+                                                                        <span class="booking-loader"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div id="menu3" class="tab-pane fade">
+                                    <div class="contact-info-detail">
+                                        <h5>Overview Restaurant Demo</h5>
+                                        <p class="restaurant-desc"></p>
+                                        <p>Base prepared fresh daily. Extra toppings are available in choose
+                                            extraChoose
+                                            you sauce: Go for BBQ sauce or piri piri sauce on your pizza base for no
+                                            extra cost.Choose your cut: Triangular, square, fingers or Un cut on any
+                                            size pizza
+                                        </p>
+                                        <div class="map-sec-holder">
+                                            <div class="cs-map-section">
+                                                <div class="cs-map">
+                                                    <div class="cs-map-content">
+                                                        <div class="mapouter">
+                                                            <div class="gmap_canvas">
+                                                                <div id="map" style="height: 400px"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                <div class="contact-info">
+                                                    <h5>Contact details</h5>
+                                                    <p>{{ vendor.address_line_1 }}</p>
+                                                    <ul>
+                                                        <li class="cell"><i class="icon-phone"></i><a
+                                                                href="#">{{ vendor.fax_number }}</a></li>
+                                                        <li class="pizzaeast"><i class="icon-globe2"></i><a href="#">http://www.com</a>
+                                                        </li>
+                                                        <li class="email"><i class="icon-mail5"></i><a
+                                                                class="text-color"
+                                                                href="mailto:{{ vendor.email }}?subject=Enquiry&body=Hello, I would like to enquire about...">Send
+                                                            Enquiry
+                                                            By Email</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                <div class="widget widget-timing">
+                                                    <h5>Opening Hours</h5>
+                                                    <ul>
+                                                        <li><span>Monday</span>11:00 am - 11:00 pm</li>
+                                                        <li><span>Tuesday</span>11:00 am - 11:00 pm</li>
+                                                        <li><span>Wednesday</span>11:00 am - 11:00 pm</li>
+                                                        <li><span>Thursday</span>11:00 am - 11:00 pm</li>
+                                                        <li><span>Friday</span>11:00 am - 11:00 pm</li>
+                                                        <li><span>Saturday</span>11:00 am - 11:00 pm</li>
+                                                        <li><span>Sunday</span>Off</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -164,4 +527,16 @@
             </div>
         </div>
     </div>
+    <script>
+        var vendorLat = {{ vendor.latitude }};
+        var vendorLng = {{ vendor.longitude }};
+        var vendorLocation = "{{ vendor.location }}";
+        var addressVendor = "{{ vendor.address_line_1 }}";
+    </script>
+{% endblock %}
+{% block extra_scripts %}
+    {#    <script src="{% static 'js/cart.js' %}"></script>#}
+    <script src="{% static 'js/vendor_detail.js' %}"></script>
+    <script src="{% static 'js/location_vendor.js' %}"></script>
+
 {% endblock %}

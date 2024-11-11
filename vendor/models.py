@@ -1,5 +1,6 @@
 from django.db import models
 from django.template.defaultfilters import slugify
+from django.urls import reverse
 
 from employee.mails import send_mail
 from employee.models import Profile, EmployeeProfile, District
@@ -97,7 +98,35 @@ class Vendor(models.Model):
             self.name_district = District.objects.get(geom__contains=self.location).ten_huyen
         return super(Vendor, self).save(*args, **kwargs)
 
+    def vendor_id(self):
+        return self.id
+
     class Meta:
         db_table = 'vendor'
         verbose_name = 'Vendor'
         verbose_name_plural = 'Vendors'
+
+
+class Reservation(models.Model):
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=15)
+    name = models.CharField(max_length=50)
+    email = models.EmailField(max_length=255, blank=True, null=True)
+    reservation_date = models.DateField()
+    reservation_time = models.TimeField()
+    reservation_status = models.BooleanField(default=False)
+    reservation_note = models.TextField(blank=True, null=True)
+    guest_number = models.IntegerField(default=1)
+    create_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'reservation'
+        verbose_name = 'Reservation'
+        verbose_name_plural = 'Reservations'
+
+    def __str__(self):
+        return f"Reservation for {self.vendor.vendor_name} by {self.user.user.username}"
