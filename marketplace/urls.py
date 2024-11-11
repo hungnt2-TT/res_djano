@@ -11,6 +11,7 @@ urlpatterns = [
     path('delete_cart_item/<int:cart_id>/', views.delete_cart_item, name='delete_cart_item'),
     path('cart/convert-to-words/', convert_to_words, name='convert_to_words'),
     path('food_item/<int:id>/', views.food_item_detail, name='food_item_detail'),
+    path('reservation_booking/', views.reservation_booking, name='reservation_booking'),
     path('coupon/collect/', views.apply_coupon_discount, name='apply_coupon_discount'),
     path('search/', views.search, name='search'),
 ]

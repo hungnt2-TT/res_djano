@@ -19,11 +19,6 @@
                     <div class="row">
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                             <div class="element-title">
-                                {#                                <h1 style="font-size: 40px; color: #505050; text-transform: uppercase; line-height: 50px; margin-bottom: 25px; text-align:center;">#}
-                                {#                                    We are in the business of food<br>our restaurants do</h1>#}
-                                {#                                <p style="font-size: 18px; letter-spacing: 1px; color: #505050; text-align:center;">#}
-                                {#                                    Ridiculus sociosqu#}
-                                {#                                    cursus neque cursus curae ante scelerisque vehicula.</p>#}
                             </div>
                         </div>
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
@@ -248,11 +243,6 @@
                                                     </div>
                                                     <!-- Nội dung hiển thị khi hover -->
                                                     <div class="item-hover-content">
-                                                        {#                                                        <p class="item-description">{{ item.food_title|truncate_chars:20 }}</p>#}
-                                                        {#                                                        <div class="item-sizes">#}
-                                                        {#                                                            <h4>Sizes</h4>#}
-                                                        {#                                                            <p>40, 41, 42, 43, 44, 45</p>#}
-                                                        {#                                                        </div>#}
                                                         <a href="#" class="btn buy-now">Buy Now</a>
                                                     </div>
                                                 </div>
@@ -260,9 +250,8 @@
                                         {% endfor %}
                                     </div>
 
-                                    <!-- Thay thế button bằng icon (FontAwesome) -->
-                                    <div class="prev-btn" disabled="true">
-                                        <i class="fa fa-chevron-left" disabled="true"></i>
+                                    <div class="prev-btn">
+                                        <i class="fa fa-chevron-left"></i>
                                     </div>
                                     <div class="next-btn">
                                         <i class="fa fa-chevron-right"></i>
@@ -282,22 +271,31 @@
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                         <div class="element-title align-left">
-                            <h2>Top Restaurants</h2>
-                            <p>Explore restaurants, bars, and cafés by locality</p>
+                            <h2>Top Premium Restaurants</h2>
+                            <p>Explore the best VIP restaurants, bars, and cafés.</p>
                         </div>
                     </div>
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                         <div class="company-logo">
-                            <ul id="vendorList" style="display: none;">
-                                {% for vendor in vendors %}
-                                    <li class="has-border">
-                                        <figure>
-                                            {% if vendor.user_profile.profile_picture %}
-                                                <a href="#"><img src="{{ vendor.user_profile.profile_picture.url }}"
-                                                                 class="attachment-full size-full wp-post-image"
-                                                                 alt=""></a>{% else %}
-                                                <a href="#"><img src="{% static 'employee/img/download.png' %}">
-                                                </a>{% endif %}
+                            <ul id="vendorList" class="premium-vendors-list">
+                                {% for vendor in vendors_premium %}
+                                    <li class="has-border premium-vendor-item">
+                                        <figure class="premium-vendor-figure">
+                                            <a href="{{ vendor.get_absolute_url }}" class="vendor-link">
+                                                {% if vendor.user_profile.profile_picture %}
+                                                    <img src="{{ vendor.user_profile.profile_picture.url }}"
+                                                         class="vendor-img"
+                                                         alt="{{ vendor.name }}">
+                                                {% else %}
+                                                    <img src="{% static 'employee/img/download.png' %}"
+                                                         class="vendor-img" alt="No image">
+                                                {% endif %}
+                                                <div class="premium-badge">VIP</div>
+                                            </a>
+                                            <div class="vendor-name">
+                                                <a href="{% url 'vendor_detail' vendor.vendor_slug %}"
+                                                   class="vendor-name-link">{{ vendor.name }}</a>
+                                            </div>
                                         </figure>
                                     </li>
                                 {% endfor %}
@@ -385,44 +383,6 @@
 
 
 {% block extra_scripts %}
-
-    {#    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&loading=async&defer"></script>#}
-    {#    #}
-    {#    <script src="{% static 'js/search_location.js' %}"></script>#}
-    {#    <script>#}
-    {#        // Tính toán thời gian hiện tại và thời gian kết thúc#}
-    {#        const now = new Date(); // Lấy thời gian hiện tại#}
-    {#        const saleDurationHours = 2; // Khuyến mãi kéo dài 2 giờ#}
-    {##}
-    {#        // Thêm 2 giờ vào thời gian hiện tại#}
-    {#        const saleEndTime = new Date(now.getTime() + saleDurationHours * 60 * 60 * 1000);#}
-    {##}
-    {#        // Hàm đếm ngược#}
-    {#        function startCountdown() {#}
-    {#            const now = new Date().getTime(); // Thời gian hiện tại#}
-    {#            const distance = saleEndTime.getTime() - now; // Khoảng cách thời gian còn lại#}
-    {##}
-    {#            if (distance <= 0) {#}
-    {#                clearInterval(interval);#}
-    {#                document.getElementById("countdown").innerHTML = "Hết khuyến mãi!";#}
-    {#                return;#}
-    {#            }#}
-    {##}
-    {#            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));#}
-    {#            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));#}
-    {#            const seconds = Math.floor((distance % (1000 * 60)) / 1000);#}
-    {##}
-    {#            document.getElementById("hours").textContent = hours < 10 ? '0' + hours : hours;#}
-    {#            document.getElementById("minutes").textContent = minutes < 10 ? '0' + minutes : minutes;#}
-    {#            document.getElementById("seconds").textContent = seconds < 10 ? '0' + seconds : seconds;#}
-    {#        }#}
-    {##}
-    {#        // Cập nhật countdown mỗi giây#}
-    {#        const interval = setInterval(startCountdown, 1000);#}
-    {##}
-    {#        // Khởi động lần đầu tiên#}
-    {#        startCountdown();#}
-    {#    </script>#}
     <script src="{% static 'js/search_location.js' %}"></script>
 
 {% endblock %}

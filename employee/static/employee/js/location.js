@@ -131,7 +131,7 @@ function updateDeliveryLocation(lat, lng) {
             console.log('Address:', results[0].formatted_address);
             addressInput.value = results[0].formatted_address;
             addressInput.classList.add('highlight');
-            setTimeout(() => addressInput.classList.remove('highlight'), 7000);
+            setTimeout(() => addressInput.classList.remove('highlight'), 1000);
         } else {
             addressInput.textContent = 'Không thể lấy được địa chỉ của bạn.';
         }

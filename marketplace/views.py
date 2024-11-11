@@ -6,6 +6,7 @@ from unicodedata import category
 
 import requests
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import GEOSGeometry
@@ -19,6 +20,7 @@ from django.views.decorators.csrf import csrf_exempt
 from employee.models import EmployeeProfile, Profile
 from marketplace.context_processors import get_cart_counter, get_total_price_by_marketplace, get_cart_amount
 from marketplace.distance import calculate_distance, estimate_time, calculate_shipping_cost
+from marketplace.forms import ReservationForm
 from marketplace.models import Cart
 from marketplace.templatetags.custom_filters import to_vnd_words
 from menu.models import Category, FoodItem, Size, Coupon
@@ -37,22 +39,43 @@ def marketplace(request):
     return render(request, 'listings.html', context)
 
 
+@csrf_exempt
 def vendor_detail(request, vendor_slug):
     vendor = Vendor.objects.get(vendor_slug=vendor_slug)
+    vendor_id = vendor.id
+    vendor_slug = vendor.vendor_slug
+    user = Profile.objects.get(email=request.user.email)
     categories = Category.objects.filter(vendor=vendor).prefetch_related(
         Prefetch('food_items', queryset=FoodItem.objects.filter(is_available=True)))
     if request.user.is_authenticated:
         cart_items = Cart.objects.filter(user=request.user, is_ordered=False)
+
+        user_data = {
+            'first_name': user.first_name if user.first_name else '',
+            'last_name': user.last_name if user.last_name else '',
+            'email': user.email,
+            'phone_number': user.phone_number,
+            'name': user.username,
+            'user': user,
+            'vendor': vendor
+        }
+        print('vendor_id', vendor_id)
+        form = ReservationForm(initial=user_data)
         context = {
             'vendor': vendor,
+            'vendor_slug': vendor_slug,
             'categories': categories,
-            'cart_items': cart_items
+            'cart_items': cart_items,
+            'form': form,
+            'vendor_id': vendor.id
         }
         return render(request, 'vendor_maketplace_detail.html', context)
 
     context = {
         'vendor': vendor,
-        'categories': categories
+        'vendor_slug': vendor_slug,
+        'categories': categories,
+        'vendor_id': vendor.id
     }
     return render(request, 'vendor_maketplace_detail.html', context)
 
@@ -130,8 +153,10 @@ def get_distance_and_time(api_key, origin, destination, mode="driving"):
         "key": api_key
     }
     response = requests.get(url, params=params)
+    print('response', response)
     data = response.json()
-    print('data', data)
+    print('data = ', data)
+
     if data["status"] == "OK":
         element = data["rows"][0]["elements"][0]
         if element["status"] == "OK":
@@ -337,3 +362,47 @@ def apply_coupon_discount(request):
         except (InvalidOperation, ValueError) as e:
             return JsonResponse({'error': 'Invalid input data.'}, status=400)
     return JsonResponse({'error': 'Invalid request method.'}, status=400)
+
+
+@csrf_exempt
+def reservation_booking(request):
+    print('reservation_booking', request.POST)
+    vendor_id = request.POST.get('vendor_id')
+    print('vendor_id', vendor_id)
+    vendor = Vendor.objects.get(id=vendor_id)
+    user = Profile.objects.get(email=request.user.email)
+    categories = Category.objects.filter(vendor=vendor).prefetch_related(
+        Prefetch('food_items', queryset=FoodItem.objects.filter(is_available=True)))
+    cart_items = Cart.objects.filter(user=request.user, is_ordered=False)
+    print('categories', categories)
+    print('cart_items', request.POST.get('phone_number'))
+    if request.method == 'POST':
+        post_data = request.POST.copy()
+        post_data['vendor'] = vendor.id
+        post_data['user'] = user.id
+        form = ReservationForm(post_data)
+        print('form', form.errors)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Reservation has been booked successfully')
+            return redirect('marketplace')
+        else:
+            context = {
+                'form': form,
+                'vendor': vendor,
+                'vendor_id': vendor.id,
+                'categories': categories,
+                'cart_items': cart_items
+            }
+            messages.error(request, 'Reservation booking failed')
+            return render(request, 'vendor_maketplace_detail.html', context)
+    else:
+        form = ReservationForm()
+    context = {
+        'form': form,
+        'vendor': vendor,
+        'vendor_id': vendor.id,
+        'categories': categories,
+        'cart_items': cart_items
+    }
+    return render(request, 'vendor_maketplace_detail.html', context)
