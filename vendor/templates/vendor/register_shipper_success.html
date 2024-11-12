@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/form_register.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/form_success.css' %}">
+
+{% endblock %}
+{% block title %} Register User Confirm | {{ block.super }} {% endblock %}
+
+{% block content %}
+    <div class="main-section">
+        <div class="page-section nopadding cs-nomargin"
+             style="margin-top: 0px;padding-top: 60px;padding-bottom: 60px;margin-bottom: 0px;">
+            <div class="container">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                    <div class="user-dashboard loader-holder">
+                        <div class="user-holder">
+                            <h4 class="text-center" style="margin-bottom: 0;">Success</h4>
+                            <p class="text-center">The account creation process was successful! </p>
+                            <hr>
+                            <div id="restaurant-sets-holder">
+                                <form class="form-fields-set foodbakery-dev-restaurant-form" method="post">
+                                    <ul class="register-add-restaurant-tab-container activation-tab-container"
+                                        style="display: block;">
+                                        <li>
+                                            <div class="activation-tab-message">
+                                                <div class="media-holder">
+                                                    <figure>
+                                                        <img src="{% static 'img/shipper-co-giao-hang-khi-gian-cach_2707111247.jpg' %}"
+                                                             style="width: 100%;" alt="Thank You">
+                                                    </figure>
+                                                </div>
+                                                <div class="text-holder">
+                                                    <strong>Thank You</strong>
+                                                    <span>You have successfully created your shipper, to add more
+											                    details, go
+											                    to your email inbox for login details.</span>
+                                                </div>
+                                                <div class="thankyou-contacts">
+                                                    <p>For cancellation or more infomation Please Contact Us</p>
+                                                    <ul class="list-inline clearfix">
+                                                        <li><i class="icon-phone4"></i>+84 965 399 614</li>
+                                                        <li><i class="icon-fax"></i>+84 965 399 614</li>
+                                                        <li><i class="icon-envelope-o"></i>thehungta13216@gmail.com</li>
+                                                    </ul>
+                                                </div>
+
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    {{ block.super }}
+    <script>(function (b, f, d, a, c) {
+        var e = b.createElement(f);
+        e.src = c + "/" + a + "/atm.js";
+        e.id = d;
+        e.async = true;
+        b.getElementsByTagName(f)[0].parentElement.appendChild(e)
+    })(document, "script", "__cribnotesTagMgrCmd", "074f87a7-d6a9-4f50-bba5-843350148546", "https://tag.cribnotes.jp/container_manager");</script>
+    <script>
+        window.history.pushState(null, null, '');
+    </script>
+{% endblock %}

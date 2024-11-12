@@ -1,7 +1,7 @@
 from celery import shared_task
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-
+from django.db import transaction
 from menu.models import Coupon
 from wallet.models import Wallet, Transaction, SubTransaction
 from .models import Order
@@ -62,25 +62,26 @@ def process_payment_task(order_id, *args, **kwargs):
     except (ValueError, Order.DoesNotExist):
         return f"Invalid order ID: {order_id}"
     payment_result = False
-    print('order.payment_method', order.payment_method)
     if int(order.payment_method) == 2:
+        from django.db import transaction
         try:
-            print('order.user', order.user)
-            user_wallet = Wallet.objects.get(user=order.user)
-            print('user_wallet', user_wallet)
-            if user_wallet.balance_point < order.total:
-                order.status = "Cancelled"
-                order.message_error = "Insufficient balance in user's wallet"
-                order.save()
-                return "Insufficient balance"
-            admin_wallet = Wallet.objects.get(user__is_superuser=True)
-            print('admin_wallet', admin_wallet)
-            user_wallet.balance_point -= order.total
-            admin_wallet.balance_point += order.total
-            user_wallet.save()
-            admin_wallet.save()
+            with transaction.atomic():
+                print('order.user', order.user)
+                user_wallet = Wallet.objects.get(user=order.user)
+                print('user_wallet', user_wallet)
+                if user_wallet.balance_point < order.total:
+                    order.status = "Cancelled"
+                    order.message_error = "Insufficient balance in user's wallet"
+                    order.save()
+                    return "Insufficient balance"
+                admin_wallet = Wallet.objects.get(user__is_superuser=True)
+                print('admin_wallet', admin_wallet)
+                user_wallet.balance_point -= order.total
+                admin_wallet.balance_point += order.total
+                user_wallet.save()
+                admin_wallet.save()
 
-            transaction = Transaction.objects.create(
+            transactions = Transaction.objects.create(
                 transaction_type=Transaction.TRANSACTION_TYPE_WITHDRAW,
                 wallet=user_wallet,
                 status=Transaction.STATUS_COMPLETED,
@@ -90,22 +91,62 @@ def process_payment_task(order_id, *args, **kwargs):
                 create_at=timezone.now(),
                 update_at=timezone.now()
             )
-            print('transaction', transaction)
             SubTransaction.objects.create(
-                transaction_id=transaction,
+                transaction_id=transactions,
                 wallet_id_from=user_wallet,
                 wallet_id_to=admin_wallet,
                 amount_cash=0,
                 amount_point=order.total,
                 description='Payment from wallet to admin',
-                status=Transaction.STATUS_COMPLETED,
+                status=transactions.STATUS_COMPLETED,
                 create_at=timezone.now(),
                 update_at=timezone.now()
             )
             payment_result = True
-            order.status = "Confirmed"
+            order.status = "Waiting for Confirmation"
+            order.is_payment_completed = True
             order.save()
             return "Payment Processed"
+        except Wallet.DoesNotExist:
+            order.status = "Cancelled"
+            order.message_error = "User's wallet not found"
+            order.save()
+            return "Wallet not found"
+    elif int(order.payment_method) == 3:
+        try:
+            from django.db import transaction
+            with transaction.atomic():
+                user_wallet = Wallet.objects.get(user=order.user)
+                admin_wallet = Wallet.objects.get(user__is_superuser=True)
+
+                # Create a transaction record for PayPal payment
+                transaction_instance = Transaction.objects.create(
+                    transaction_type=Transaction.TRANSACTION_TYPE_DEPOSIT,
+                    wallet=user_wallet,
+                    status=Transaction.STATUS_PENDING,
+                    user_id_from=order.user,
+                    user_id_to=admin_wallet.user,
+                    description="Payment via PayPal",
+                    create_at=timezone.now(),
+                    update_at=timezone.now()
+                )
+
+                # Create a sub-transaction record
+                SubTransaction.objects.create(
+                    transaction_id=transaction_instance,
+                    wallet_id_from=user_wallet,
+                    wallet_id_to=admin_wallet,
+                    amount_cash=order.total,
+                    amount_point=0,
+                    description='Payment via PayPal to admin',
+                    status=Transaction.STATUS_PENDING,
+                    create_at=timezone.now(),
+                    update_at=timezone.now()
+                )
+
+                order.status = "Processing"
+                order.save()
+                return "Payment Processed"
         except Wallet.DoesNotExist:
             order.status = "Cancelled"
             order.message_error = "User's wallet not found"

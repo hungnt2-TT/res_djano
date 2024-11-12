@@ -6,15 +6,11 @@ from django.db.models import Sum, F
 
 
 def get_cart_counter(request):
-    print('reqquest ?????', request.POST)
     if request.user.is_authenticated:
         size = request.POST.get('firstSizeId')
         cart = Cart.objects.filter(user=request.user, is_ordered=False)
-        print('cart', cart.query)
-        print('cart', cart)
         cart_count = cart.aggregate(total_quantity=Sum('quantity'))['total_quantity'] or 0
         cart_list = cart.values_list('food_item', flat=True)
-        print('cart_list', cart_list)
     else:
         cart_count = 0
     return {'cart_count': cart_count}
@@ -43,12 +39,10 @@ def get_cart_amount(request):
     tax = 0
     grand_total = 0
     ship_cost = request.POST.get('shipCost', 0)
-    print('ship_cost', ship_cost)
     if request.user.is_authenticated:
         cart = Cart.objects.filter(user=request.user, is_ordered=False)
         for item in cart:
             size_price = item.size.price if item.size else 0
             subtotal += size_price * item.quantity
-        grand_total = subtotal + tax + int(ship_cost)
-
+        grand_total = subtotal + tax + float(ship_cost)
     return dict(subtotal=subtotal, tax=tax, grand_total=grand_total, ship_cost=ship_cost)

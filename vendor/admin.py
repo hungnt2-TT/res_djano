@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from menu.models import Size
 # Register your models here.
-from .models import Vendor
+from .models import Vendor, OpeningHour
 
 
 @admin.register(Vendor)
@@ -20,3 +20,10 @@ class SizeAdmin(admin.ModelAdmin):
     search_fields = ('size', 'price')
     list_filter = ('size', 'price')
     list_editable = ('price',)
+
+
+class OpeningHourAdmin(admin.ModelAdmin):
+    list_display = ('vendor', 'day', 'from_hour', 'to_hour')
+
+
+admin.site.register(OpeningHour, OpeningHourAdmin)

@@ -1,5 +1,8 @@
 import os
+from cgi import print_environ_usage
+
 from django.db.models import Q
+from django.utils import timezone
 
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
@@ -47,19 +50,20 @@ from django.contrib.gis.geos import Point
 def home(request):
     lat = request.GET.get('lat')
     lng = request.GET.get('lng')
+
+    vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)
     if request.user.is_authenticated:
-        vendors = Vendor.objects.filter(is_approved=True, user__is_active=True).exclude(user=request.user)
-    else:
-        vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)
-    vendors_premium = vendors.filter(vendor_type=Vendor.VENDOR_TYPE_PREMIUM)
+        vendors = vendors.exclude(user=request.user)
+
+    vendors_premium = vendors.filter(vendor_type=Vendor.VENDOR_TYPE_PREMIUM)[:5]
     profile = Profile.objects.filter(is_active=True)
 
     information = {
         'vendors': vendors.count(),
         'profile': profile.count()
     }
-    current_hour = datetime.now().hour + 7
-    print('current_hour', current_hour)
+
+    current_hour = timezone.now().hour + 7
     if 6 <= current_hour < 12:
         time_range = 'morning'
     elif 12 <= current_hour < 18:
@@ -67,63 +71,63 @@ def home(request):
     elif 18 <= current_hour < 24:
         time_range = 'evening'
     else:
-        time_range = 'night'
-
-    food_items = FoodItem.objects.filter(time_range=time_range)
-    vendors_list = []
+        time_range = 'evening'
+    food_items = FoodItem.objects.filter(Q(time_range=time_range) | Q(time_range='all_day'))
+    list_food_items = FoodItem.objects.all()
     if lat and lng:
-        lat = float(lat)
-        lng = float(lng)
-        user_location = Point(lng, lat, srid=4326)
-        if request.user.is_authenticated:
-            employee_profile = EmployeeProfile.objects.get(user=request.user)
-            employee_profile.latitude = lat
-            employee_profile.longitude = lng
-            employee_profile.save()
-        districts = District.objects.filter(geom__contains=user_location).first()
-        print('districts', districts)
-        if vendors:
-            print('vendors', vendors)
-            vendor_district = vendors.filter(name_district=districts)
-            print('vendors', vendors)
-            vendors_list = list(vendor_district.values())
-            for vendor in vendors_list:
-                vendor.pop('location', None)
+        try:
+            lat = float(lat)
+            lng = float(lng)
+            user_location = Point(lng, lat, srid=4326)
 
-        districts_dict = districts and {
-            'id': districts.id,
-            'ten_tinh': districts.ten_tinh,
-            'ten_huyen': districts.ten_huyen,
-            'dan_so': districts.dan_so,
-            'nam_tk': districts.nam_tk,
-            'code_vung': districts.code_vung,
-            # 'location': {'lat': districts.geom.centroid.y, 'lng': districts.geom.centroid.x} if districts.geom else None
-        }
-        return JsonResponse({
-            'vendors': vendors_list if vendors_list else [],
-            'information': information,
-            'districts': districts_dict,
-            'status': 'success',
-            'vendors_premium': list(vendors_premium.values())  # Convert QuerySet to list
-        })
+            if request.user.is_authenticated:
+                EmployeeProfile.objects.filter(user=request.user).update(latitude=lat, longitude=lng)
+
+            districts = District.objects.filter(geom__contains=user_location).first()
+
+            if districts:
+                vendor_district = vendors.filter(name_district=districts)
+                vendors_list = list(vendor_district.values('id', 'vendor_name', 'user__first_name', 'user__last_name',
+                                                           'vendor_slug'))
+
+                districts_dict = {
+                    'id': districts.id,
+                    'ten_tinh': districts.ten_tinh,
+                    'ten_huyen': districts.ten_huyen,
+                    'dan_so': districts.dan_so,
+                    'nam_tk': districts.nam_tk,
+                    'code_vung': districts.code_vung,
+                    'location': {'lat': districts.geom.centroid.y,
+                                 'lng': districts.geom.centroid.x} if districts.geom else None
+                }
+                return JsonResponse({
+                    'vendors': vendors_list,
+                    'information': information,
+                    'districts': districts_dict,
+                    'status': 'success',
+                    'vendors_premium': list(
+                        vendors_premium.values('id', 'vendor_name', 'user__first_name', 'user__last_name',
+                                               'vendor_slug'))
+                })
+            else:
+                return JsonResponse({'status': 'error', 'message': 'No district found for the given coordinates'})
+        except ValueError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid latitude or longitude'})
     else:
-        districts = None
-        vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)[:8]
-    print('vendors districts', food_items)
+        vendors = vendors[:8]
+
     context = {
         'vendors': vendors,
-        'districts': districts,
         'lat': lat,
         'lng': lng,
         'information': information,
         'food_items': food_items,
         'vendors_premium': vendors_premium,
-
-        'time_range': time_range
+        'time_range': time_range,
+        'list_food_items': list_food_items
     }
-    print('context', context)
+    print('vendors_premium', vendors_premium)
     return render(request, 'home.html', context)
-
 def register(request):
     return render(request, 'account/register.html')
 
@@ -362,7 +366,7 @@ def check_role_vendor(user):
 
 
 def check_role_employee(user):
-    if user.employee_type == 2:
+    if user.employee_type == 2 or user.employee_type == 5:
         return True
     else:
         raise PermissionDenied
@@ -385,6 +389,7 @@ def owner_dashboard(request):
 @login_required(redirect_field_name='next', login_url='_login')
 @user_passes_test(check_role_employee, login_url='_login')
 def customer_dashboard(request):
+    print('customer_dashboard', request.user)
     return render(request, 'customer.html')
 
 

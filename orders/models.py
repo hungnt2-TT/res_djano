@@ -2,6 +2,7 @@ from django.db import models
 
 from employee.models import Profile
 from menu.models import FoodItem
+from vendor.models import Vendor
 from wallet.models import PaymentMethod
 
 
@@ -9,6 +10,7 @@ from wallet.models import PaymentMethod
 class Order(models.Model):
     STATUS = (
         ('New', 'New'),
+        ('Processing', 'Processing'),
         ('Waiting for Confirmation', 'Waiting for Confirmation'),
         ('Accepted', 'Accepted'),
         ('Completed', 'Completed'),
@@ -17,6 +19,7 @@ class Order(models.Model):
         ('Delivered', 'Delivered'),
     )
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    vendors = models.ManyToManyField(Vendor, blank=True)
     payment = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE)
     order_number = models.CharField(max_length=50)
     first_name = models.CharField(max_length=50)
@@ -36,6 +39,7 @@ class Order(models.Model):
                                        blank=True)
     tax_data = models.JSONField(blank=True, help_text="Data format: {'tax_type':{'tax_percentage':'tax_amount'}}",
                                 null=True)
+    is_payment_completed = models.BooleanField(default=False)
     total_tax = models.IntegerField(default=0)
     total_shipping_cost = models.IntegerField(default=0)
     total_delivery_time = models.IntegerField(default=0)

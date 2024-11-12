@@ -4,20 +4,27 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isHomePage) {
         showLoading();
         initializeLocation();
+    } else {
+        const savedLat = localStorage.getItem('formatted_address');
+        const addressInput = document.getElementById('id_address');
+        addressInput.innerText = savedLat;
+        addressInput.classList.add('highlight');
+
+        hideLoading();
     }
 });
 
 function initializeLocation() {
     const savedLat = localStorage.getItem('latitude');
     const savedLng = localStorage.getItem('longitude');
-
+    console.log('Saved location:', savedLat, savedLng);
     if (savedLat && savedLng) {
         console.log('Using saved location...');
         updateLocationAndFetchRestaurants(savedLat, savedLng);
     } else {
         console.log('Getting location...');
         getCurrentLocation()
-            .then(({ lat, lng }) => {
+            .then(({lat, lng}) => {
                 console.log('Updating location...', lat, lng);
                 localStorage.setItem('latitude', lat);
                 localStorage.setItem('longitude', lng);
@@ -41,7 +48,7 @@ function getCurrentLocation() {
                 lng: position.coords.longitude
             }),
             reject,
-            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+            {enableHighAccuracy: true, timeout: 5000, maximumAge: 0}
         );
     });
 }
@@ -56,7 +63,10 @@ function fetchRestaurants(lat, lng) {
     fetch(`/employee/home/?lat=${lat}&lng=${lng}`)
         .then(response => response.json())
         .then(data => {
+            console.log('Data:', data);
             updateRestaurantList(data.vendors);
+
+            updateRestaturantVIP(data.vendors_premium)
             hideLoading();
         })
         .catch(error => console.error('Error:', error));
@@ -114,22 +124,68 @@ function updateRestaurantList(vendors) {
             restaurantList.insertAdjacentHTML('beforeend', restaurantItem);
         });
     } else {
-        const noVendorsMessage = '<li>Không có nhà hàng nào gần bạn.</li>';
+        const noVendorsMessage = `
+            <li class="no-vendors">
+                <figure>
+                    <img src="/static/employee/img/download.png" alt="No Restaurants" class="no-vendors-img">
+                    <figcaption>Không có nhà hàng nào gần bạn.</figcaption>
+                </figure>
+            </li>`;
         vendorList.innerHTML = noVendorsMessage;
         restaurantList.innerHTML = noVendorsMessage;
     }
 }
 
+function updateRestaturantVIP(vendors_premium) {
+    const vendorList = document.getElementById('vendorList');
+    vendorList.innerHTML = '';
+
+    if (vendors_premium.length > 0) {
+        vendors_premium.forEach(vendor => {
+            const profilePicture = vendor.user_profile?.profile_picture?.url || '/static/employee/img/download.png';
+            const vendorItem = `
+                <li class="has-border premium-vendor-item" style="    width: 228px !important;   padding: 20px; margin: 10px 15px 0 15px">
+                    <figure class="premium-vendor-figure">
+                        <a href="${vendor.get_absolute_url}" class="vendor-link">
+                            <img src="${profilePicture}" class="vendor-img" alt="${vendor.vendor_name}">
+                            <div class="premium-badge">VIP</div>
+                        </a>
+                        
+                    </figure>
+                    <div class="vendor-name" >
+                        <a href="/marketplace/maketplace/${vendor.vendor_slug}" class="vendor-name-link">${vendor.vendor_name}</a>
+                    </div>
+                    <div class="best-choice">
+                        BEST CHOICE
+                    </div>
+                    <a href="/marketplace/maketplace/${vendor.vendor_slug}" class="btn view-details">View Details</a>
+                </li>`;
+            vendorList.insertAdjacentHTML('beforeend', vendorItem);
+        });
+    } else {
+        const noVendorsMessage = `
+            <li class="no-vendors">
+                <figure>
+                    <img src="/static/employee/img/download.png" alt="No VIP Restaurants" class="no-vendors-img">
+                    <figcaption>Không có nhà hàng VIP nào gần bạn.</figcaption>
+                </figure>
+            </li>`;
+        vendorList.innerHTML = noVendorsMessage;
+    }
+}
+
 function updateDeliveryLocation(lat, lng) {
     const geocoder = new google.maps.Geocoder();
-    const latlng = { lat: parseFloat(lat), lng: parseFloat(lng) };
+    const latlng = {lat: parseFloat(lat), lng: parseFloat(lng)};
 
-    geocoder.geocode({ location: latlng }, (results, status) => {
+    geocoder.geocode({location: latlng}, (results, status) => {
         const addressInput = document.getElementById('id_address');
-
+        console.log('addressInput', addressInput);
         if (status === 'OK' && results[0]) {
             console.log('Address:', results[0].formatted_address);
-            addressInput.value = results[0].formatted_address;
+            addressInput.innerText = results[0].formatted_address;
+            localStorage.setItem('formatted_address', results[0].formatted_address);
+
             addressInput.classList.add('highlight');
             setTimeout(() => addressInput.classList.remove('highlight'), 1000);
         } else {
@@ -137,9 +193,11 @@ function updateDeliveryLocation(lat, lng) {
         }
     });
 }
+
 function updateLocationProfile(lat, lng) {
 
 }
+
 function hideLoading() {
     document.getElementById('loading_spinner').style.display = 'none';
     document.getElementById('loadingArea').style.display = 'none';

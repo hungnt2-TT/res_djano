@@ -27,6 +27,7 @@ class UserManager(BaseUserManager):
         )
 
         user.set_password(password)
+
         user.is_active = True
         user.save(using=self._db)
         return user
@@ -52,11 +53,13 @@ class Profile(AbstractBaseUser):
     EMPLOYEE_TYPE_CUSTOMER = 2
     EMPLOYEE_TYPE_ADMIN = 3
     EMPLOYEE_TYPE_CANCEL = 4
+    EMPLOYEE_TYPE_SHIPPER = 5
     EMPLOYEE_TYPE_CHOICES = (
         (EMPLOYEE_TYPE_OWNER, 'owner'),
         (EMPLOYEE_TYPE_CUSTOMER, 'customer'),
         (EMPLOYEE_TYPE_CANCEL, 'cancel'),
         (EMPLOYEE_TYPE_ADMIN, 'admin'),
+        (EMPLOYEE_TYPE_SHIPPER, 'shipper'),
     )
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -65,8 +68,11 @@ class Profile(AbstractBaseUser):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     phone_number_verified = models.BooleanField(default=False)
     employee_type = models.IntegerField(choices=EMPLOYEE_TYPE_CHOICES, default=EMPLOYEE_TYPE_CUSTOMER)
+    avatar_shipper = models.ImageField(upload_to='avatar_shipper', blank=True, null=True)
+    driving_license = models.ImageField(upload_to='driving_license', blank=True, null=True)
     nickname = models.CharField(max_length=50, blank=True, null=True)
     email_contact = models.CharField(max_length=50, blank=True, null=True, default='email')
+    address = models.CharField(max_length=255, blank=True, null=True)
     data_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -96,8 +102,10 @@ class Profile(AbstractBaseUser):
             user_role = 'owner'
         elif self.employee_type == 2:
             user_role = 'customer'
+        elif self.employee_type == 5:
+            user_role = 'shipper'
         else:
-            user_role = 'cancel'
+            user_role = 'admin'
         return user_role
 
     def is_user(self):
@@ -114,6 +122,23 @@ class Profile(AbstractBaseUser):
             'status': status
         }
         send_mail(subject, 'mails/notification.html', context)
+
+    def save(self, *args, **kwargs):
+        if self.pk is not None:
+            old = Profile.objects.get(pk=self.pk)
+            if old.is_active != self.is_active and self.employee_type == 5:
+                context = {
+                    'user': old,
+                    'verified': self.is_active
+                }
+
+                if self.is_active:
+                    mail_sj = 'Congratulation ' + self.username
+                    send_mail(mail_sj, 'mails/approved_shipper.html', context)
+                else:
+                    mail_sj = 'Sorry'
+                    send_mail(mail_sj, 'mails/approved_shipper.html', context)
+        super(Profile, self).save(*args, **kwargs)
 
 class EmployeeProfile(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE, blank=True, null=True)

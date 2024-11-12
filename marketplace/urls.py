@@ -1,9 +1,12 @@
 from django.urls import path, include
 from . import views
 from .views import convert_to_words
-
 urlpatterns = [
     path('', views.marketplace, name='marketplace'),
+
+    path('food_item_recomment/', views.food_item_recomment, name='food_item_recomment'),
+    path('food_item/', views.food_item, name='food_item'),
+    path('paypal-payment/<int:order_id>/', views.paypal_payment, name='paypal_payment'),
     path('maketplace/<slug:vendor_slug>/', views.vendor_detail, name='vendor_detail'),
     path('add_to_cart/<int:food_item_id>/', views.add_to_cart, name='add_to_cart'),
     path('remove_from_cart/<int:food_item_id>/', views.remove_from_cart, name='remove_from_cart'),

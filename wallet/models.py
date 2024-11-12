@@ -174,7 +174,7 @@ class Transaction(models.Model):
         (STATUS_COMPLETED, 'completed'),
         (STATUS_REJECTED, 'rejected')
     )
-    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE, null=True, blank=True)
     transaction_type = models.IntegerField(choices=TRANSACTION_TYPE_CHOICES)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default=STATUS_PENDING)
     user_id_from = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='receiver', blank=True, null=True)

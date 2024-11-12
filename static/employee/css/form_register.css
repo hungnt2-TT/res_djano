@@ -1,29 +1,36 @@
 .payment-holder {
     line-height: 28px;
     position: relative;
-    height: 30px ;
+    height: 30px;
     width: 90px;
     margin: 20px 0px 0px;
 }
 
 .btnArea {
-  width:100%;
-  text-align:center;
-  padding: 2px 90px;
-  align-items: center;
+    width: 100%;
+    text-align: center;
+    padding: 2px 90px;
+    align-items: center;
 }
+
 .btnArea button,
 .btnArea a.btn-primary,
 .btnArea a.btn-secondary {
-  display:inline-block;
-  min-width:180px;
-  padding:20px;
-  margin:0 20px;
-  border:none;
-  border-radius:5px;
-  font-weight:bold;
+    display: inline-block;
+    min-width: 180px;
+    padding: 20px;
+    margin: 0 20px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
 }
 
 .key {
     background: #004290;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 5px;
 }

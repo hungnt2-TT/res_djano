@@ -1,7 +1,8 @@
 import json
 import math
 from lib2to3.fixes.fix_input import context
-
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
 from celery import shared_task
 from django.core.exceptions import ValidationError
 from geopy.distance import geodesic
@@ -25,7 +26,7 @@ from menu.models import Coupon
 from orders.forms import OrderForm
 from orders.utils import generate_order_number
 from vendor.models import Vendor
-from wallet.models import PaymentMethod, Wallet
+from wallet.models import PaymentMethod, Wallet, Transaction, SubTransaction
 from collections import defaultdict
 from django.db import transaction
 
@@ -66,12 +67,17 @@ def checkout(request):
     vendor_coordinates = []
     for vendor, data in grouped_cart_items.items():
         vendor_obj = Vendor.objects.get(vendor_name=vendor)
-        vendor_coordinates.append({
-            'vendor_name': vendor,
-            'latitude': vendor_obj.latitude,
-            'longitude': vendor_obj.longitude,
-            'total_price': data['total_price']
-        })
+        lat, lng = vendor_obj.latitude, vendor_obj.longitude
+        origin = f"{lat},{lng}"
+        distance, duration = get_distance_and_time(api_key, origin, destination)
+        shipping_cost = calculate_shipping_cost(distance)
+        data['shipping_cost'] = shipping_cost
+        data['time_to_deliver'] = math.ceil(duration) if duration else 30
+        vendor_total_price = data['total_price'] + shipping_cost
+        data['total_with_shipping'] = vendor_total_price
+        total_shipping_cost += shipping_cost
+
+
         for item in data['items']:
             order_details.append({
                 "vendor": vendor_obj.id,
@@ -80,32 +86,31 @@ def checkout(request):
                 "quantity": item.quantity,
                 "price": item.get_total_price()
             })
-    print('order_details = ', order_details)
-    customer_coords = {'latitude': profile_lat, 'longitude': profile_lng}
-    sorted_vendors = sort_vendors_by_distance(vendor_coordinates, customer_coords)
-    print('sorted_vendors = ', sorted_vendors)
-    total_duration = 0
-    prev_coords = customer_coords
-    for vendor_data in sorted_vendors:
-        origin = f"{prev_coords['latitude']},{prev_coords['longitude']}"
-        destination = f"{vendor_data['latitude']},{vendor_data['longitude']}"
-        distance, duration = get_distance_and_time(api_key, origin, destination)
-
-        total_duration += math.ceil(duration)
-
-        shipping_cost = calculate_shipping_cost(distance)
-        vendor_name = vendor_data['vendor_name']
-        grouped_cart_items[vendor_name]['shipping_cost'] = shipping_cost
-        grouped_cart_items[vendor_name]['time_to_deliver'] = math.ceil(duration)
-        grouped_cart_items[vendor_name]['total_with_shipping'] = vendor_data['total_price'] + shipping_cost
-        total_shipping_cost += shipping_cost
-
-        prev_coords = vendor_data
-    final_origin = f"{prev_coords['latitude']},{prev_coords['longitude']}"
-    final_destination = f"{customer_coords['latitude']},{customer_coords['longitude']}"
-    _, final_duration = get_distance_and_time(api_key, final_origin, final_destination)
-    total_delivery_time = total_duration + final_duration
-    print('total_delivery_time = ', total_delivery_time)
+    # print('order_details = ', order_details)
+    # customer_coords = {'latitude': profile_lat, 'longitude': profile_lng}
+    # sorted_vendors = sort_vendors_by_distance(vendor_coordinates, customer_coords)
+    # print('sorted_vendors = ', sorted_vendors)
+    # total_duration = 0
+    # prev_coords = customer_coords
+    # for vendor_data in sorted_vendors:
+    #     origin = f"{prev_coords['latitude']},{prev_coords['longitude']}"
+    #     destination = f"{vendor_data['latitude']},{vendor_data['longitude']}"
+    #     distance, duration = get_distance_and_time(api_key, origin, destination)
+    #
+    #     total_duration += math.ceil(duration)
+    #
+    #     shipping_cost = calculate_shipping_cost(distance)
+    #     vendor_name = vendor_data['vendor_name']
+    #     grouped_cart_items[vendor_name]['shipping_cost'] = shipping_cost
+    #     grouped_cart_items[vendor_name]['time_to_deliver'] = math.ceil(duration)
+    #     grouped_cart_items[vendor_name]['total_with_shipping'] = vendor_data['total_price'] + shipping_cost
+    #     total_shipping_cost += shipping_cost
+    #
+    #     prev_coords = vendor_data
+    # final_origin = f"{prev_coords['latitude']},{prev_coords['longitude']}"
+    # final_destination = f"{customer_coords['latitude']},{customer_coords['longitude']}"
+    # _, final_duration = get_distance_and_time(api_key, final_origin, final_destination)
+    time_to_deliver = math.ceil(total_shipping_cost)
     final_grand_total = grand_total + int(total_shipping_cost)
     default_data = {
         'first_name': user_profile.first_name,
@@ -130,7 +135,7 @@ def checkout(request):
         if form.is_valid():
             coupon_ids = request.POST.getlist('coupon_id')
             selected_coupon_id = next((id for id in coupon_ids if id), None)
-            print('selected_coupon_id:', selected_coupon_id)
+            total_delivery_time = sum(data['time_to_deliver'] for data in grouped_cart_items.values())
             context = {
                 'profile': employee_profile,
                 'form': form,
@@ -141,7 +146,7 @@ def checkout(request):
                 'coupon': request.POST.get('coupon'),
                 'payment_method': request.POST.get('payment_method'),
                 'total_delivery_time': math.ceil(total_delivery_time),
-                'order_details': order_details
+                'order_details': order_details,
             }
             if request.POST.get('payment_method') == 'Cash':
                 if user_profile.phone_number_verified:
@@ -153,9 +158,21 @@ def checkout(request):
         form = OrderForm(initial=default_data)
 
     current_time = timezone.now()
-    coupons = Coupon.objects.filter(
-        Q(coupon_expiry_date__gte=current_time) | Q(user=request.user),
+    global_coupons = Coupon.objects.filter(
+        user__isnull=True,
+        vendor__isnull=True,
+        coupon_expiry_date__gte=current_time
     )
+    user_coupons = Coupon.objects.filter(
+        user=request.user,
+        coupon_expiry_date__gte=current_time
+    )
+    vendor_coupons = Coupon.objects.filter(
+        vendor__in=grouped_cart_items.keys(),
+        coupon_expiry_date__gte=current_time
+    )
+    coupons = global_coupons | user_coupons | vendor_coupons
+    coupons = coupons.distinct()
 
     context = {
         'profile': employee_profile,
@@ -185,6 +202,8 @@ def place_order(request):
             'state': request.POST.get('state'),
         }
         order_details = json.loads(request.POST.get('order_details'))
+        vendor_ids = list({item['vendor'] for item in order_details if 'vendor' in item})
+        print('vendor_ids = ', vendor_ids)
         form = OrderForm(data)
         if form.is_valid():
             try:
@@ -204,9 +223,13 @@ def place_order(request):
                     order.total = request.POST.get('final_grand_total', 0)
                     order.order_details = order_details
                     order.is_ordered = True
+                    order.is_payment_completed = False
                     order.save()
                     order.order_number = generate_order_number(order.id)
                     order.save()
+
+                    order.vendors.set(vendor_ids)
+
                     cart_items = Cart.objects.filter(user=request.user)
                     for item in cart_items:
                         ordered_food = OrderedFood()
@@ -231,7 +254,17 @@ def place_order(request):
                     else:
                         return JsonResponse({
                             'status': 'success',
-                            'message': 'Your order has been processed successfully.'
+                            'redirect_url': reverse('paypal_payment', kwargs={'order_id': order.id}),
+
+                            'message': 'Your order has been processed successfully.',
+                            'order': {
+                                'id': order.id,
+                                'order_number': order.order_number,
+                                'total': order.total,
+                                'payment_method': order.payment_method,
+                                'status': order.status,
+                                'created_at': order.created_at,
+                            }
                         })
             except Exception as e:
                 return JsonResponse({
@@ -245,7 +278,6 @@ def place_order(request):
                 'errors': form.errors
             })
 
-    # Hiển thị trang đặt hàng nếu là GET request
     return render(request, 'place_order.html', {
         'form': OrderForm(),
         'cart_items': 1,
@@ -329,3 +361,51 @@ def order_detail(request, order_number):
         return render(request, 'order_detail.html', context)
     except:
         return redirect('customer')
+
+
+@require_POST
+def confirm_paypal_payment(request):
+    try:
+        data = json.loads(request.body)
+        order_number = data.get('orderNumber')
+        payment_id = data.get('paymentID')
+
+        order = get_object_or_404(Order, order_number=order_number)
+        order.status = 'Waiting for Confirmation'
+        order.is_payment_completed = True
+        order.save()
+        admin = Profile.objects.get(is_superuser=True)
+
+        transaction = Transaction.objects.create(
+            transaction_type=Transaction.TRANSACTION_TYPE_DEPOSIT,
+            wallet=admin.wallet,
+            status=Transaction.STATUS_COMPLETED,
+            user_id_from=admin,
+            user_id_to=order.user,
+            description=f'Payment for order {order.order_number} and Paypal id {payment_id}',
+            create_at=timezone.now(),
+            update_at=timezone.now()
+        )
+        SubTransaction.objects.create(
+            transaction_id=transaction,
+            wallet_id_from=admin.wallet,
+            wallet_id_to=order.user.wallet,
+            amount_cash=order.total,
+            amount_point=0,
+            description='Payment PayPal',
+            status=Transaction.STATUS_COMPLETED,
+            create_at=timezone.now(),
+            update_at=timezone.now()
+        )
+
+        return JsonResponse({'status': 'success'})
+    except:
+        return JsonResponse({'status': 'error'})
+
+
+def payment_success(request):
+    return render(request, "payment/payment_success.html")
+
+
+def payment_failed(request):
+    return render(request, 'payment/payment_failed.html')

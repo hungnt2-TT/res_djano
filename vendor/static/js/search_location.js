@@ -51,9 +51,11 @@ document.addEventListener('DOMContentLoaded', function () {
         slider.style.transform = `translateX(-${(currentIndex * (100 / itemsPerSlide))}%)`;
     }
 
-    // Sự kiện khi nhấn nút Next
     nextBtn.addEventListener('click', function () {
-        if (currentIndex < Math.floor(totalItems / itemsPerSlide) - 1) {
+        console.log('currentIndex', currentIndex)
+        var a = Math.floor(currentIndex) < Math.floor(totalItems / itemsPerSlide) - 1
+        console.log('Math.floor(totalItems / itemsPerSlide)', Math.floor(totalItems / itemsPerSlide))
+        if (currentIndex <= Math.floor(totalItems / itemsPerSlide) + 1) {
             currentIndex++;
         } else {
             currentIndex = 0;
@@ -65,8 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (currentIndex > 0) {
             currentIndex--;
         } else {
-            // currentIndex = Math.floor(totalItems / itemsPerSlide) - 1;
-            currentIndex = totalItems - itemsPerSlide; // Quay lại nhóm cuối cùng
+            currentIndex = totalItems - itemsPerSlide;
         }
         updateSlider();
     });

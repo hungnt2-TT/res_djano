@@ -13,7 +13,7 @@
     <div class="main-section pt-5">
         <div class="page-section">
             <div class="container">
-                <form action="{% url 'checkout' %}" method="get">
+                <form action="{% url 'checkout' %}" id="checkout" method="get">
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
@@ -185,7 +185,7 @@
                                     </div>
 
                                     {#                                <a href="#" class="menu-order-confirm">Confirm Order</a>#}
-                                    <button type="submit"
+                                    <button type="submit" id="checkout-cart"
                                             class="menu-order-confirm text-uppercase font-weight-bold" type="submit">
                                         PROCEED
                                         TO CHECKOUT
@@ -194,99 +194,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        {#                                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">#}
-                        {#                                                <div class="tabs-holder horizontal">#}
-                        {#                                                    <ul class="stickynav-tabs nav nav-tabs">#}
-                        {#                                                        <li class="active"><a data-toggle="tab" href="#home"><i#}
-                        {#                                                                class="fa-solid fa-map-location"></i>Address</a></li>#}
-                        {#                                                    </ul>#}
-                        {#                                                    <div class="tab-content">#}
-                        {#                                                        <div id="home" class="tab-pane in active">#}
-                        {#                                                            <div class="menu-itam-holder">#}
-                        {#                                                                <div class="address-customer">#}
-                        {#                                                                    {{ profile.address_line_2 }}#}
-                        {#                                                                </div>#}
-                        {##}
-                        {#                                                                <div id="address-dropdown" class="address-dropdown" style="display: none;">#}
-                        {#                                                                    <select class="form-control mt-3">#}
-                        {#                                                                        <option value="{{ profile.address_line_1 }}">{{ profile.address_line_1 }}</option>#}
-                        {#                                                                        <option value="{{ profile.address_line_2 }}">{{ profile.address_line_2 }}</option>#}
-                        {#                                                                        <option value="{{ profile.address_line_3 }}">{{ profile.address_line_3 }}</option>#}
-                        {#                                                                        <!-- Add more options as needed -->#}
-                        {#                                                                    </select>#}
-                        {#                                                                </div>#}
-                        {#                                                            </div>#}
-                        {#                                                            <button class="btn btn-primary btn-block mt-3 change-address-btn">Change#}
-                        {#                                                                Address#}
-                        {#                                                            </button>#}
-                        {##}
-                        {#                                                            <div class="offer-selection d-none" id="offerSection">#}
-                        {#                                                                <fieldset>#}
-                        {#                                                                    <div class="offer-card">#}
-                        {#                                                                        <input type="radio" name="offer" id="offer1">#}
-                        {#                                                                        <label for="offer1">Địa điểm 1</label>#}
-                        {#                                                                        <h5>{{ profile.address_line_1 }}</h5>#}
-                        {#                                                                    </div>#}
-                        {#                                                                    <div class="offer-card">#}
-                        {#                                                                        <input type="radio" name="offer" id="offer2">#}
-                        {#                                                                        <label for="offer2">Địa điểm 2</label>#}
-                        {#                                                                        <h5>{{ profile.address_line_2 }}</h5>#}
-                        {#                                                                    </div>#}
-                        {#                                                                </fieldset>#}
-                        {#                                                            </div>#}
-                        {#                                                        </div>#}
-                        {#                                                    </div>#}
-                        {#                                                </div>#}
-                        {#                                                <div class="tabs-holder horizontal">#}
-                        {#                                                    <ul class="stickynav-tabs nav nav-tabs">#}
-                        {#                                                        <li class="active"><h2><a data-toggle="tab" href="#home"><i#}
-                        {#                                                                class="icon- icon-room_service"></i>Your Order</a></h2></li>#}
-                        {#                                                    </ul>#}
-                        {#                                                    <div class="tab-content">#}
-                        {#                                                        <div id="home" class="tab-pane in active">#}
-                        {#                                                            <div class="menu-itam-holder " style="padding: 0px">#}
-                        {##}
-                        {#                                                                <div class="price-area dev-menu-price-con">#}
-                        {#                                                                    <ul>#}
-                        {#                                                                        <li>Subtotal <span class="price"><em#}
-                        {#                                                                                class="dev-menu-subtotal">{{ subtotal }} VND</em></span></li>#}
-                        {#                                                                        <li class="restaurant-fee-con">#}
-                        {#                                                                            <span class="fee-title">Pick-Up</span>#}
-                        {#                                                                            <span class="price"><em class="dev-menu-charges">{{ tax }} VND</em></span>#}
-                        {#                                                                        </li>#}
-                        {##}
-                        {#                                                                    </ul>#}
-                        {#                                                                    <p class="total-price">Total <span class="price"><em#}
-                        {#                                                                            class="dev-menu-grtotal">{{ grand_total }} VND</em></span>#}
-                        {#                                                                    </p>#}
-                        {#                                                                    <div class="total-words">#}
-                        {#                                                                        {% load custom_filters %}#}
-                        {#                                                                        <span>{{ grand_total|to_vnd_words }}</span>#}
-                        {#                                                                    </div>#}
-                        {#                                                                </div>#}
-                        {##}
-                        {#                                                                <div class="order-summary">#}
-                        {#                                                                    <div class="subtotal_all">Subtotal: <span class="highlight"#}
-                        {#                                                                                                              id="subtotal_all">{{ subtotal }} </span>#}
-                        {#                                                                        VND#}
-                        {#                                                                    </div>#}
-                        {#                                                                    <div class="tax">Tax: <span class="highlight" id="tax">{{ tax }} </span> VND#}
-                        {#                                                                    </div>#}
-                        {#                                                                    <div class="grand_total">TOTAL: <span class="highlight grand_total"#}
-                        {#                                                                                                          id="grand_total">{{ grand_total }} </span>#}
-                        {#                                                                        VND#}
-                        {#                                                                    </div>#}
-                        {#                                                                    <div class="total-words">#}
-                        {#                                                                        {% load custom_filters %}#}
-                        {#                                                                        <span>{{ grand_total|to_vnd_words }}</span>#}
-                        {#                                                                    </div>#}
-                        {#                                                                </div>#}
-                        {#                                                            </div>#}
-                        {#                                                        </div>#}
-                        {#                                                    </div>#}
-                        {#                                                </div>#}
-                        {#                                            </div>#}
                     </div>
                 </form>
             </div>

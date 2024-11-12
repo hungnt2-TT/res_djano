@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/form_register.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/lightslider.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/lightgallery.css' %}">
+
+{% endblock %}
+
+{% block title %} Register Vendor | {{ block.super }} {% endblock %}
+{% block content %}
+    <div class="main-section">
+        <div class="page-section nopadding cs-nomargin"
+             style="margin-top: 0px; padding-top: 60px; padding-bottom: 60px; margin-bottom: 0px; background-image: url('{% static 'employee/img/shipping_background_motorbike_map_sketch_motion_design_6846911.jpg' %}'); background-size: cover; background-position: center;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                        <div class="user-dashboard loader-holder">
+                            <div class="user-holder">
+                                <h4 class="text-center" style="margin-bottom: 0;">Become a delivery person</h4>
+                                <p class="text-center">To become a delivery person, you will have to fill in your
+                                    personal information here!</p>
+                                <hr>
+                                <div id="restaurant-sets-holder">
+                                    <form class="form-fields-set foodbakery-dev-restaurant-form" method="post"
+                                          action="{% url 'register_shipper' %}"
+                                          enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        {{ form.non_field_errors }}
+
+                                        <ul class="register-add-restaurant-tab-container restaurant-information-tab-container">
+                                            <li>
+                                                <div class="row">
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="row">
+                                                            <ul>
+                                                                <li>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+
+                                                                        <div class="field-holder">
+                                                                            <label for="{{ form.first_name.id_for_label }}">First
+                                                                                Name:</label>
+                                                                            {{ form.first_name }}
+                                                                            {% if form.first_name.errors %}
+                                                                                <div class="error-message">{{ form.first_name.errors }}</div>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label for="{{ form.last_name.id_for_label }}">Last
+                                                                                Name:</label>
+                                                                            {{ form.last_name }}
+                                                                            {% if form.last_name.errors %}
+                                                                                <div class="error-message">{{ form.last_name.errors }}</div>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label for="{{ form.username.id_for_label }}">Username:</label>
+                                                                            {{ form.username }}
+                                                                            {% if form.username.errors %}
+                                                                                <div class="error-message">{{ form.username.errors }}</div>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label for="{{ form.phone_number.id_for_label }}">Phone
+                                                                                Number:</label>
+                                                                            {{ form.phone_number }}
+                                                                            {% if form.phone_number.errors %}
+                                                                                <div class="error-message">{{ form.phone_number.errors }}</div>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label>Email:</label>
+                                                                            {{ form.email }}
+                                                                            {% if form.email.errors %}
+                                                                                <div class="error-message">{{ form.email.errors }}</div>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                        <div class="field-holder">
+                                                                            <label for="{{ form.nickname.id_for_label }}">Nickname:</label>
+                                                                            {{ form.nickname }}
+                                                                            {% if form.nickname.errors %}
+                                                                                <div class="error-message">{{ form.nickname.errors }}</div>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                        <!-- Gallery container with data attribute for dynamic identification -->
+                                                                        <label for="{{ form.avatar_shipper.id_for_label }}">Avatar:</label>
+                                                                        <input type="file"
+                                                                               name="{{ form.avatar_shipper.name }}"
+                                                                               id="{{ form.avatar_shipper.auto_id }}"
+                                                                               accept="image/*" required>
+                                                                        {% if form.avatar_shipper.errors %}
+                                                                            <div class="error-message">{{ form.avatar_shipper.errors }}</div>
+                                                                        {% endif %}
+                                                                    </div>
+
+                                                                    <!-- Section for License -->
+                                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                        <label for="{{ form.driving_license.id_for_label }}">Driving
+                                                                            License:</label>
+                                                                        <input type="file"
+                                                                               name="{{ form.driving_license.name }}"
+                                                                               id="{{ form.driving_license.auto_id }}"
+                                                                               accept="image/*" required>
+                                                                        {% if form.driving_license.errors %}
+                                                                            <div class="error-message">{{ form.driving_license.errors }}</div>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+
+
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li>
+                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                    <div class="field-holder">
+                                                        <label>Password</label>
+                                                        {{ form.password1 }}
+                                                        <span toggle="#id_password1"
+                                                              class="fa fa-fw fa-eye field-icon toggle-password"
+                                                              style="position: absolute; right: 0px; top: 70%; transform: translateY(-50%); cursor: pointer;"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                    <div class="field-holder">
+                                                        <label>Confirm Password</label>
+                                                        {{ form.password2 }}
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+
+                                        <ul>
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <div class="element-title">
+                                                    <h4>Location</h4>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+                                                <div class="opt-conts">
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-12 col-sm-6 col-xs-12">
+                                                            <div class="field-holder">
+                                                                <label>State</label>
+                                                                {{ form.address }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        </ul>
+                                        <ul>
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                    <input type="checkbox" id="terms-59054637" required
+                                                           name="terms-59054637"
+                                                           class="foodbakery-dev-req-field">
+                                                    <label for="terms-59054637">
+                                                        By Registering You Confirm That You Accept The
+                                                        <a target="_blank" href="contact-us.html">Terms
+                                                            &amp; conditions </a>
+                                                        And <a target="_blank" href="price-plans.html">Privacy
+                                                        Policy </a>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </ul>
+                                        <ul>
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                    <div class="field-holder">
+                                                        <div class="payment-holder"
+                                                             style="margin: 0 25% 15px !important;">
+                                                            <div class="btnArea">
+                                                                <button type="submit" class="btn-primary key"
+                                                                        name="next" value="confirm">Next
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ul>
+                                        </ul>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block extra_scripts %}
+    <script src="{% static 'js/init_google_map_plf.js' %}"></script>
+    <script src="{% static 'js/lightslider.js' %}"></script>
+
+    <script src="{% static 'js/functions_vendor.js' %}"></script>
+{% endblock %}

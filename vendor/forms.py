@@ -6,7 +6,7 @@ from django.contrib.auth import (
 
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm, UserCreationForm, PasswordChangeForm
 
-from vendor.models import Vendor, VendorService
+from vendor.models import Vendor, VendorService, OpeningHour
 
 
 class VendorForm(forms.ModelForm):
@@ -95,3 +95,9 @@ class VendorServiceForm(forms.ModelForm):
         self.fields['delivery_fee'].widget.attrs['placeholder'] = 'Delivery Fee'
         self.fields['payment_on_delivery'].widget.attrs['placeholder'] = 'Payment On Delivery'
         self.fields['booking'].widget.attrs['placeholder'] = 'Booking'
+
+
+class OpeningHourForm(forms.ModelForm):
+    class Meta:
+        model = OpeningHour
+        fields = ['day', 'from_hour', 'to_hour', 'is_closed']

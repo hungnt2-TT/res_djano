@@ -154,6 +154,7 @@ class Coupon(models.Model):
     usage_limit = models.IntegerField(default=1)
     current_usage = models.IntegerField(default=0)
     user = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):

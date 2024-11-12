@@ -6,6 +6,7 @@ from menu.models import Size
 # Create your models here.
 class Cart(models.Model):
     user = models.ForeignKey('employee.Profile', on_delete=models.CASCADE)
+    vendor = models.ForeignKey('vendor.Vendor', on_delete=models.CASCADE)
     food_item = models.ForeignKey('menu.FoodItem', on_delete=models.CASCADE)
     size = models.ForeignKey(Size, on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField(default=1)

@@ -4,7 +4,7 @@
     width: 100%;
     overflow: hidden;
     padding: 20px 0;
-        margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 .slider {
@@ -188,7 +188,6 @@
     position: relative;
     margin: 15px;
     width: 180px;
-    height: 300px;
     border: 2px solid #ffb400;
     border-radius: 8px;
     overflow: hidden;
@@ -208,23 +207,23 @@
 }
 
 .vendor-img {
-    width: 100%;
-    height: 180px;
+    width: 105%;
+    height: 122px;
     object-fit: cover;
     transition: opacity 0.3s ease;
 }
 
 .premium-badge {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 1px;
+    left: -10px;
     background-color: #ffb400;
     color: white;
     font-weight: bold;
-    padding: 5px 10px;
+    padding: 7px 16px;
     border-radius: 12px;
     font-size: 14px;
-    z-index: 1;
+    z-index: 7;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
@@ -255,4 +254,185 @@
 .disabled {
     pointer-events: none;
     opacity: 0.5; /* Tùy chọn, để làm mờ các nút đã vô hiệu hóa */
+}
+
+.best-choice {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #ff5733;
+    font-weight: bold;
+}
+
+
+.btn.view-details {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #ff5733;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.btn.view-details:hover {
+    background-color: #d44e2e;
+}
+
+.vendor-name {
+    margin-top: -15px;
+}
+
+.premium-vendor-item:last-child .vendor-name {
+    margin-top: 0 !important;
+}
+
+.flash-sale-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flash-sale-title h3 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+}
+
+.view-all {
+    font-size: 14px;
+    color: #ff5733;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 5px 10px;
+    border: 1px solid #ff5733;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.view-all:hover {
+    background-color: #ff5733;
+    color: #fff;
+}
+
+.card {
+    background: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.rating {
+    background: #22c55e;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+}
+
+.star {
+    width: 12px;
+    height: 12px;
+    fill: currentColor;
+}
+
+.address-display {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 11px;
+    color: #495057;
+    margin-top: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.address-display.highlight {
+    background-color: #e2e6ea;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.features-container {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .features-container {
+        flex-direction: column;
+    }
+}
+
+.feature-card {
+    flex: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    background: #fff;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-image {
+    position: relative;
+    height: 250px;
+    overflow: hidden;
+}
+
+.feature-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-image img {
+    transform: scale(1.05);
+}
+
+.feature-content {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.feature-content h2 {
+    margin: 0 0 0.5rem;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.feature-content p {
+    margin: 0 0 1.5rem;
+    color: #666;
+    font-size: 1rem;
+}
+
+.feature-btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background-color: #e74c3c;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+
+.feature-btn:hover {
+    background-color: #c0392b;
 }

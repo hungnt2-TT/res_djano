@@ -12,7 +12,8 @@ from employee.models import CustomProfile, Profile, EmployeeProfile
 from employee.validators import validator_file_upload
 from django.core.validators import RegexValidator
 
-
+from django.core.exceptions import ValidationError
+import re
 class RegisterForm(UserCreationForm):
     phone_number = forms.CharField(
         validators=[RegexValidator(
@@ -163,3 +164,35 @@ class ProfileUpdateForm(forms.ModelForm):
             field.widget.attrs['placeholder'] = field.label
         self.fields['email'].widget.attrs['readonly'] = True
         self.fields['email'].widget.attrs['placeholder'] = 'Email'
+
+
+def validate_phone_number(value):
+    if not re.match(r'^0\d{8,10}$', value):
+        raise ValidationError('Phone number must start with 0 and have 9-11 digits.')
+
+
+class ShipperRegistrationForm(UserCreationForm):
+    phone_number = forms.CharField(validators=[validate_phone_number])
+
+    class Meta:
+        model = Profile
+        fields = ['first_name', 'password1', 'password2', 'address', 'last_name', 'username', 'email', 'phone_number'
+            , 'avatar_shipper', 'driving_license', 'nickname']
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email and not email.strip():
+            raise forms.ValidationError("Email cannot be blank.")
+        return email
+
+    def clean_avatar_shipper(self):
+        avatar = self.cleaned_data.get('avatar_shipper')
+        if not avatar:
+            raise forms.ValidationError("Avatar is required.")
+        return avatar
+
+    def clean_driving_license(self):
+        license = self.cleaned_data.get('driving_license')
+        if not license:
+            raise forms.ValidationError("Driving license is required.")
+        return license

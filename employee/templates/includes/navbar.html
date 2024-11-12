@@ -11,7 +11,7 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
     <div class="main-header">
         <div class="container" style="max-width: 1550px">
             <div class="row">
-                <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+                <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
                     <div class="logo">
                         <figure>
                             <a href="{% url 'home' %}" class="light-logo">
@@ -64,18 +64,19 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
                     <div class="main-location">
                         <ul>
                             <li class="location-has-children choose-location" style="width: 160%">
-                                <form action="#">
-                                    <input type="text" value="" name="location" id="id_address"
-                                           placeholder="Deliver To:" autocomplete="off">
-                                    <span id="foodbakery_radius_location_open" class="foodbakery-radius-location"><i
-                                            class="icon-target5"></i></span>
+
+                                {#                                                                        <input type="text" value="" name="location" id="id_address"#}
+                                {#                                                                               placeholder="Deliver To:" autocomplete="off">#}
+                                <span id="id_address" class="address-display"></span>
+                                {#                                    <span id="foodbakery_radius_location_open" class="foodbakery-radius-location"><i#}
+                                {#                                            class="icon-target5"></i></span>#}
                                 </form>
 
                             </li>
                         </ul>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12">
                     <div class="login-option" style="padding-top: 9px">
                         {% if user.is_authenticated %}
                             <a href="{% url 'cart_store' %}" class="nav-bar-cart">
@@ -148,11 +149,15 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
 
                                href="{% url '_login' %}">Login</a> </span>/ <span>
                             <a href="{% url 'register_user' %}"
-                               class="cs-color cs-popup-joinus-btn login-popup ml-0">Register</a></span><a
-                                    class="get-start-btn"
-                                    href="{% url 'register_vendor' %}">
-                                Register
-                                Restaurant </a>
+                               class="cs-color cs-popup-joinus-btn login-popup ml-0">Register</a></span>
+                                <span>or
+                            <a href="{% url 'register_shipper' %}"
+                               class="cs-color cs-popup-joinus-btn login-popup ml-0">Shiper</a></span>
+                                <a
+                                        class="get-start-btn"
+                                        href="{% url 'register_vendor' %}">
+                                    Register
+                                    Restaurant </a>
                             </div>
                         {% endif %}
                 </div>

@@ -13,14 +13,15 @@ from django.db.models import F
 
 from employee import consts
 from employee.consts import PAGE
-from employee.forms import RegisterForm
+from employee.forms import RegisterForm, ShipperRegistrationForm
 from employee.models import EmployeeProfile, Profile
 from employee.paginations import paginate_data
 from menu.forms import CategoryForm, FoodItemForm, SizeForm
 from menu.models import Category, FoodItem, Size
-from vendor.forms import VendorForm, VendorUpdateForm, VendorUpdateMapForm
+from orders.models import Order, OrderedFood
+from vendor.forms import VendorForm, VendorUpdateForm, VendorUpdateMapForm, OpeningHourForm
 from django.conf import settings
-from vendor.models import Vendor
+from vendor.models import Vendor, OpeningHour
 from wallet.models import Wallet
 from django.db import transaction
 from django.http import HttpResponseServerError
@@ -98,7 +99,6 @@ def handle_next_payment(request, form, vendor_form):
 def handle_send(request):
     try:
         form_data = request.session.get('form_data', {})
-        print('form_data', form_data)
         if form_data:
             with transaction.atomic():
                 user = Profile.objects.create_user(
@@ -165,6 +165,40 @@ def register_vendor(request):
         "vendor_form": vendor_form,
         "upload_file_url": upload_file_url,
     })
+
+
+def register_shipper(request):
+    if request.user.is_authenticated:
+        messages.warning(request, 'You are already logged in')
+        return redirect('home')
+    if request.method == 'POST':
+        form = ShipperRegistrationForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            shipper = form.save(commit=False)
+            shipper.is_active = False
+            shipper.employee_type = 5
+            form.save()
+            messages.info(request, 'Please check your email to confirm your account')
+            return render(request, 'vendor/register_shipper_success.html', {
+                "form": form,
+            })
+    else:
+        form = ShipperRegistrationForm()
+    return render(request, 'vendor/register_shipper.html', {'form': form})
+    # upload_file_url = upload_file(request.FILES.get('vendor_license'))
+    # form = RegisterForm(request.POST or None)
+    # profile_shipper_form = ShipperProfileForm(request.POST or None)
+    # if request.method == 'POST':
+    #     next_action = request.POST.get('next', '')
+    #     if next_action == 'confirm':
+    #         pass
+    #
+    #
+    # return render(request, 'vendor/register_shipper.html', {
+    #     "form": form,
+    #     "upload_file_url": upload_file_url,
+    # })
 
 
 @login_required
@@ -384,3 +418,46 @@ def food_item_delete(request, pk):
 
 def get_google_api(request):
     return {'GOOGLE_API_KEY': settings.GOOGLE_API_KEY}
+
+
+def get_vendor(request):
+    vendor = Vendor.objects.get(user=request.user)
+    return vendor
+
+
+def opening_hours(request):
+    opening_hours = OpeningHour.objects.filter(vendor=get_vendor(request))
+    form = OpeningHourForm()
+    context = {
+        'form': form,
+        'opening_hours': opening_hours,
+    }
+    return render(request, 'vendor/opening_hours.html', context)
+
+
+def order_detail(request, order_number):
+    try:
+        order = Order.objects.get(order_number=order_number, is_ordered=True)
+        ordered_food = OrderedFood.objects.filter(order=order, fooditem__vendor=get_vendor(request))
+
+        context = {
+            'order': order,
+            'ordered_food': ordered_food,
+            'subtotal': order.get_total_by_vendor()['subtotal'],
+            'tax_data': order.get_total_by_vendor()['tax_dict'],
+            'grand_total': order.get_total_by_vendor()['grand_total'],
+        }
+    except:
+        return redirect('vendor')
+    return render(request, 'vendor/order_detail.html', context)
+
+
+def my_orders(request):
+    vendor = Vendor.objects.get(user=request.user)
+    food_items = vendor.vendor_food_items.all()
+    ordered_foods = OrderedFood.objects.filter(fooditem__in=food_items)
+    orders = Order.objects.filter(id__in=ordered_foods.values('order_id'), is_ordered=True).order_by('created_at')
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'vendor/my_orders.html', context)

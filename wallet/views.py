@@ -35,12 +35,6 @@ import uuid
 from wallet.vnpay import vnpay
 
 
-def payment_success(request):
-    return render(request, "payment/payment_success.html")
-
-
-def payment_failed(request):
-    return render(request, 'payment/payment_failed.html')
 
 
 def payment_service_paypal(request):
