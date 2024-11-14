@@ -103,7 +103,7 @@ def process_payment_task(order_id, *args, **kwargs):
                 update_at=timezone.now()
             )
             payment_result = True
-            order.status = "Waiting for Confirmation"
+            order.status = "Payment Completed"
             order.is_payment_completed = True
             order.save()
             return "Payment Processed"
@@ -144,7 +144,7 @@ def process_payment_task(order_id, *args, **kwargs):
                     update_at=timezone.now()
                 )
 
-                order.status = "Processing"
+                order.status = "Processing Payment"
                 order.save()
                 return "Payment Processed"
         except Wallet.DoesNotExist:

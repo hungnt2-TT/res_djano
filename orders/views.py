@@ -202,7 +202,7 @@ def place_order(request):
             'state': request.POST.get('state'),
         }
         order_details = json.loads(request.POST.get('order_details'))
-        vendor_ids = list({item['vendor'] for item in order_details if 'vendor' in item})
+        vendor_ids = list({item['vendor'] for item   in order_details if 'vendor' in item})
         print('vendor_ids = ', vendor_ids)
         form = OrderForm(data)
         if form.is_valid():
@@ -214,7 +214,7 @@ def place_order(request):
                     order.total_tax = request.POST.get('total_tax', 0)
                     order.total_shipping_cost = request.POST.get('total_shipping_cost', 0)
                     order.coupon = request.POST.get('coupon', '')
-                    order.coupon_id = request.POST.get('coupon_id', None)
+                    order.coupon_id = request.POST.get('coupon_id', 0)
                     payment_method_str = request.POST.get('payment_method', '')
                     order.payment = PaymentMethod.objects.get(name=payment_method_str)
                     order.payment_method = convert_to_payment_method(payment_method_str)
@@ -224,12 +224,13 @@ def place_order(request):
                     order.order_details = order_details
                     order.is_ordered = True
                     order.is_payment_completed = False
+
                     order.save()
                     order.order_number = generate_order_number(order.id)
+                    order.vendors.set(Vendor.objects.filter(id__in=vendor_ids))
+
                     order.save()
-
-                    order.vendors.set(vendor_ids)
-
+                    print('order = ', Vendor.objects.filter(id__in=vendor_ids))
                     cart_items = Cart.objects.filter(user=request.user)
                     for item in cart_items:
                         ordered_food = OrderedFood()
@@ -371,7 +372,7 @@ def confirm_paypal_payment(request):
         payment_id = data.get('paymentID')
 
         order = get_object_or_404(Order, order_number=order_number)
-        order.status = 'Waiting for Confirmation'
+        order.status = 'Payment Completed'
         order.is_payment_completed = True
         order.save()
         admin = Profile.objects.get(is_superuser=True)

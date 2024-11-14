@@ -26,6 +26,7 @@ from google.auth.transport import requests
 from google.oauth2 import id_token
 
 from menu.models import FoodItem
+from orders.models import Order
 from vendor.forms import VendorUpdateForm, VendorServiceForm
 from vendor.models import Vendor
 from vendor.views import render_file_img
@@ -383,7 +384,10 @@ def middleware_account(request):
 @login_required(redirect_field_name='next', login_url='_login')
 @user_passes_test(check_role_vendor, login_url='_login')
 def owner_dashboard(request):
-    return render(request, 'owner.html')
+    user = request.user
+    vendor = Vendor.objects.get(user=user)
+    orders = Order.objects.filter(vendors=vendor, status='Waiting for Confirmation')
+    return render(request, 'owner.html', {'orders': orders})
 
 
 @login_required(redirect_field_name='next', login_url='_login')
@@ -604,3 +608,9 @@ def update_location(request):
             profile.save()
             return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'failed'})
+
+
+def get_orders(request):
+    user = request.user
+    vendor = Vendor.objects.get(user=user)
+    orders = Order.objects.filter(vendor=vendor, status='Waiting for Confirmation')

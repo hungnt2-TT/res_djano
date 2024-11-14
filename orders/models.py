@@ -9,9 +9,12 @@ from wallet.models import PaymentMethod
 # Create your models here.
 class Order(models.Model):
     STATUS = (
-        ('New', 'New'),
-        ('Processing', 'Processing'),
+        ('New Order', 'New Order'),
+        ('Processing Payment', 'Processing Payment'),
+        ('Payment Failed', 'Payment Failed'),
+        ('Payment Completed', 'Payment Completed'),
         ('Waiting for Confirmation', 'Waiting for Confirmation'),
+
         ('Accepted', 'Accepted'),
         ('Completed', 'Completed'),
         ('Cancelled', 'Cancelled'),
@@ -19,7 +22,7 @@ class Order(models.Model):
         ('Delivered', 'Delivered'),
     )
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    vendors = models.ManyToManyField(Vendor, blank=True)
+    vendors = models.ManyToManyField(Vendor)
     payment = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE)
     order_number = models.CharField(max_length=50)
     first_name = models.CharField(max_length=50)

@@ -159,6 +159,7 @@
                                 <div class="user-order-holder">
                                     <div class="user-order">
                                         <h6><i class="icon-sticky-note"></i>Coupon</h6>
+                                    {% if coupons %}
                                         {% for coupon in coupons %}
                                             <div class="swiper mySwiper" thumbsSlider="">
                                                 <div class="swiper-wrapper">
@@ -226,6 +227,11 @@
                                                 </div>
                                             </div>
                                         {% endfor %}
+                                    {% else %}
+                                        <div class="alert alert-info">
+                                            No coupon available
+                                        </div>
+                                    {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -409,3 +415,6 @@
     </script>
 {% endblock %}
 
+{#{% block extra_scripts %}#}
+{#    <script src="{% static 'employee/js/confirmOrder.js' %}"></script>#}
+{#{% endblock %}#}
