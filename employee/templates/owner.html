@@ -1,6 +1,14 @@
 {% extends 'base.html' %}
 
 {% load static %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/dashboard.css' %}">
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{% static 'employee/js/dashboard.js' %}"></script>
+{% endblock %}
+{% block title %}DashBoard{{ block.super }} {% endblock %}
 {% block content %}
     <div class="main-section">
         {% include 'includes/cover.html' %}
@@ -13,48 +21,57 @@
                     <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
                         <div class="user-dashboard loader-holder">
                             <div class="user-holder">
-                                <div class="user-message" style=";">
+                                <div class="" style=";">
                                     <a class="close" href="#"><i class="icon-cross-out"></i></a>
                                     <h2>Request Order</h2>
                                     <div>
                                         <div class="listing simple">
                                             <ul>
-                                                {% for order in orders %}
-                                                <li>
-                                                    <div class="img-holder">
-                                                        <figure>
-                                                            
-                                                        </figure>
-                                                    </div>
-                                                    <div class="text-holder">
-                                                        <div class="list-rating">
-                                                                <span class="rating-box" style="width: 100%;">{{order.order_number}}</span>
-                                                            <span class="reviews">(1)</span>
-                                                        </div>
-                                                        <div class="post-title">
-                                                            <h5>
-                                                                <a href="">{{ order.user.username }}</a>
-                                                                <span class="sponsored text-color">{{ order.status }}</span>
-                                                            </h5>
-                                                            <div>
-                                                                <span>{{ order.total }}</span>
-                                                                <span class="post-date">Order Date: {{ order.created_at }}</span>
-                                                                
+                                                <div class="order-container">
+                                                    {% for order in pending_orders %}
+                                                        <div class="order-card" data-order-id="{{ order.id }}">
+                                                            <div class="order-header">
+                                                                <h2>Order Name: {{ order.order_number }}</h2>
+                                                                <p class="user-info">
+                                                                    User: {{ order.user.get_full_name }}</p>
+                                                            </div>
+                                                            <ul class="order-items">
+                                                                {% for ordered_food in order.orderedfood_set.all %}
+                                                                    <li>
+                                                                        <span class="item-name">{{ ordered_food.fooditem.name }}</span>
+                                                                        <span class="item-quantity">QTY: {{ ordered_food.quantity }}</span>
+                                                                    </li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                            <p class="order-total">Total: {{ order.total }} VND</p>
+                                                            <div class="button-container">
+                                                                {#                                                        <a href="{% url 'reject_order' order.id %}"#}
+                                                                {#                                                           class="btn btn-primary">Reject</a>#}
+                                                                {#                                                        <a href="{% url 'accept_order' order.id %}"#}
+                                                                {#                                                           class="btn btn-success">Accept</a>#}
+                                                                <div class="button-container">
+                                                                    <button class="btn btn-danger reject-btn"
+                                                                            data-url="{% url 'reject_order' order.id %}">
+                                                                        Reject
+                                                                    </button>
+                                                                    <button class="btn btn-success accept-btn"
+                                                                            style="margin-left: 35px"
+                                                                            data-url="{% url 'accept_order' order.id %}">
+                                                                        Accept
+                                                                    </button>
+                                                                </div>
+                                                                {#                                                        <button class="btn btn-danger reject-btn"#}
+                                                                {#                                                                data-url="{% url 'reject_order' order.id %}">Reject#}
+                                                                {#                                                        </button>#}
+                                                                {#                                                        <button class="btn btn-success accept-btn"#}
+                                                                {#                                                                data-url="{% url 'accept_order' order.id %}>Accept#}
+                                                                {#                                                                </button>#}
                                                             </div>
                                                         </div>
-                                                 
-                                                        <br>
-                                                  
-                                                        
-                                                    </div>
-                                                    <div class="list-option" data-id="{{ order.id }}">
-                                                        <a href=""
-                                                           class="viewmenu-btn text-color">Refuse</a>
-                                                        <a href="" id="confirm"
-                                                           class="viewmenu-btn text-color">Confirm</a>
-                                                    </div>
-                                                </li>
-                                                {% endfor %}
+                                                    {% empty %}
+                                                        <p class=" no-orders-msg">No pending orders at the moment.</p>
+                                                    {% endfor %}
+                                                </div>
                                             </ul>
                                         </div>
 

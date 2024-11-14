@@ -25,4 +25,7 @@ urlpatterns = [
     path('login_by_email/', views.register_by_email, name='login_by_email'),
     path('update_location/', views.update_location, name='update_location'),
     path('send_sms_view/<str:phone_number>/', views.send_sms_view, name='send_sms_view'),
+    path('accept-order/<int:order_id>/', views.accept_order, name='accept_order'),
+    path('reject-order/<int:order_id>/', views.reject_order, name='reject_order'),
+
 ]

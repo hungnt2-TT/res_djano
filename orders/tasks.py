@@ -9,13 +9,10 @@ from .models import Order
 
 @shared_task
 def process_order(order_id):
-    print('order_id', order_id)
     validate_order_task.apply_async(args=[order_id], link=process_payment_task.s(order_id))
-    print('order_id', order_id)
-    process_payment_task.apply_async(args=[order_id], link=track_delivery_status_task.s(order_id))
-    print('order_id', order_id)
-    track_delivery_status_task.apply_async(args=[order_id], countdown=1800)
-    print('order_id', order_id)
+    process_payment_task.apply_async(args=[order_id], link=cancel_order_if_unconfirmed.s(order_id))
+    cancel_order_if_unconfirmed.apply_async(args=[order_id], countdown=1200)
+    track_delivery_status_task.apply_async(args=[order_id], countdown=2000)
     complete_order_task.apply_async(args=[order_id], countdown=86400)
 
 
@@ -103,7 +100,7 @@ def process_payment_task(order_id, *args, **kwargs):
                 update_at=timezone.now()
             )
             payment_result = True
-            order.status = "Payment Completed"
+            order.status = "Waiting for Confirmation"
             order.is_payment_completed = True
             order.save()
             return "Payment Processed"
@@ -187,7 +184,7 @@ def notify_user_task(order_id, status):
 @shared_task
 def track_delivery_status_task(order_id, *args, **kwargs):
     try:
-        order_id = int(order_id)  # Đảm bảo order_id là số nguyên
+        order_id = int(order_id)
     except ValueError:
         return f"Invalid order ID: {order_id}"
 
@@ -224,3 +221,20 @@ def complete_order_task(order_id):
     # Gửi thông báo cho người dùng
     notify_user_task.delay(order_id, "Your order has been completed.")
     return "Order Completed"
+
+
+@shared_task
+def cancel_order_if_unconfirmed(order_id, *args, **kwargs):
+    try:
+        order_id = int(order_id)
+        order = Order.objects.get(id=order_id)
+
+        if order.status in ['Processing Payment', 'Waiting for Confirmation', 'Shipper Assigned']:
+            order.status = 'Cancelled'
+            order.message_error = "Order auto-cancelled due to inactivity"
+            order.save()
+            return "Order auto-cancelled due to inactivity"
+        else:
+            return "Order already processed or confirmed"
+    except Order.DoesNotExist:
+        return f"Order does not exist: {order_id}"

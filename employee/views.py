@@ -1,7 +1,7 @@
 import os
 from cgi import print_environ_usage
 
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from django.utils import timezone
 
 from django.contrib import messages
@@ -20,13 +20,13 @@ from django.urls import reverse_lazy
 from django.utils.http import urlsafe_base64_decode
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 from django.views.generic import TemplateView
 from google.auth.transport import requests
 from google.oauth2 import id_token
 
 from menu.models import FoodItem
-from orders.models import Order
+from orders.models import Order, OrderedFood
 from vendor.forms import VendorUpdateForm, VendorServiceForm
 from vendor.models import Vendor
 from vendor.views import render_file_img
@@ -38,6 +38,7 @@ from .mails import send_verification_email
 from .models import Profile, EmployeeProfile, District
 from .utils import detect_usertype
 from datetime import datetime
+from .tasks import find_nearest_shipper
 
 from twilio.rest import Client
 
@@ -129,6 +130,8 @@ def home(request):
     }
     print('vendors_premium', vendors_premium)
     return render(request, 'home.html', context)
+
+
 def register(request):
     return render(request, 'account/register.html')
 
@@ -183,6 +186,7 @@ def send_sms_view(request, phone_number):
     else:
         messages.error(request, 'Failed to send code.')
     return render(request, 'send_sms_form.html')
+
 
 def register_user(request):
     form = RegisterForm(request.POST or None)
@@ -386,8 +390,13 @@ def middleware_account(request):
 def owner_dashboard(request):
     user = request.user
     vendor = Vendor.objects.get(user=user)
-    orders = Order.objects.filter(vendors=vendor, status='Waiting for Confirmation')
-    return render(request, 'owner.html', {'orders': orders})
+    pending_orders = get_pending_orders_for_vendor(vendor.id)
+    context = {
+        'vendor': vendor,
+        'pending_orders': pending_orders,
+    }
+
+    return render(request, 'owner.html', context)
 
 
 @login_required(redirect_field_name='next', login_url='_login')
@@ -610,7 +619,37 @@ def update_location(request):
     return JsonResponse({'status': 'failed'})
 
 
-def get_orders(request):
-    user = request.user
-    vendor = Vendor.objects.get(user=user)
-    orders = Order.objects.filter(vendor=vendor, status='Waiting for Confirmation')
+def get_pending_orders_for_vendor(vendor_id):
+    pending_orders = Order.objects.filter(
+        status='Waiting for Confirmation',
+        vendors=vendor_id
+    ).prefetch_related(
+        Prefetch('orderedfood_set', queryset=OrderedFood.objects.select_related('fooditem'))
+    ).select_related('user', 'payment')
+    print('pending_orders', pending_orders)
+    return pending_orders
+
+
+@csrf_exempt
+@require_POST
+def accept_order(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id, status='Waiting for Confirmation')
+        order.status = 'Accepted'
+        order.save()
+        find_nearest_shipper.delay(order.id)
+        return JsonResponse({'status': 'success', 'message': 'Order accepted! Shipper will be assigned soon'})
+    except Order.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Order not found'}, status=404)
+
+
+@csrf_exempt
+@require_POST
+def reject_order(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id, status='Waiting for Confirmation')
+        order.status = 'Cancelled'
+        order.save()
+        return JsonResponse({'status': 'success'})
+    except Order.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Order not found'}, status=404)

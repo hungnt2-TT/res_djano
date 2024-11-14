@@ -16,6 +16,7 @@ class Order(models.Model):
         ('Waiting for Confirmation', 'Waiting for Confirmation'),
 
         ('Accepted', 'Accepted'),
+        ('Shipper Assigned', 'Shipper Assigned'),
         ('Completed', 'Completed'),
         ('Cancelled', 'Cancelled'),
         ('In Transit', 'In Transit'),
@@ -24,6 +25,9 @@ class Order(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     vendors = models.ManyToManyField(Vendor)
     payment = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE)
+    shipper = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.SET_NULL, related_name='orders')
+    assigned_at = models.DateTimeField(null=True, blank=True)
+
     order_number = models.CharField(max_length=50)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -69,6 +73,8 @@ class Order(models.Model):
             return 'Delivered'
         elif self.status == 'Accepted':
             return 'In Transit'
+        elif self.status == 'Waiting for Confirmation':
+            return 'Waiting for Confirmation'
         else:
             return None
     def __str__(self):

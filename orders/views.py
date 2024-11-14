@@ -372,7 +372,7 @@ def confirm_paypal_payment(request):
         payment_id = data.get('paymentID')
 
         order = get_object_or_404(Order, order_number=order_number)
-        order.status = 'Payment Completed'
+        order.status = 'Waiting for Confirmation'
         order.is_payment_completed = True
         order.save()
         admin = Profile.objects.get(is_superuser=True)

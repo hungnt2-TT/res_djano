@@ -448,8 +448,8 @@ def reservation_booking(request):
 
 
 def paypal_payment(request, order_id):
-    # success_url = reverse('success')
-    # error_url = reverse('error')
+    success_url = reverse('payment_success')
+    error_url = reverse('payment_failed')
     order = get_object_or_404(Order, id=order_id)
     converted_total = convert_currency(order.total, from_currency="VND", to_currency="USD")
     print('converted_total', converted_total)
@@ -461,8 +461,8 @@ def paypal_payment(request, order_id):
         'order': order,
         'converted_total': converted_total,
         'formatted_total': formatted_total,
-        # 'success_url': success_url,
-        # 'error_url': error_url
+        'success_url': success_url,
+        'error_url': error_url
     }
     return render(request, 'payment_paypal.html', context)
 

@@ -14,7 +14,6 @@
                 <form action="{% url 'place-order' %}" method="post">
                     {% csrf_token %}
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-
                         <div class="user-sidebar">
                             <div class="user-order">
                                 <h1>PayPal Payment</h1>
@@ -22,6 +21,11 @@
                                 <p>Total Amount: ${{ formatted_total }}</p>
                                 <span id="confirm-url" data-url="{% url 'confirm_paypal_payment' %}"
                                       style="display: none;"></span>
+                                <span id="payment_success" data-url="{% url 'payment_success' %}"
+                                      style="display: none;"></span>
+                                <span id="payment_failed" data-url="{% url 'payment_failed' %}"
+                                      style="display: none;"></span>
+
                                 <span id="confirm-url" data-url="{% url 'my_orders' %}"
                                       style="display: none;"></span>
                                 <div class="paypal-logo"
@@ -35,48 +39,56 @@
         </div>
     </div>
     <script>
-        const confirmUrl = document.getElementById('confirm-url').getAttribute('data-url');
-        const completeUrl = document.getElementById('my_orders').getAttribute('data-url');
-        const successUrl = '{{ success_url }}';
-        const errorUrl = '{{ error_url }}';
+        document.addEventListener('DOMContentLoaded', function () {
+            const confirmElement = document.getElementById('confirm-url');
+            const completeElement = document.getElementById('my_orders');
+            const successElement = document.getElementById('payment_success');
+            const errorElement = document.getElementById('payment_failed');
 
-        paypal.Buttons({
-            // Set up the transaction
-            createOrder: function (data, actions) {
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: {
-                            value: {{converted_total}}
-                        }
-                    }]
-                });
-            },
+            const confirmUrl = confirmElement ? confirmElement.getAttribute('data-url') : null;
+            const completeUrl = completeElement ? completeElement.getAttribute('data-url') : null;
+            const successUrl = successElement ? successElement.getAttribute('data-url') : null;
+            const errorUrl = errorElement ? errorElement.getAttribute('data-url') : null;
 
-            // Finalize the transaction
-            onApprove: function (data, actions) {
-                return actions.order.capture().then(function (details) {
-                    // Send the payment details to your server
-                    return fetch(confirmUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': '{{ csrf_token }}'
-                        },
-                        body: JSON.stringify({
-                            orderID: data.orderID,
-                            orderNumber: '{{ order.order_number }}',
-                            paymentID: details.id
-                        })
-                    }).then(res => res.json())
-                        .then(data => {
-                            if (data.status === 'success') {
-                                window.location.href = successUrl;
-                            } else {
-                                window.location.href = errorUrl;
+
+            paypal.Buttons({
+                // Set up the transaction
+                createOrder: function (data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: {{converted_total}}
                             }
-                        });
-                });
-            }
-        }).render('#paypal-button-container');
+                        }]
+                    });
+                },
+
+                // Finalize the transaction
+                onApprove: function (data, actions) {
+                    return actions.order.capture().then(function (details) {
+                        // Send the payment details to your server
+                        return fetch(confirmUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            body: JSON.stringify({
+                                orderID: data.orderID,
+                                orderNumber: '{{ order.order_number }}',
+                                paymentID: details.id
+                            })
+                        }).then(res => res.json())
+                            .then(data => {
+                                if (data.status === 'success') {
+                                    window.location.href = successUrl;
+                                } else {
+                                    window.location.href = errorUrl;
+                                }
+                            });
+                    });
+                }
+            }).render('#paypal-button-container');
+        });
     </script>
 {% endblock %}
