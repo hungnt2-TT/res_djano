@@ -3,7 +3,7 @@ from . import views
 from .views import convert_to_words
 urlpatterns = [
     path('', views.marketplace, name='marketplace'),
-
+    path('find_restaurant_in_map/', views.find_restaurant_in_map, name='find_restaurant_in_map'),
     path('food_item_recomment/', views.food_item_recomment, name='food_item_recomment'),
     path('food_item/', views.food_item, name='food_item'),
     path('paypal-payment/<int:order_id>/', views.paypal_payment, name='paypal_payment'),

@@ -45,6 +45,17 @@ def marketplace(request):
     return render(request, 'listings.html', context)
 
 
+def find_restaurant_in_map(request):
+    vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)
+    vendors_data = json.dumps(list(vendors.values('vendor_name', 'address_line_1', 'latitude', 'longitude')))
+    context = {
+        'vendors': vendors_data,
+        'vendor_locations': vendors,
+        'vendor_count': vendors.count()
+    }
+    return render(request, 'find_restaurant_in_map.html', context)
+
+
 def food_item_recomment(request):
     current_hour = timezone.now().hour + 7
 
