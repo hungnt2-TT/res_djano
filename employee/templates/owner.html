@@ -13,71 +13,16 @@
     <div class="main-section">
         {% include 'includes/cover.html' %}
         <div class="page-section account-header buyer-logged-in">
-            <div class="container">
-                <div class="row">
+            <div class="container-field">
+                <div class="row px-5">
                     <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
                         {% include 'includes/v_sidebar.html' %}
                     </div>
                     <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
-                        <div class="user-dashboard loader-holder">
+                        <div class="user-dashboard loader-holder w-100 p-3">
                             <div class="user-holder">
-                                <div class="" style=";">
-                                    <a class="close" href="#"><i class="icon-cross-out"></i></a>
-                                    <h2>Request Order</h2>
-                                    <div>
-                                        <div class="listing simple">
-                                            <ul>
-                                                <div class="order-container">
-                                                    {% for order in pending_orders %}
-                                                        <div class="order-card" data-order-id="{{ order.id }}">
-                                                            <div class="order-header">
-                                                                <h2>Order Name: {{ order.order_number }}</h2>
-                                                                <p class="user-info">
-                                                                    User: {{ order.user.get_full_name }}</p>
-                                                            </div>
-                                                            <ul class="order-items">
-                                                                {% for ordered_food in order.orderedfood_set.all %}
-                                                                    <li>
-                                                                        <span class="item-name">{{ ordered_food.fooditem.name }}</span>
-                                                                        <span class="item-quantity">QTY: {{ ordered_food.quantity }}</span>
-                                                                    </li>
-                                                                {% endfor %}
-                                                            </ul>
-                                                            <p class="order-total">Total: {{ order.total }} VND</p>
-                                                            <div class="button-container">
-                                                                {#                                                        <a href="{% url 'reject_order' order.id %}"#}
-                                                                {#                                                           class="btn btn-primary">Reject</a>#}
-                                                                {#                                                        <a href="{% url 'accept_order' order.id %}"#}
-                                                                {#                                                           class="btn btn-success">Accept</a>#}
-                                                                <div class="button-container">
-                                                                    <button class="btn btn-danger reject-btn"
-                                                                            data-url="{% url 'reject_order' order.id %}">
-                                                                        Reject
-                                                                    </button>
-                                                                    <button class="btn btn-success accept-btn"
-                                                                            style="margin-left: 35px"
-                                                                            data-url="{% url 'accept_order' order.id %}">
-                                                                        Accept
-                                                                    </button>
-                                                                </div>
-                                                                {#                                                        <button class="btn btn-danger reject-btn"#}
-                                                                {#                                                                data-url="{% url 'reject_order' order.id %}">Reject#}
-                                                                {#                                                        </button>#}
-                                                                {#                                                        <button class="btn btn-success accept-btn"#}
-                                                                {#                                                                data-url="{% url 'accept_order' order.id %}>Accept#}
-                                                                {#                                                                </button>#}
-                                                            </div>
-                                                        </div>
-                                                    {% empty %}
-                                                        <p class=" no-orders-msg">No pending orders at the moment.</p>
-                                                    {% endfor %}
-                                                </div>
-                                            </ul>
-                                        </div>
 
-                                    </div>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="row">
                                         <div class="element-title has-border right-filters-row">
                                             <h5>Recent Orders</h5>

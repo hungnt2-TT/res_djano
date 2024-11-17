@@ -122,7 +122,10 @@ TEMPLATES = [
                 "marketplace.context_processors.get_cart_counter",
                 "marketplace.context_processors.get_cart_amount",
                 "employee.context_processors.get_vendor",
-                "employee.context_processors.get_paypal_client_id"
+                "employee.context_processors.get_paypal_client_id",
+                "employee.context_processors.role",
+                "employee.context_processors.request_order",
+                "employee.context_processors.request_shipper",
             ],
         },
     },

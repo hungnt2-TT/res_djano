@@ -12,8 +12,8 @@ class OrderForm(forms.ModelForm):
     phone = forms.CharField(validators=[phone_regex], max_length=10)
 
     pin_code_regex = RegexValidator(
-        regex=r'^\d{5}$',
-        message="PIN code must be 5 digits for Vietnam."
+        regex=r'^\d{5,6}$',
+        message="PIN code must be 5 or 6 digits for Vietnam."
     )
     pin_code = forms.CharField(validators=[pin_code_regex], max_length=5)
 

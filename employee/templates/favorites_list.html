@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/dashboard.css' %}">
+{% endblock %}
+{% block extra_scripts %}
+    <script src="{% static 'employee/js/favorites.js' %}"></script>
+{% endblock %}
+{% block title %}DashBoard{{ block.super }} {% endblock %}
+{% block content %}
+    {% include 'includes/alerts.html' %}
+
+    <!-- Main Section Start -->
+    <div class="main-section">
+
+        {% include 'includes/cover.html' %}
+        <div class="page-section account-header buyer-logged-in">
+            <div class="container-field">
+                <div class="row px-5">
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        <!-- Load the sidebar here -->
+                        {% include 'includes/c_sidebar.html' %}
+                    </div>
+                    <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                        <div class="user-dashboard loader-holder w-100 p-3">
+                            <div class="user-holder">
+
+                                <h5 class="text-uppercase">Your Favorites</h5>
+
+                                <form action="{% url 'customer_setting' %}" method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="form-fields-set">
+                                        <ul>
+                                            <li>
+                                                <div class="row">
+                                                    {% for favorite in favorites %}
+                                                        <div class="col-md-4 mb-4">
+                                                            <div class="card favorite-card shadow-sm">
+                                                                <img src="{{ favorite.vendor.user_profile.profile_picture.url }}"
+                                                                     class="card-img-top"
+                                                                     alt="{{ favorite.vendor.vendor_name }}">
+                                                                <div class="card-body">
+                                                                    <h5 class="card-title">{{ favorite.vendor.vendor_name }}</h5>
+                                                                    <p class="card-text text-muted">
+                                                                        {{ favorite.vendor.description|truncatechars:100 }}
+                                                                    </p>
+                                                                    <div class="d-flex justify-content-between align-items-center">
+                                                                        <a href="{% url 'vendor_detail' favorite.vendor.vendor_slug %}"
+                                                                           class="btn btn-primary btn-sm">View
+                                                                            Menu</a>
+                                                                        <button class="btn btn-danger btn-sm remove-favorite-btn"
+                                                                                data-url="{% url 'toggle_favorite' favorite.vendor.id %}"
+                                                                                data-id="{{ favorite.vendor.id }}">
+
+                                                                            Remove <i
+                                                                                class="icon-heart4 {% if vendor in user.favorites.all %}favorited{% endif %}"></i>
+
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% empty %}
+                                                        <div class="col-12 text-center">
+                                                            <p class="text-muted">You don't have any favorites
+                                                                yet!</p>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Main Section End -->
+
+
+{% endblock %}

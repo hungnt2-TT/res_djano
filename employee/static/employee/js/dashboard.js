@@ -2,6 +2,7 @@ $(document).ready(function () {
     $('.accept-btn').click(function () {
         var orderId = $(this).closest('.order-card').data('order-id');
         var url = $(this).data('url');
+        console.log(orderId, url);
         handleOrderAction(orderId, url, 'accept');
     });
 
@@ -9,9 +10,11 @@ $(document).ready(function () {
         var orderId = $(this).closest('.order-card').data('order-id');
         var url = $(this).data('url');
         handleOrderAction(orderId, url, 'reject');
+
     });
 
     function handleOrderAction(orderId, url, action) {
+        console.log(orderId, url, action);
         $.ajax({
             url: url.replace('order_id', orderId),
             type: 'POST',

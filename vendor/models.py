@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
@@ -8,6 +9,8 @@ from employee.models import Profile, EmployeeProfile, District
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import Point
 from datetime import time, date, datetime
+
+from res import settings
 
 
 class VendorService(models.Model):
@@ -160,3 +163,15 @@ class OpeningHour(models.Model):
 
     def __str__(self):
         return self.get_day_display()
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    vendor = models.ForeignKey('Vendor', on_delete=models.CASCADE, related_name='favorited_by')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'vendor')
+
+    def __str__(self):
+        return f"{self.user.username} -> {self.vendor.vendor_name}"

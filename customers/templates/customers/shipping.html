@@ -1,0 +1,922 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+    {#    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/daterangepicker.css' %}">#}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <link rel="stylesheet" type="text/css" href="{% static '/css/setting_orders.css' %}">
+
+    <style>
+        #map {
+            height: 40vh;
+            width: 100%;
+        }
+    </style>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
+
+    <!-- Your custom script -->
+    <script src="{% static 'employee/js/start_ship.js' %}"></script>
+{% endblock %}
+{% block title %}Order{{ block.super }} {% endblock %}
+
+%}
+{% block content %}
+    {% include 'includes/alerts.html' %}
+
+    <!-- Main Section Start -->
+    <div class="main-section">
+
+        {% include 'includes/cover.html' %}
+        <div class="page-section account-header buyer-logged-in">
+            <div class="container-field">
+                <div class="row px-5">
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        <!-- Load the sidebar here -->
+                        {% include 'includes/c_sidebar.html' %}
+                    </div>
+                    <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                        <div class="user-dashboard loader-holder w-100 p-3">
+                            <div class="user-holder">
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="row" style="display: block">
+                                        <div class="element-title has-border right-filters-row">
+                                            <h5>Recent Orders</h5>
+                                            <div>
+                                                <div class="">
+                                                    {#                                                    <div class="col-lg-3 col-md-3 col-xs-6">#}
+                                                    {#                                                        <div class="input-field">#}
+                                                    {#                                                            <select class="chosen-select-no-single" name="order_status">#}
+                                                    {#                                                                <option value="">Select Orders Status</option>#}
+                                                    {#                                                                <option value="Processing">Processing</option>#}
+                                                    {#                                                                <option value="Cancelled">Cancelled</option>#}
+                                                    {#                                                                <option value="Completed">Completed</option>#}
+                                                    {#                                                            </select>#}
+                                                    {#                                                        </div>#}
+                                                    {#                                                    </div>#}
+                                                    <div class="col-lg-12 col-md-12 col-xs-6">
+                                                        <div class="input-field">
+                                                            <i class="icon-angle-down"></i>
+                                                            <form method="GET" id="search-form" style="display: flex">
+                                                                <div class="input-field">
+                                                                    <select class="chosen-select-no-single"
+                                                                            name="order_status">
+                                                                        <option value="">Select Orders Status</option>
+
+                                                                        {% for status in order_statuses %}
+                                                                            <option value="{{ status }}">{{ status }}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </div>
+
+                                                                <input type="text" id="date-range" name="date_range"
+                                                                       style="    width: 125%;"/>
+                                                                <button type="submit">Tìm kiếm</button>
+                                                            </form>
+                                                            <script>
+                                                                flatpickr("#date-range", {
+                                                                    mode: "range",
+                                                                    dateFormat: "Y-m-d",
+                                                                });
+                                                            </script>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="user-orders-list">
+                                            <div class="responsive-table">
+                                                <ul class="table-generic">
+                                                    <li class="order-heading-titles">
+                                                        <div>Order id</div>
+                                                        <div>Date</div>
+                                                        <div>Total Price</div>
+                                                        <div>Is payment</div>
+                                                        {#                                                        <div>Vendor</div>#}
+                                                        <div>Status</div>
+                                                        <div>Detail</div>
+                                                    </li>
+                                                    {% for order in orders %}
+
+                                                        <li class="order-heading-titles">
+                                                            <div>
+                                                                <a href="{% url 'vendor_order_detail' order.order_number %}"
+                                                                   data-toggle="modal"
+                                                                   data-target="#order-det-22606">{{ order.order_number }}</a>
+                                                            </div>
+                                                            <div>{{ order.created_at }}</div>
+                                                            <div>{{ order.subtotal }}</div>
+                                                            {% if order.is_payment_completed %}
+                                                                <span class="badge badge-success"
+                                                                      style="margin: 11px 0 0 140px;">Payment completed</span>
+                                                            {% else %}
+                                                                <span class="badge badge-danger"
+                                                                      style="margin: 11px 0 0 140px;">Payment not completed
+                                                                </span>
+
+                                                            {% endif %}
+                                                            {{ vendor.vendor_name }}{% if not forloop.last %}
+                                                                , {% endif %}
+
+                                                            <div>
+                                                                <span class="order-status-list {{ order.status|slugify }}">
+                                                                    {{ order.status }}
+                                                                </span>
+                                                            </div>
+                                                            <div><a href="#" data-toggle="modal"
+                                                                    data-target="#order-det-22606{{ order.order_number }}"><i
+                                                                    class="icon-plus2 text-color"></i></a></div>
+                                                        </li>
+                                                        <div class="modal fade menu-order-detail order-detail"
+                                                             id="order-det-22606{{ order.order_number }}"
+                                                             tabindex="-1" role="dialog"
+                                                             style="display: none; top: 200px">
+                                                        <div class="modal-dialog" style="max-width: 60%">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+
+                                                                    <h2>Order Detail</h2>
+                                                                    <button class="btn-print"><i
+                                                                            class="icon-printer"></i><span>Receipt</span>
+                                                                    </button>
+                                                                    <button type="button" class="close"
+                                                                            data-dismiss="modal"
+                                                                            aria-label="Close"><span
+                                                                            aria-hidden="true">×</span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <div class="order-detail-inner">
+                                                                        <div class="description-holder">
+                                                                            <div class="row">
+                                                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                                                                    <div class="list-detail-options has-checkbox">
+                                                                                        <h3>
+                                                                                            Restaurant Names:
+                                                                                            {{ vendor.vendor_name }}
+                                                                                        </h3>
+                                                                                        <ul class="order-detail-options">
+                                                                                            <li class="order-number">
+                                                                                                <strong>Order
+                                                                                                    ID:</strong>
+                                                                                                <span>{{ order.order_number }}</span>
+                                                                                            </li>
+                                                                                            <li class="req-delivery">
+                                                                                                <strong>Delivery
+                                                                                                    Time:</strong>
+                                                                                                <span>{{ order.total_delivery_time }} Minutes</span>
+                                                                                            </li>
+                                                                                            <li class="created-date">
+                                                                                                <strong>Delivery
+                                                                                                    Date:</strong>
+                                                                                                <span>{{ order.updated_at }}</span>
+                                                                                            </li>
+                                                                                            <li class="order-type">
+                                                                                                <strong>Type:</strong>
+                                                                                                <span>Order</span>
+                                                                                            </li>
+                                                                                            <li class="order-type">
+                                                                                                <strong>Payment
+                                                                                                    Status:</strong>
+                                                                                                {% if order.is_payment_completed %}
+                                                                                                    <span class="badge badge-success">Payment Completed</span>
+                                                                                                {% else %}
+                                                                                                    <span class="badge badge-danger">Payment Not Completed</span>
+                                                                                                {% endif %}
+                                                                                            </li>
+                                                                                        </ul>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                                                                    <div class="customer-detail-holder">
+                                                                                        <h3>Customer Details</h3>
+                                                                                        <ul class="customer-detail">
+
+                                                                                            {{ order.user }}
+                                                                                            <li>
+                                                                                                <strong>Name:</strong>
+                                                                                                <span>{{ order.user.username }}</span>
+                                                                                            </li>
+                                                                                            <li>
+                                                                                                <strong>Phone
+                                                                                                    Number:</strong>
+                                                                                                <span>{{ order.phone_number }}</span>
+                                                                                            </li>
+                                                                                            <li>
+                                                                                                <strong>Email:</strong>
+                                                                                                <span>{{ order.user.email }}</span>
+                                                                                            </li>
+                                                                                            <li>
+                                                                                                <strong>Address:</strong>
+                                                                                                <span>{{ order.address }}</span>
+                                                                                            </li>
+                                                                                        </ul>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                                                                    <div class="customer-detail-holder">
+                                                                                        <h3>Shipper Details</h3>
+                                                                                        <ul class="customer-detail">
+                                                                                            <li>
+                                                                                                <strong>Name:</strong>
+                                                                                                <span>{{ order.shipper.username }}</span>
+                                                                                            </li>
+                                                                                            <li>
+                                                                                                <strong>Phone
+                                                                                                    Number:</strong>
+                                                                                                <span>{{ order.shipper.phone_number }}</span>
+                                                                                            </li>
+                                                                                            <li>
+                                                                                                <strong>Email:</strong>
+                                                                                                <span>{{ order.shipper.email }}</span>
+                                                                                            </li>
+                                                                                            <li>
+                                                                                                <strong>Address:</strong>
+                                                                                                <span>{{ order.shipper.address }}</span>
+                                                                                            </li>
+                                                                                        </ul>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                                    <div class="order-status-holder">
+                                                                                        <div class="row">
+                                                                                            <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+                                                                                                <h3>Order
+                                                                                                    Status</h3>
+                                                                                            </div>
+                                                                                            <div class="col-lg-9 col-md-8 col-sm-8 col-xs-12">
+                                                                                                <div class="input-field">
+                                                                                                    <select class="chosen-select-no-single"
+                                                                                                            name="order_status">
+                                                                                                        <option value="{{ order.status }}"
+                                                                                                                selected="selected">{{ order.status }}</option>
+                                                                                                    </select>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                                    {% if order.map == True %}
+                                                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                                            <div id="map"></div>
+                                                                                            <input type="hidden"
+                                                                                                   id="user_location"
+                                                                                                   value="{{ order.user_location }}">
+                                                                                            <input type="hidden"
+                                                                                                   id="shipper_location"
+                                                                                                   value="{{ order.shipper_location }}">
+                                                                                        </div>
+                                                                                    {% endif %}
+                                                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                                        <h2 class="heading">Food
+                                                                                            Menu</h2>
+                                                                                        <div class="responsive-table">
+                                                                                            <ul class="categories-order table-generic">
+                                                                                                <li class="order-heading-titles">
+                                                                                                    <div>Products</div>
+                                                                                                    <div>Quantity</div>
+                                                                                                    <div>Size</div>
+                                                                                                    <div>Price</div>
+                                                                                                </li>
+                                                                                                {% for item in order.order_details %}
+                                                                                                    <li class="order-heading-titles">
+                                                                                                        <div>
+                                                                                                            <h4>{{ item.food_name }}</h4>
+                                                                                                            <h5>{{ item.food_title }}</h5>
+                                                                                                        </div>
+                                                                                                        <div>
+                                                                                                             <span
+                                                                                                                     class="category-price">{{ item.quantity }}</span>
+
+
+                                                                                                        </div>
+                                                                                                        <div><span
+                                                                                                                class="category-price">{{ item.size }}</span>
+                                                                                                        </div>
+
+                                                                                                        <div><span
+                                                                                                                class="category-price">{{ item.price }}</span>
+                                                                                                        </div>
+                                                                                                    </li>
+                                                                                                {% endfor %}
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                                        <div class="row"
+                                                                                             style="display: block">
+
+                                                                                            <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+
+
+                                                                                                <form id="complete-ship-form"
+                                                                                                      action="{% url 'complated_ship' %}"
+                                                                                                      enctype="multipart/form-data">
+                                                                                                    {% if order.status == 'Delivering' %}
+                                                                                                        <h4>Proof Image
+                                                                                                            *</h4>
+                                                                                                        <input type="file"
+                                                                                                               id="proof-image"
+                                                                                                               name="proof_image"
+                                                                                                               accept="image/*"
+                                                                                                        >
+                                                                                                        <input type="hidden"
+                                                                                                               id="order-id"
+                                                                                                               value=" {{ order.order_id }}">
+                                                                                                    {% endif %}
+                                                                                                    {% if order.status == 'Completed' %}
+                                                                                                        <h4>Proof Image
+                                                                                                            *</h4>
+                                                                                                        <img src="{{ order.proof_image.url }}"
+                                                                                                             alt="">
+                                                                                                    {% endif %}
+                                                                                                    <li class="order-type total-price"
+                                                                                                        style="margin-top: 40px">
+                                                                                                        {% if order.status == 'Delivering' %}
+                                                                                                            <button class="btn btn-warning"
+                                                                                                                    type="submit"
+                                                                                                                    id="btn-complated-ship"
+                                                                                                                    data-url="{% url 'complated_ship' %}"
+                                                                                                                    data-order-id="{{ order.order_id }}">
+                                                                                                                End
+                                                                                                                Ship
+                                                                                                            </button>
+                                                                                                        {% elif order.status == 'Shipper Accepted' %}
+                                                                                                            <button class="btn btn-primary"
+                                                                                                                    id="btn-accept-order"
+                                                                                                                    data-url="{% url 'start_ship' %}"
+                                                                                                                    data-order-id="{{ order.order_id }}">
+                                                                                                                Start
+                                                                                                                Ship
+                                                                                                            </button>
+                                                                                                        {% else %}
+                                                                                                            <button class="btn btn-success"
+                                                                                                                    id="btn-accept-order"
+                                                                                                                    disabled
+                                                                                                                    data-url="{% url 'complated_ship' %}"
+                                                                                                                    data-order-id="{{ order.order_id }}">
+                                                                                                            Complated
+                                                                                                            Ship
+                                                                                                        {% endif %}
+                                                                                                    </li>
+                                                                                                </form>
+
+                                                                                            </div>
+                                                                                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                                                                <ul class="order-detail-options order-total">
+                                                                                                    <h3>Order
+                                                                                                        Total</h3>
+
+                                                                                                    <li class="created-date">
+                                                                                                        <strong>Subtotal:</strong>
+                                                                                                        <span>{{ order.subtotal }} VND</span>
+                                                                                                    </li>
+                                                                                                    <li class="order-type">
+                                                                                                        <strong>VAT
+                                                                                                            (0%):</strong>
+                                                                                                        <span>0 VND</span>
+                                                                                                    </li>
+                                                                                                    <li class="order-type">
+                                                                                                        <strong>SHIP
+                                                                                                            :</strong>
+                                                                                                        <span>{{ order.total_shipping_cost }} VND</span>
+                                                                                                    </li>
+                                                                                                    <li class="order-type total-price">
+                                                                                                        <strong>Total:</strong>
+                                                                                                        <span>{{ order.total }}</span>
+                                                                                                    </li>
+                                                                                                </ul>
+                                                                                            </div>
+
+
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {#                                                        <script>#}
+                                                        {#                                                            (function ($) {#}
+                                                        {#                                                                $(document).ready(function () {#}
+                                                        {#                                                                    $(".order-detail .modal-dialog .modal-content").mCustomScrollbar({#}
+                                                        {#                                                                        setHeight: 724,#}
+                                                        {#                                                                        theme: "minimal-dark",#}
+                                                        {#                                                                        mouseWheelPixels: 100#}
+                                                        {#                                                                    });#}
+                                                        {#                                                                });#}
+                                                        {#                                                            })(jQuery);#}
+                                                        {#                                                        </script>#}
+                                                    {% endfor %}
+                                                </ul>
+
+                                            </div>
+                                            <div class="print-order-detail menu-order-detail order-detail"
+                                                 style="display: none;">
+                                                <div class="logo"><img src="assets/extra-images/main-logo.png" alt="">
+                                                </div>
+                                                <h2>Order Detail</h2>
+                                                <div class="order-detail-inner">
+                                                    <div class="description-holder">
+                                                        <div class="row">
+                                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                <div class="list-detail-options has-checkbox">
+                                                                    <h3>Restaurant Demo </h3>
+                                                                    <ul class="order-detail-options">
+                                                                        <li class="order-number">
+                                                                            <strong>Order ID:</strong>
+                                                                            <span>22606</span>
+                                                                        </li>
+                                                                        <li class="req-delivery">
+                                                                            <strong>Delivery Time:</strong>
+                                                                            <span>10 Minutes </span>
+                                                                        </li>
+                                                                        <li class="created-date">
+                                                                            <strong>Delivery Date:</strong>
+                                                                            <span>Apr 9, 2020 06:38 AM </span>
+                                                                        </li>
+                                                                        <li class="order-type">
+                                                                            <strong>Type:</strong>
+                                                                            <span>order</span>
+                                                                        </li>
+                                                                        <li class="order-type">
+                                                                            <strong>Payment Status:</strong>
+                                                                            <span>Approved</span>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                <div class="customer-detail-holder">
+                                                                    <h3>Customer Detail</h3>
+                                                                    <ul class="customer-detail">
+                                                                        <li>
+                                                                            <strong>Name :</strong>
+                                                                            <span>Buyer Demo</span>
+                                                                        </li>
+                                                                        <li>
+                                                                            <strong>Phone Number :</strong>
+                                                                            <span>0123456789</span>
+                                                                        </li>
+                                                                        <li>
+                                                                            <strong>Email :</strong>
+                                                                            <span>dum4@chimpgroup.com</span>
+                                                                        </li>
+                                                                        <li>
+                                                                            <strong>Address :</strong>
+                                                                            <span>London</span>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                    <div class="order-status-holder">
+                                                                        <h3> Order Status:</h3>
+                                                                        <div class="order-status-process order-status">
+                                                                            <p>Completed</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                <h2 class="heading">Food Menu</h2>
+                                                                <div class="responsive-table">
+                                                                    <ul class="categories-order table-generic">
+                                                                        <li class="order-heading-titles">
+                                                                            <div>Products</div>
+                                                                            <div>Price per</div>
+                                                                        </li>
+                                                                        <li class="order-heading-titles">
+                                                                            <div>
+                                                                                <h4>Pizzas</h4>
+                                                                                <h5>Foodbakery Special 9" Deep Pan</h5>
+                                                                            </div>
+                                                                            <div><span
+                                                                                    class="category-price">£4.80</span>
+                                                                            </div>
+                                                                        </li>
+                                                                        <li class="order-heading-titles">
+                                                                            <div>
+                                                                                <h4>Pizzas</h4>
+                                                                                <h5>Foodbakery Special 9" Deep Pan</h5>
+                                                                            </div>
+                                                                            <div><span
+                                                                                    class="category-price">£4.80</span>
+                                                                            </div>
+                                                                        </li>
+                                                                        <li class="order-heading-titles">
+                                                                            <div>
+                                                                                <h4>Pizzas</h4>
+                                                                                <h5>Foodbakery Special 12" Deep Pan</h5>
+                                                                            </div>
+                                                                            <div><span
+                                                                                    class="category-price">£3.90</span>
+                                                                            </div>
+                                                                        </li>
+                                                                        <li class="order-heading-titles">
+                                                                            <div>
+                                                                                <h4>Garlic Bread</h4>
+                                                                                <h5>Garlic Bread 12" Deep</h5>
+                                                                            </div>
+                                                                            <div><span
+                                                                                    class="category-price">£3.50</span>
+                                                                            </div>
+                                                                        </li>
+                                                                        <li class="order-heading-titles">
+                                                                            <div>
+                                                                                <h4>Kebabs</h4>
+                                                                                <h5>Kebabs With Naan</h5>
+                                                                            </div>
+                                                                            <div><span
+                                                                                    class="category-price">£4.50</span>
+                                                                            </div>
+                                                                        </li>
+                                                                        <li class="order-heading-titles">
+                                                                            <div>
+                                                                                <h4>Burgers</h4>
+                                                                                <h5>Quarter Pounder</h5>
+                                                                            </div>
+                                                                            <div><span
+                                                                                    class="category-price">£3.00</span>
+                                                                            </div>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                <div class="row">
+                                                                    <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+                                                                        <h3>Order Total</h3>
+                                                                    </div>
+                                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                                        <ul class="order-detail-options order-total">
+                                                                            <li class="created-date">
+                                                                                <strong>Subtotal:</strong>
+                                                                                <span>£24.50</span>
+                                                                            </li>
+                                                                            <li class="order-type">
+                                                                                <strong>
+                                                                                    Pick Up Fee: </strong>
+                                                                                <span>£10.00</span>
+                                                                            </li>
+                                                                            <li class="order-type">
+                                                                                <strong>VAT (13%)</strong>
+                                                                                <span>£4.48</span>
+                                                                            </li>
+                                                                            <li class="order-type total-price">
+                                                                                <strong>Total:</strong>
+                                                                                <span>£38.99</span>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal fade menu-order-detail order-detail"
+                                                 id="order-det-22606{{ order.order_number }}"
+                                                 tabindex="-1" role="dialog" style="display: none;">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close" data-dismiss="modal"
+                                                                    aria-label="Close"><span aria-hidden="true">×</span>
+                                                            </button>
+                                                            <h2>Order Detail</h2>
+                                                            <div id="receipt">
+                                                            </div>
+
+                                                            <button class="btn-print" onclick="printReceipt()">
+                                                                <i class="icon-printer"></i><span>Receipt</span>
+                                                            </button>
+
+                                                            </script>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="order-detail-inner">
+                                                                <div class="description-holder">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                            <div class="list-detail-options has-checkbox">
+                                                                                <h3>
+                                                                                    Restaurant Demo </h3>
+                                                                                <ul class="order-detail-options">
+                                                                                    <li class="order-number">
+                                                                                        <strong>Order ID:</strong>
+                                                                                        <span>22606</span>
+                                                                                    </li>
+                                                                                    <li class="req-delivery">
+                                                                                        <strong>Delivery
+                                                                                            Time:</strong>
+                                                                                        <span>10 Minutes </span>
+                                                                                    </li>
+                                                                                    <li class="created-date">
+                                                                                        <strong>Delivery
+                                                                                            Date:</strong>
+                                                                                        <span>
+																								Apr 9, 2020 06:38 AM </span>
+                                                                                    </li>
+                                                                                    <li class="order-type">
+                                                                                        <strong>Type:</strong>
+                                                                                        <span>order</span>
+                                                                                    </li>
+                                                                                    <li class="order-type">
+                                                                                        <strong>Payment
+                                                                                            Status:</strong>
+                                                                                        <span>Approved</span>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+
+                                                                        </div>
+                                                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                            <div class="customer-detail-holder">
+                                                                                <h3>Customer Detail</h3>
+                                                                                <ul class="customer-detail">
+                                                                                    <li>
+                                                                                        <strong>Name :</strong>
+                                                                                        <span>Buyer Demo</span>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <strong>Phone Number :</strong>
+                                                                                        <span>0123456789</span>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <strong>Email :</strong>
+                                                                                        <span>dum4@chimpgroup.com</span>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <strong>Address :</strong>
+                                                                                        <span>London</span>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                            <div class="order-status-holder">
+                                                                                <div class="row">
+                                                                                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+                                                                                        <h3>Order Status </h3>
+                                                                                    </div>
+                                                                                    <div class="col-lg-9 col-md-8 col-sm-8 col-xs-12">
+                                                                                        <div class="input-field">
+                                                                                            <select class="chosen-select-no-single">
+                                                                                                <option value="Processing">
+                                                                                                    Processing
+                                                                                                </option>
+                                                                                                <option value="Cancelled">
+                                                                                                    Cancelled
+                                                                                                </option>
+                                                                                                <option selected="selected"
+                                                                                                        value="Completed">
+                                                                                                    Completed
+                                                                                                </option>
+                                                                                            </select>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                            <h2 class="heading">Food Menu</h2>
+                                                                            <div class="responsive-table">
+                                                                                <ul class="categories-order table-generic">
+                                                                                    <li class="order-heading-titles">
+                                                                                        <div>Products</div>
+                                                                                        <div>Price per</div>
+                                                                                    </li>
+                                                                                    <li class="order-heading-titles">
+                                                                                        <div>
+                                                                                            <h4>Pizzas</h4>
+                                                                                            <h5>Foodbakery Special 9"
+                                                                                                Deep Pan</h5>
+                                                                                        </div>
+                                                                                        <div><span
+                                                                                                class="category-price">£4.80</span>
+                                                                                        </div>
+                                                                                    </li>
+                                                                                    <li class="order-heading-titles">
+                                                                                        <div>
+                                                                                            <h4>Pizzas</h4>
+                                                                                            <h5>Foodbakery Special 9"
+                                                                                                Deep Pan</h5>
+                                                                                        </div>
+                                                                                        <div><span
+                                                                                                class="category-price">£4.80</span>
+                                                                                        </div>
+                                                                                    </li>
+                                                                                    <li class="order-heading-titles">
+                                                                                        <div>
+                                                                                            <h4>Pizzas</h4>
+                                                                                            <h5>Foodbakery Special 12"
+                                                                                                Deep Pan</h5>
+                                                                                        </div>
+                                                                                        <div><span
+                                                                                                class="category-price">£3.90</span>
+                                                                                        </div>
+                                                                                    </li>
+                                                                                    <li class="order-heading-titles">
+                                                                                        <div>
+                                                                                            <h4>Garlic Bread</h4>
+                                                                                            <h5>Garlic Bread 12"
+                                                                                                Deep</h5>
+                                                                                        </div>
+                                                                                        <div><span
+                                                                                                class="category-price">£3.50</span>
+                                                                                        </div>
+                                                                                    </li>
+                                                                                    <li class="order-heading-titles">
+                                                                                        <div>
+                                                                                            <h4>Kebabs</h4>
+                                                                                            <h5>Kebabs With Naan</h5>
+                                                                                        </div>
+                                                                                        <div><span
+                                                                                                class="category-price">£4.50</span>
+                                                                                        </div>
+                                                                                    </li>
+                                                                                    <li class="order-heading-titles">
+                                                                                        <div>
+                                                                                            <h4>Burgers</h4>
+                                                                                            <h5>Quarter Pounder</h5>
+                                                                                        </div>
+                                                                                        <div><span
+                                                                                                class="category-price">£3.00</span>
+                                                                                        </div>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                            <div class="row">
+                                                                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+                                                                                    <h3>Order Total</h3>
+                                                                                </div>
+                                                                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                                                                    <ul class="order-detail-options order-total">
+                                                                                        <li class="created-date">
+                                                                                            <strong>Subtotal:</strong>
+                                                                                            <span>£24.50</span>
+                                                                                        </li>
+                                                                                        <li class="order-type">
+                                                                                            <strong>
+                                                                                                Pick Up Fee: </strong>
+                                                                                            <span>£10.00</span>
+                                                                                        </li>
+                                                                                        <li class="order-type">
+                                                                                            <strong>VAT (13%)</strong>
+                                                                                            <span>£4.48</span>
+                                                                                        </li>
+                                                                                        <li class="order-type total-price">
+                                                                                            <strong>Total:</strong>
+                                                                                            <span>£38.99</span>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {#                                            <script>#}
+                                            {#                                                (function ($) {#}
+                                            {#                                                    $(document).ready(function () {#}
+                                            {#                                                        $(".order-detail .modal-dialog .modal-content").mCustomScrollbar({#}
+                                            {#                                                            setHeight: 724,#}
+                                            {#                                                            theme: "minimal-dark",#}
+                                            {#                                                            mouseWheelPixels: 100#}
+                                            {#                                                        });#}
+                                            {#                                                    });#}
+                                            {#                                                })(jQuery);#}
+                                            {#                                            </script>#}
+                                            {#                                            <div class="responsive-table">#}
+                                            {#                                                <table class="table table-hover" id="myOrdersTable">#}
+                                            {#                                                    <thead>#}
+                                            {#                                                    <tr>#}
+                                            {#                                                        <th scope="col">Order #</th>#}
+                                            {#                                                        <th scope="col">Name</th>#}
+                                            {#                                                        <th scope="col">Total</th>#}
+                                            {#                                                        <th scope="col">Status</th>#}
+                                            {#                                                        <th scope="col">Date</th>#}
+                                            {#                                                        <th scope="col">Action</th>#}
+                                            {#                                                    </tr>#}
+                                            {#                                                    </thead>#}
+                                            {#                                                    <tbody>#}
+                                            {#                                                    {% for order in orders %}#}
+                                            {#                                                        <tr>#}
+                                            {#                                                            <td><b><a#}
+                                            {#                                                                    href="{% url 'vendor_order_detail' order.order_number %}"#}
+                                            {#                                                                    class="text-dark">{{ order.order_number }}</a></b>#}
+                                            {#                                                            </td>#}
+                                            {#                                                            <td>{{ order.name }}</td>#}
+                                            {#                                                            <td>${{ order.get_total_by_vendor.grand_total }}</td>#}
+                                            {#                                                            <td>{{ order.status }}</td>#}
+                                            {#                                                            <td>{{ order.created_at }}</td>#}
+                                            {#                                                            <td>#}
+                                            {#                                                                <a href="{% url 'vendor_order_detail' order.order_number %}"#}
+                                            {#                                                                   class="btn btn-danger">Details</a></td>#}
+                                            {#                                                        </tr>#}
+                                            {#                                                    {% endfor %}#}
+                                            {#                                                    </tbody>#}
+                                            {#                                                </table>#}
+                                            {##}
+                                            {#                                            </div>#}
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Main Section End -->
+
+    <script>
+        console.log('print');
+
+        function printReceipt() {
+            var printContent = document.getElementById('receipt').innerHTML;
+            var originalContent = document.body.innerHTML;
+
+            document.body.innerHTML = printContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+
+        }
+
+        {##}
+        {#function initMap() {#}
+        {#    console.log('initMap');#}
+        {#    var user_location = document.getElementById('user_location').value;#}
+        {#    var shipper_location = document.getElementById('shipper_location').value;#}
+        {##}
+        {#    var user_location = user_location.split(',');#}
+        {#    var shipper_location = shipper_location.split(',');#}
+        {##}
+        {#    var user_lat = parseFloat(user_location[0]);#}
+        {#    var user_lng = parseFloat(user_location[1]);#}
+        {##}
+        {#    var shipper_lat = parseFloat(shipper_location[0]);#}
+        {#    var shipper_lng = parseFloat(shipper_location[1]);#}
+        {##}
+        {#    var directionsService = new google.maps.DirectionsService;#}
+        {#    var directionsDisplay = new google.maps.DirectionsRenderer;#}
+        {##}
+        {#    var map = new google.maps.Map(document.getElementById('map'), {#}
+        {#        zoom: 7,#}
+        {#        center: {lat: user_lat, lng: user_lng}#}
+        {#    });#}
+        {##}
+        {#    directionsDisplay.setMap(map);#}
+        {##}
+        {#    calculateAndDisplayRoute(directionsService, directionsDisplay, user_lat, user_lng, shipper_lat, shipper_lng);#}
+        {#}#}
+            {##}
+            {#function calculateAndDisplayRoute(directionsService, directionsDisplay, user_lat, user_lng, shipper_lat, shipper_lng) {#}
+            {#    directionsService.route({#}
+            {#        origin: {lat: user_lat, lng: user_lng},#}
+            {#        destination: {lat: shipper_lat, lng: shipper_lng},#}
+            {#        travelMode: 'DRIVING'#}
+            {#    }, function (response, status) {#}
+            {#        if (status === 'OK') {#}
+            {#            directionsDisplay.setDirections(response);#}
+            {#        } else {#}
+            {#            window.alert('Directions request failed due to ' + status);#}
+            {#        }#}
+            {#    });#}
+            {
+        #}#}
+        {##}
+        {#initMap()#}
+    </script>
+{% endblock %}

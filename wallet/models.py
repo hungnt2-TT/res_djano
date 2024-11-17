@@ -79,20 +79,26 @@ class Wallet(models.Model):
         self.balance_point = round(self.balance_point, 2)
         super(Wallet, self).save(*args, **kwargs)
 
-    def deposit(self, value, type=''):
+    def deposit(self, value, type='', message=''):
         admin_user = get_user_model().objects.filter(is_superuser=True).first()
         if not admin_user:
             raise ValueError("No admin user found")
-        print('admin_user', admin_user)
         admin_wallet = admin_user.wallet
-        if admin_wallet.balance_point < value:
-            raise ValueError("Admin wallet does not have enough balance")
 
-        admin_wallet.balance_point -= value
-        admin_wallet.save()
-
-        self.balance_point += value
-        self.save()
+        if type == 'order_payment':
+            if admin_wallet.balance_cash < value:
+                raise ValueError("Admin wallet does not have enough balance")
+            admin_wallet.balance_cash -= value
+            admin_wallet.save()
+            self.balance_cash += value
+            self.save()
+        else:
+            if admin_wallet.balance_point < value:
+                raise ValueError("Admin wallet does not have enough balance")
+            admin_wallet.balance_point -= value
+            admin_wallet.save()
+            self.balance_point += value
+            self.save()
 
         transaction = self.transaction_set.create(
             transaction_type=Transaction.TRANSACTION_TYPE_DEPOSIT,
@@ -109,9 +115,9 @@ class Wallet(models.Model):
             transaction_id=transaction,
             wallet_id_from=admin_user.wallet,
             wallet_id_to=self,
-            amount_cash=value,
-            amount_point=value,
-            description=type,
+            amount_cash=value if type == 'order_payment' else 0,
+            amount_point=value if type != 'order_payment' else 0,
+            description=message,
             status=Transaction.STATUS_COMPLETED,
             create_at=timezone,
             update_at=timezone

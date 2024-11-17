@@ -16,7 +16,9 @@ class Order(models.Model):
         ('Waiting for Confirmation', 'Waiting for Confirmation'),
 
         ('Accepted', 'Accepted'),
+        ('Shipper Pending', 'Shipper Pending'),
         ('Shipper Assigned', 'Shipper Assigned'),
+        ('Shipper Rejected', 'Shipper Rejected'),
         ('Completed', 'Completed'),
         ('Cancelled', 'Cancelled'),
         ('In Transit', 'In Transit'),
@@ -56,6 +58,10 @@ class Order(models.Model):
     status = models.CharField(max_length=24, choices=STATUS, default='New')
     is_ordered = models.BooleanField(default=False)
     message_error = models.TextField(null=True, blank=True)
+    attempts = models.IntegerField(default=0)
+    proof_image = models.ImageField(upload_to='order/proof', blank=True, null=True)
+    lat = models.FloatField(blank=True, null=True)
+    lng = models.FloatField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -75,10 +81,18 @@ class Order(models.Model):
             return 'In Transit'
         elif self.status == 'Waiting for Confirmation':
             return 'Waiting for Confirmation'
+        elif self.status == 'Delivering':
+            return 'Delivering'
         else:
             return None
     def __str__(self):
         return self.order_number
+
+    def get_vendor_by_order_details(self):
+        if self.order_details:
+            return self.order_details[0]['vendor']
+        return None
+
 
 class OrderedFood(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)

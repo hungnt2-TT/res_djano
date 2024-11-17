@@ -21,11 +21,24 @@ urlpatterns = [
     path('middleware_account/', views.middleware_account, name='middleware_account'),
     path('owner/', views.owner_dashboard, name='owner_dashboard'),
     path('customer/', views.customer_dashboard, name='customer_dashboard'),
+    path('shipper/', views.shipper_dashboard, name='shipper_dashboard'),
+
     path('auth-receiver', views.auth_receiver, name='auth_receiver'),
     path('login_by_email/', views.register_by_email, name='login_by_email'),
     path('update_location/', views.update_location, name='update_location'),
     path('send_sms_view/<str:phone_number>/', views.send_sms_view, name='send_sms_view'),
     path('accept-order/<int:order_id>/', views.accept_order, name='accept_order'),
     path('reject-order/<int:order_id>/', views.reject_order, name='reject_order'),
+
+    # shipper
+    path('request_ship/', views.request_ship, name='request_ship'),
+    path('accept_ship/<int:order_id>/', views.accept_ship, name='accept_ship'),
+    path('reject_ship/<int:order_id>/', views.reject_ship, name='reject_ship'),
+
+    # account
+    path('delete_account/', views.delete_account, name='delete_account'),
+
+    # favorite
+    path('favorites/', views.favorite_list, name='favorite_list'),
 
 ]

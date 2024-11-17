@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM loaded');
+
     const form = document.getElementById('order-form');
     const url = form.getAttribute('data-url');
     console.log('url:', url);
@@ -42,12 +43,22 @@ document.addEventListener('DOMContentLoaded', function () {
                         window.location.href = data.redirect_url;
                         return;
                     }
-                    alert(data.message + ' Order number: ' + orderDetails.order_number);
+                    Swal.fire({
+                        title: 'Order Placed Successfully!',
+                        text: 'Your order has been placed successfully. Order number: ' + orderDetails.order_number,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    })
                     // Redirect to order confirmation page
-                    window.location.href = '/order-confirmation/' + orderDetails.order_number + '/';
+                    window.location.href = data.success_url
                 } else {
-                    alert('Error: ' + data.message);
-                    console.error(data.errors);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    window.location.href = data.failed_url;
                 }
             })
             .catch(error => {

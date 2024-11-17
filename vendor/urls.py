@@ -17,4 +17,10 @@ urlpatterns = [
 
     path('order_detail/<str:order_number>/', views.order_detail, name='vendor_order_detail'),
     path('my_orders/', views.my_orders, name='vendor_my_orders'),
+
+    path('request_orders/', views.request_orders, name='request_orders'),
+
+    # toggle_favorite
+    path('toggle-favorite/<int:vendor_id>/', views.toggle_favorite, name='toggle_favorite'),
+
 ]

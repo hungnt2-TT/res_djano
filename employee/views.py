@@ -1,7 +1,8 @@
 import os
 from cgi import print_environ_usage
 
-from django.db.models import Q, Prefetch
+from django.db.models import Q, Prefetch, Sum, Count
+from django.db.models.functions import TruncDate
 from django.utils import timezone
 
 from django.contrib import messages
@@ -17,6 +18,7 @@ from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
+from django.utils.dateparse import parse_date
 from django.utils.http import urlsafe_base64_decode
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
@@ -28,17 +30,17 @@ from google.oauth2 import id_token
 from menu.models import FoodItem
 from orders.models import Order, OrderedFood
 from vendor.forms import VendorUpdateForm, VendorServiceForm
-from vendor.models import Vendor
+from vendor.models import Vendor, Favorite
 from vendor.views import render_file_img
 from wallet.decorators import verified
-from wallet.models import Wallet
+from wallet.models import Wallet, Transaction, SubTransaction
 from .forms import RegisterForm, MyPasswordResetForm, MySetPasswordForm, EmployeeProfileForm, \
-    ProfileUpdateForm, RegisterFormByEmail
+    ProfileUpdateForm, RegisterFormByEmail, PasswordConfirmationForm
 from .mails import send_verification_email
 from .models import Profile, EmployeeProfile, District
 from .utils import detect_usertype
 from datetime import datetime
-from .tasks import find_nearest_shipper
+from .tasks import find_nearest_shipper, reassign_shipper_if_no_response
 
 from twilio.rest import Client
 
@@ -371,7 +373,14 @@ def check_role_vendor(user):
 
 
 def check_role_employee(user):
-    if user.employee_type == 2 or user.employee_type == 5:
+    if user.employee_type == 2:
+        return True
+    else:
+        raise PermissionDenied
+
+
+def check_role_shipper(user):
+    if user.employee_type == 5:
         return True
     else:
         raise PermissionDenied
@@ -390,6 +399,7 @@ def middleware_account(request):
 def owner_dashboard(request):
     user = request.user
     vendor = Vendor.objects.get(user=user)
+    print('owner_dashboard', vendor)
     pending_orders = get_pending_orders_for_vendor(vendor.id)
     context = {
         'vendor': vendor,
@@ -400,10 +410,93 @@ def owner_dashboard(request):
 
 
 @login_required(redirect_field_name='next', login_url='_login')
+@user_passes_test(check_role_shipper, login_url='_login')
+def shipper_dashboard(request):
+    shipper = request.user
+
+    pending_orders = get_pending_orders_for_shipper(shipper.id)
+    context = {
+        'shipper': shipper,
+        'pending_orders': pending_orders,
+    }
+
+    return render(request, 'shipper.html', context)
+
+
+@login_required(redirect_field_name='next', login_url='_login')
 @user_passes_test(check_role_employee, login_url='_login')
 def customer_dashboard(request):
-    print('customer_dashboard', request.user)
-    return render(request, 'customer.html')
+    # Date range filtering
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    search_query = request.GET.get('search', '')
+    status_filter = request.GET.get('status', '')
+
+    # Order data
+    completed_orders = Order.objects.filter(user=request.user, status__in=['Completed', 'Delivered'])
+
+    if start_date and end_date:
+        start_date = parse_date(start_date)
+        end_date = parse_date(end_date)
+        completed_orders = completed_orders.filter(created_at__date__range=[start_date, end_date])
+
+    if search_query:
+        completed_orders = completed_orders.filter(
+            Q(order_number__icontains=search_query) |
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query)
+        )
+
+    if status_filter:
+        completed_orders = completed_orders.filter(status=status_filter)
+
+    total_order_amounts = completed_orders.values('created_at__date').annotate(total_amount=Sum('total')).order_by(
+        'created_at__date')
+    order_status = Order.objects.filter(user=request.user)
+    successful_orders_count = order_status.filter(status__in=['Completed', 'Delivered']).count()
+    failed_orders_count = order_status.filter(status__in=['Payment Failed', 'Cancelled']).count()
+    order_dates = [entry['created_at__date'].strftime('%Y-%m-%d') for entry in total_order_amounts]
+    total_amounts = [entry['total_amount'] for entry in total_order_amounts]
+    statuses = Order.STATUS
+
+    # Transaction data
+    user_wallet = Wallet.objects.get(user=request.user)
+    transactions = Transaction.objects.filter(wallet=user_wallet)
+    if start_date and end_date:
+        transactions = transactions.filter(create_at__date__range=[start_date, end_date])
+
+    transactions_by_date = (
+        transactions
+        .annotate(date=TruncDate('create_at'))
+        .values('date', 'transaction_type')
+        .annotate(count=Count('id'))
+        .order_by('date', 'transaction_type')
+    )
+
+    transaction_dates = sorted(set(t['date'].strftime('%Y-%m-%d') for t in transactions_by_date))
+    deposit_data = {d: 0 for d in transaction_dates}
+    withdraw_data = {d: 0 for d in transaction_dates}
+
+    for t in transactions_by_date:
+        date_str = t['date'].strftime('%Y-%m-%d')
+        if t['transaction_type'] == Transaction.TRANSACTION_TYPE_DEPOSIT:
+            deposit_data[date_str] = t['count']
+        else:
+            withdraw_data[date_str] = t['count']
+
+    context = {
+        'order_dates': order_dates,
+        'total_amounts': total_amounts,
+        'statuses': statuses,
+        'successful_orders_count': successful_orders_count,
+        'failed_orders_count': failed_orders_count,
+        'transaction_dates': transaction_dates,
+        'deposit_data': list(deposit_data.values()),
+        'withdraw_data': list(withdraw_data.values()),
+        'search_query': search_query,
+        'status_filter': status_filter,
+    }
+    return render(request, 'customer.html', context)
 
 
 def activate(request, uidb64, token):
@@ -620,21 +713,44 @@ def update_location(request):
 
 
 def get_pending_orders_for_vendor(vendor_id):
+    print('vendor_id', vendor_id)
     pending_orders = Order.objects.filter(
         status='Waiting for Confirmation',
         vendors=vendor_id
-    ).prefetch_related(
-        Prefetch('orderedfood_set', queryset=OrderedFood.objects.select_related('fooditem'))
     ).select_related('user', 'payment')
     print('pending_orders', pending_orders)
-    return pending_orders
+    return get_order_details(pending_orders)
+
+
+def get_pending_orders_for_shipper(shipper_id):
+    pending_ship = Order.objects.filter(
+        status='Shipper Pending',
+        shipper=shipper_id
+    ).select_related('user', 'payment')
+    return get_order_details(pending_ship)
+
+
+def get_order_details(pending):
+    for order in pending:
+        order_details = order.order_details
+        for detail in order_details:
+            food_item_id = detail.get("food_item")
+            if food_item_id:
+                try:
+                    food_item = FoodItem.objects.get(id=food_item_id)
+                    detail['food_item'] = food_item.food_name
+                except FoodItem.DoesNotExist:
+                    detail['food_item'] = 'Unknown'
+    return pending
 
 
 @csrf_exempt
 @require_POST
 def accept_order(request, order_id):
     try:
+        print('order_id', order_id)
         order = Order.objects.get(id=order_id, status='Waiting for Confirmation')
+        print('order', order)
         order.status = 'Accepted'
         order.save()
         find_nearest_shipper.delay(order.id)
@@ -653,3 +769,85 @@ def reject_order(request, order_id):
         return JsonResponse({'status': 'success'})
     except Order.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'Order not found'}, status=404)
+
+
+@login_required(redirect_field_name='next', login_url='_login')
+@user_passes_test(check_role_shipper, login_url='_login')
+def request_ship(request):
+    shipper = request.user
+
+    pending_orders = get_pending_orders_for_shipper(shipper.id)
+    context = {
+        'shipper': shipper,
+        'pending_orders': pending_orders,
+    }
+
+    return render(request, 'ship/request_ship.html', context)
+
+
+@csrf_exempt
+@require_POST
+def accept_ship(request, order_id):
+    try:
+        shipper = request.user
+        shipper_order = Order.objects.filter(shipper=shipper, status='Shipper Assigned')
+        if shipper_order.count() >= 3:
+            return JsonResponse({'status': 'error', 'message': 'You have reached the maximum number of orders'})
+        order = Order.objects.get(id=order_id, status='Shipper Pending', shipper=request.user)
+        print('order', order)
+        order.status = 'Shipper Accepted'
+        order.shipper = shipper
+        order.assigned_at = timezone.now()
+        order.save()
+        return JsonResponse({'status': 'success', 'message': 'Order accepted!'})
+    except Order.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Order not found'}, status=404)
+
+
+@csrf_exempt
+@require_POST
+def reject_ship(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id, status='Shipper Pending', shipper=request.user)
+        order.status = 'Shipper Rejected'
+        order.message_error = 'Shipper rejected the order'
+        order.save()
+        reassign_shipper_if_no_response.apply_async((order_id,), kwargs={'type': 'shipper_reject'})
+        return JsonResponse({'status': 'success'})
+    except Order.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Order not found'}, status=404)
+
+
+@login_required()
+def delete_account(request):
+    if request.method == 'POST':
+        print('request.POST', request.POST)
+        form = PasswordConfirmationForm(request.POST)
+        if form.is_valid():
+            password = form.cleaned_data.get('password')
+            print('password', password)
+            print('user', request.user)
+
+            email = request.user.email
+
+            user = authenticate(request, email=email, password=password)
+            print('user', user)
+
+            if user:
+                user.is_active = False
+                user.save()
+                messages.success(request, 'Your account has been deleted')
+                return redirect('home')
+            else:
+                form.add_error('password', 'Incorrect password')
+    else:
+        form = PasswordConfirmationForm()
+
+    return render(request, 'delete_account.html', {'form': form})
+
+
+@login_required
+def favorite_list(request):
+    favorites = Favorite.objects.filter(user=request.user).select_related('vendor')
+    print('favorites = ', favorites)
+    return render(request, 'favorites_list.html', {'favorites': favorites})

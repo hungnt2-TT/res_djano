@@ -21,7 +21,7 @@ from django.utils import timezone
 from django.db import transaction
 from paypal.pro.forms import PaymentForm
 from wallet.forms import BVNForm, VnpayPaymentForm
-from wallet.models import Wallet, Event
+from wallet.models import Wallet, Event, Transaction, SubTransaction
 from datetime import datetime, timedelta
 
 from django.db import transaction
@@ -152,6 +152,7 @@ def setting_wallet(request):
     event = Event.objects.filter(user=request.user, event_type='check_in', event_date__in=recent_days)
     checkin_dates = [checkin.event_date for checkin in event]
     checkin_status = []
+
     for day in recent_days:
         checked_in = day in checkin_dates
         checkin_status.append({
@@ -159,8 +160,14 @@ def setting_wallet(request):
             'checked_in': checked_in
         })
     print(checkin_status)
+
+    transactions = Transaction.objects.filter(wallet=wallet).order_by('-create_at')[:10]
+    sub_transactions = SubTransaction.objects.filter(transaction_id__in=transactions).order_by('-create_at')
+
     context = {
         'wallet': wallet,
+        'transactions': transactions,
+        'sub_transactions': sub_transactions,
         'checkin_status': checkin_status
     }
     return render(request, 'wallet/wallet_setting.html', context)

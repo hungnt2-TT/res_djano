@@ -1,6 +1,19 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block extra_scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
+{% endblock %}
+{% block css %}
+    {#    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/daterangepicker.css' %}">#}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <link rel="stylesheet" type="text/css" href="{% static '/css/setting_orders.css' %}">
+{% endblock %}
+
+{% block title %}Order{{ block.super }} {% endblock %}
+
+%}
 {% block content %}
     {% include 'includes/alerts.html' %}
 
@@ -9,17 +22,64 @@
 
         {% include 'includes/cover.html' %}
         <div class="page-section account-header buyer-logged-in">
-            <div class="container">
-                <div class="row">
+            <div class="container-field">
+                <div class="row px-5">
                     <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
                         <!-- Load the sidebar here -->
                         {% include 'includes/v_sidebar.html' %}
                     </div>
                     <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
-                        <div class="user-dashboard loader-holder">
+                        <div class="user-dashboard loader-holder w-100 p-3">
                             <div class="user-holder">
 
-                                <h5 class="text-uppercase">My Orders</h5>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="row" style="display: block">
+                                        <div class="element-title has-border right-filters-row">
+                                            <h5>Recent Orders</h5>
+                                            <div>
+                                                <div class="">
+                                                    {#                                                    <div class="col-lg-3 col-md-3 col-xs-6">#}
+                                                    {#                                                        <div class="input-field">#}
+                                                    {#                                                            <select class="chosen-select-no-single" name="order_status">#}
+                                                    {#                                                                <option value="">Select Orders Status</option>#}
+                                                    {#                                                                <option value="Processing">Processing</option>#}
+                                                    {#                                                                <option value="Cancelled">Cancelled</option>#}
+                                                    {#                                                                <option value="Completed">Completed</option>#}
+                                                    {#                                                            </select>#}
+                                                    {#                                                        </div>#}
+                                                    {#                                                    </div>#}
+                                                    <div class="col-lg-12 col-md-12 col-xs-6">
+                                                        <div class="input-field">
+                                                            <i class="icon-angle-down"></i>
+                                                            <form method="GET" id="search-form" style="display: flex">
+                                                                <div class="input-field">
+                                                                    <select class="chosen-select-no-single"
+                                                                            name="order_status">
+                                                                        <option value="">Select Orders Status</option>
+
+                                                                        {% for status in order_statuses %}
+                                                                            <option value="{{ status }}">{{ status }}</option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </div>
+
+                                                                <input type="text" id="date-range" name="date_range"
+                                                                       style="    width: 125%;"/>
+                                                                <button type="submit">Tìm kiếm</button>
+                                                            </form>
+                                                            <script>
+                                                                flatpickr("#date-range", {
+                                                                    mode: "range",
+                                                                    dateFormat: "Y-m-d",
+                                                                });
+                                                            </script>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="row">
                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                         <div class="user-orders-list">
@@ -29,8 +89,8 @@
                                                         <div>Order id</div>
                                                         <div>Date</div>
                                                         <div>Total Price</div>
-                                                        <div>Charges</div>
-                                                        <div>Received</div>
+                                                        <div>Is payment</div>
+                                                        <div>Shipper</div>
                                                         <div>Status</div>
                                                         <div>Detail</div>
                                                     </li>
@@ -43,11 +103,24 @@
                                                                    data-target="#order-det-22606">{{ order.order_number }}</a>
                                                             </div>
                                                             <div>{{ order.created_at }}</div>
-                                                            <div>{{ order.get_total_by_vendor.grand_total }}</div>
-                                                            <div>{{ order.created_at }}</div>
-                                                            <div>{{ order.created_at }}</div>
-                                                            <div><span class="order-status"
-                                                                       style="background-color: #047a06;">{{ order.status }}</span>
+                                                            <div>{{ order.subtotal }}</div>
+                                                            {% if order.is_payment_completed %}
+                                                                <span class="badge badge-success"
+                                                                      style="margin: 11px 0 0 140px;">Payment completed</span>
+                                                            {% else %}
+                                                                <span class="badge badge-danger"
+                                                                      style="margin: 11px 0 0 140px;">Payment not completed
+                                                                </span>
+                                                            {% endif %}
+                                                            {% if order.shipper %}
+                                                                <div>{{ order.shipper.first_name }}</div>
+                                                            {% else %}
+                                                                <div>Not assigned ...</div>
+                                                            {% endif %}
+                                                            <div>
+                                                                <span class="order-status-list {{ order.status|slugify }}">
+                                                                    {{ order.status }}
+                                                                </span>
                                                             </div>
                                                             <div><a href="#" data-toggle="modal"
                                                                     data-target="#order-det-22606{{ order.order_number }}"><i
@@ -55,111 +128,137 @@
                                                         </li>
                                                         <div class="modal fade menu-order-detail order-detail"
                                                              id="order-det-22606{{ order.order_number }}"
-                                                             tabindex="-1" role="dialog" style="display: none;">
-                                                            <div class="modal-dialog">
+                                                             tabindex="-1" role="dialog"
+                                                             style="display: none; top: 200px">
+                                                            <div class="modal-dialog" style="max-width: 60%">
                                                                 <div class="modal-content">
                                                                     <div class="modal-header">
+
+                                                                        <h2>Order Detail</h2>
+                                                                        <button class="btn-print"><i
+                                                                                class="icon-printer"></i><span>Receipt</span>
+                                                                        </button>
                                                                         <button type="button" class="close"
                                                                                 data-dismiss="modal"
                                                                                 aria-label="Close"><span
                                                                                 aria-hidden="true">×</span>
-                                                                        </button>
-                                                                        <h2>Order Detail</h2>
-                                                                        <button class="btn-print"><i
-                                                                                class="icon-printer"></i><span>Receipt</span>
                                                                         </button>
                                                                     </div>
                                                                     <div class="modal-body">
                                                                         <div class="order-detail-inner">
                                                                             <div class="description-holder">
                                                                                 <div class="row">
-                                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                                                                                         <div class="list-detail-options has-checkbox">
                                                                                             <h3>
-                                                                                                Restaurant Demo </h3>
+                                                                                                Restaurant Names:
+                                                                                                {{ vendor.vendor_name }}
+                                                                                            </h3>
                                                                                             <ul class="order-detail-options">
                                                                                                 <li class="order-number">
                                                                                                     <strong>Order
                                                                                                         ID:</strong>
-                                                                                                    <span>22606</span>
+                                                                                                    <span>{{ order.order_number }}</span>
                                                                                                 </li>
                                                                                                 <li class="req-delivery">
                                                                                                     <strong>Delivery
                                                                                                         Time:</strong>
-                                                                                                    <span>10 Minutes </span>
+                                                                                                    <span>{{ order.total_delivery_time }} Minutes</span>
                                                                                                 </li>
                                                                                                 <li class="created-date">
                                                                                                     <strong>Delivery
                                                                                                         Date:</strong>
-                                                                                                    <span>
-																								Apr 9, 2020 06:38 AM </span>
+                                                                                                    <span>{{ order.updated_at }}</span>
                                                                                                 </li>
                                                                                                 <li class="order-type">
                                                                                                     <strong>Type:</strong>
-                                                                                                    <span>order</span>
+                                                                                                    <span>Order</span>
                                                                                                 </li>
                                                                                                 <li class="order-type">
                                                                                                     <strong>Payment
                                                                                                         Status:</strong>
-                                                                                                    <span>Approved</span>
+                                                                                                    {% if order.is_payment_completed %}
+                                                                                                        <span class="badge badge-success">Payment Completed</span>
+                                                                                                    {% else %}
+                                                                                                        <span class="badge badge-danger">Payment Not Completed</span>
+                                                                                                    {% endif %}
                                                                                                 </li>
                                                                                             </ul>
                                                                                         </div>
-
                                                                                     </div>
-                                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+
+                                                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                                                                                         <div class="customer-detail-holder">
-                                                                                            <h3>Customer Detail</h3>
+                                                                                            <h3>Customer Details</h3>
+                                                                                            <ul class="customer-detail">
+
+                                                                                                {{ order.user }}
+                                                                                                <li>
+                                                                                                    <strong>Name:</strong>
+                                                                                                    <span>{{ order.user.username }}</span>
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                    <strong>Phone
+                                                                                                        Number:</strong>
+                                                                                                    <span>{{ order.phone_number }}</span>
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                    <strong>Email:</strong>
+                                                                                                    <span>{{ order.user.email }}</span>
+                                                                                                </li>
+                                                                                                <li>
+                                                                                                    <strong>Address:</strong>
+                                                                                                    <span>{{ order.address }}</span>
+                                                                                                </li>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                                                                        <div class="customer-detail-holder">
+                                                                                            <h3>Shipper Details</h3>
                                                                                             <ul class="customer-detail">
                                                                                                 <li>
-                                                                                                    <strong>Name
-                                                                                                        :</strong>
-                                                                                                    <span>Buyer Demo</span>
+                                                                                                    <strong>Name:</strong>
+                                                                                                    <span>{{ order.shipper.username }}</span>
                                                                                                 </li>
                                                                                                 <li>
-                                                                                                    <strong>Phone Number
-                                                                                                        :</strong>
-                                                                                                    <span>0123456789</span>
+                                                                                                    <strong>Phone
+                                                                                                        Number:</strong>
+                                                                                                    <span>{{ order.shipper.phone_number }}</span>
                                                                                                 </li>
                                                                                                 <li>
-                                                                                                    <strong>Email
-                                                                                                        :</strong>
-                                                                                                    <span>dum4@chimpgroup.com</span>
+                                                                                                    <strong>Email:</strong>
+                                                                                                    <span>{{ order.shipper.email }}</span>
                                                                                                 </li>
                                                                                                 <li>
-                                                                                                    <strong>Address
-                                                                                                        :</strong>
-                                                                                                    <span>London</span>
+                                                                                                    <strong>Address:</strong>
+                                                                                                    <span>{{ order.shipper.address }}</span>
                                                                                                 </li>
                                                                                             </ul>
                                                                                         </div>
                                                                                     </div>
+
                                                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                                                         <div class="order-status-holder">
                                                                                             <div class="row">
                                                                                                 <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
                                                                                                     <h3>Order
-                                                                                                        Status </h3>
+                                                                                                        Status</h3>
                                                                                                 </div>
                                                                                                 <div class="col-lg-9 col-md-8 col-sm-8 col-xs-12">
                                                                                                     <div class="input-field">
-                                                                                                        <select class="chosen-select-no-single">
-                                                                                                            <option value="Processing">
-                                                                                                                Processing
-                                                                                                            </option>
-                                                                                                            <option value="Cancelled">
-                                                                                                                Cancelled
-                                                                                                            </option>
-                                                                                                            <option selected="selected"
-                                                                                                                    value="Completed">
-                                                                                                                Completed
-                                                                                                            </option>
+                                                                                                        <select class="chosen-select-no-single"
+                                                                                                                name="order_status">
+                                                                                                            <option value="{{ order.status }}"
+                                                                                                                    selected="selected">{{ order.status }}</option>
                                                                                                         </select>
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
+
                                                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                                                         <h2 class="heading">Food
                                                                                             Menu</h2>
@@ -167,79 +266,35 @@
                                                                                             <ul class="categories-order table-generic">
                                                                                                 <li class="order-heading-titles">
                                                                                                     <div>Products</div>
-                                                                                                    <div>Price per</div>
+                                                                                                    <div>Quantity</div>
+                                                                                                    <div>Size</div>
+                                                                                                    <div>Price</div>
                                                                                                 </li>
-                                                                                                <li class="order-heading-titles">
-                                                                                                    <div>
-                                                                                                        <h4>Pizzas</h4>
-                                                                                                        <h5>Foodbakery
-                                                                                                            Special 9"
-                                                                                                            Deep
-                                                                                                            Pan</h5>
-                                                                                                    </div>
-                                                                                                    <div><span
-                                                                                                            class="category-price">£4.80</span>
-                                                                                                    </div>
-                                                                                                </li>
-                                                                                                <li class="order-heading-titles">
-                                                                                                    <div>
-                                                                                                        <h4>Pizzas</h4>
-                                                                                                        <h5>Foodbakery
-                                                                                                            Special 9"
-                                                                                                            Deep
-                                                                                                            Pan</h5>
-                                                                                                    </div>
-                                                                                                    <div><span
-                                                                                                            class="category-price">£4.80</span>
-                                                                                                    </div>
-                                                                                                </li>
-                                                                                                <li class="order-heading-titles">
-                                                                                                    <div>
-                                                                                                        <h4>Pizzas</h4>
-                                                                                                        <h5>Foodbakery
-                                                                                                            Special 12"
-                                                                                                            Deep
-                                                                                                            Pan</h5>
-                                                                                                    </div>
-                                                                                                    <div><span
-                                                                                                            class="category-price">£3.90</span>
-                                                                                                    </div>
-                                                                                                </li>
-                                                                                                <li class="order-heading-titles">
-                                                                                                    <div>
-                                                                                                        <h4>Garlic
-                                                                                                            Bread</h4>
-                                                                                                        <h5>Garlic Bread
-                                                                                                            12"
-                                                                                                            Deep</h5>
-                                                                                                    </div>
-                                                                                                    <div><span
-                                                                                                            class="category-price">£3.50</span>
-                                                                                                    </div>
-                                                                                                </li>
-                                                                                                <li class="order-heading-titles">
-                                                                                                    <div>
-                                                                                                        <h4>Kebabs</h4>
-                                                                                                        <h5>Kebabs With
-                                                                                                            Naan</h5>
-                                                                                                    </div>
-                                                                                                    <div><span
-                                                                                                            class="category-price">£4.50</span>
-                                                                                                    </div>
-                                                                                                </li>
-                                                                                                <li class="order-heading-titles">
-                                                                                                    <div>
-                                                                                                        <h4>Burgers</h4>
-                                                                                                        <h5>Quarter
-                                                                                                            Pounder</h5>
-                                                                                                    </div>
-                                                                                                    <div><span
-                                                                                                            class="category-price">£3.00</span>
-                                                                                                    </div>
-                                                                                                </li>
+                                                                                                {% for item in order.order_details %}
+                                                                                                    <li class="order-heading-titles">
+                                                                                                        <div>
+                                                                                                            <h4>{{ item.food_name }}</h4>
+                                                                                                            <h5>{{ item.food_title }}</h5>
+                                                                                                        </div>
+                                                                                                        <div>
+                                                                                                             <span
+                                                                                                                     class="category-price">{{ item.quantity }}</span>
+
+
+                                                                                                        </div>
+                                                                                                        <div><span
+                                                                                                                class="category-price">{{ item.size }}</span>
+                                                                                                        </div>
+
+                                                                                                        <div><span
+                                                                                                                class="category-price">{{ item.price }}</span>
+                                                                                                        </div>
+                                                                                                    </li>
+                                                                                                {% endfor %}
                                                                                             </ul>
                                                                                         </div>
                                                                                     </div>
+
                                                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                                                         <div class="row">
                                                                                             <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
@@ -249,22 +304,16 @@
                                                                                                 <ul class="order-detail-options order-total">
                                                                                                     <li class="created-date">
                                                                                                         <strong>Subtotal:</strong>
-                                                                                                        <span>£24.50</span>
-                                                                                                    </li>
-                                                                                                    <li class="order-type">
-                                                                                                        <strong>
-                                                                                                            Pick Up
-                                                                                                            Fee: </strong>
-                                                                                                        <span>£10.00</span>
+                                                                                                        <span>{{ order.subtotal }} VND</span>
                                                                                                     </li>
                                                                                                     <li class="order-type">
                                                                                                         <strong>VAT
-                                                                                                            (13%)</strong>
-                                                                                                        <span>£4.48</span>
+                                                                                                            (0%):</strong>
+                                                                                                        <span>0 VND</span>
                                                                                                     </li>
                                                                                                     <li class="order-type total-price">
                                                                                                         <strong>Total:</strong>
-                                                                                                        <span>£38.99</span>
+                                                                                                        <span>{{ order.subtotal }} VND</span>
                                                                                                     </li>
                                                                                                 </ul>
                                                                                             </div>
@@ -467,8 +516,14 @@
                                                                     aria-label="Close"><span aria-hidden="true">×</span>
                                                             </button>
                                                             <h2>Order Detail</h2>
-                                                            <button class="btn-print"><i class="icon-printer"></i><span>Receipt</span>
+                                                            <div id="receipt">
+                                                            </div>
+
+                                                            <button class="btn-print" onclick="printReceipt()">
+                                                                <i class="icon-printer"></i><span>Receipt</span>
                                                             </button>
+
+                                                            </script>
                                                         </div>
                                                         <div class="modal-body">
                                                             <div class="order-detail-inner">
@@ -715,5 +770,15 @@
     </div>
     <!-- Main Section End -->
 
+    <script>
+        console.log('print');
 
+        function printReceipt() {
+            var printContent = document.getElementById('receipt').innerHTML;
+            var originalContent = document.body.innerHTML;
+
+            document.body.innerHTML = printContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+        }
 {% endblock %}

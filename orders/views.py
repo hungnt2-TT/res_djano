@@ -119,9 +119,9 @@ def checkout(request):
         'email': user_profile.email,
         'phone': user_profile.phone_number,
         'country': 'Viet Nam',
-        'pin_code': '100000',
-        'city': 'Ha noi',
-        'address': employee_profile.address_line_2
+        'pin_code': '',
+        'city': '',
+        'address': ''
     }
 
     if request.method == 'POST':
@@ -147,7 +147,10 @@ def checkout(request):
                 'payment_method': request.POST.get('payment_method'),
                 'total_delivery_time': math.ceil(total_delivery_time),
                 'order_details': order_details,
+                'lat': request.POST.get('lat'),
+                'lng': request.POST.get('lng'),
             }
+            print('context = ', context)
             if request.POST.get('payment_method') == 'Cash':
                 if user_profile.phone_number_verified:
                     return render(request, 'place_order.html', context=context)
@@ -165,7 +168,8 @@ def checkout(request):
     )
     user_coupons = Coupon.objects.filter(
         user=request.user,
-        coupon_expiry_date__gte=current_time
+        coupon_expiry_date__gte=current_time,
+        redeemed=False
     )
     vendor_coupons = Coupon.objects.filter(
         vendor__in=grouped_cart_items.keys(),
@@ -224,13 +228,12 @@ def place_order(request):
                     order.order_details = order_details
                     order.is_ordered = True
                     order.is_payment_completed = False
-
+                    order.lat = float(request.POST.get('lat', 0))
+                    order.lng = float(request.POST.get('lng', 0))
                     order.save()
                     order.order_number = generate_order_number(order.id)
                     order.vendors.set(Vendor.objects.filter(id__in=vendor_ids))
-
                     order.save()
-                    print('order = ', Vendor.objects.filter(id__in=vendor_ids))
                     cart_items = Cart.objects.filter(user=request.user)
                     for item in cart_items:
                         ordered_food = OrderedFood()
@@ -242,6 +245,7 @@ def place_order(request):
                         ordered_food.price = item.get_total_price()
                         ordered_food.size = item.size
                         ordered_food.save()
+                        item.is_ordered = True
                     try:
                         process_order.delay(order.id)
                     except Exception as e:
@@ -253,10 +257,12 @@ def place_order(request):
                             'message': order.message_error
                         })
                     else:
+
                         return JsonResponse({
                             'status': 'success',
                             'redirect_url': reverse('paypal_payment', kwargs={'order_id': order.id}),
-
+                            'success_url': reverse('payment_success'),
+                            'failed_url': reverse('payment_failed'),
                             'message': 'Your order has been processed successfully.',
                             'order': {
                                 'id': order.id,
@@ -337,11 +343,11 @@ def sort_vendors_by_distance(vendors, customer_coords):
 
 
 def my_orders(request):
-    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
-
+    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-updated_at')
     context = {
         'orders': orders,
     }
+    print('orders = ', orders)
     return render(request, 'my_order.html', context)
 
 

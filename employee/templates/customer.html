@@ -3,93 +3,139 @@
 {% load static %}
 {% block css %}
     <link href="{% static 'css/customer.css' %}" rel="stylesheet">
+    <style>
 
+        canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        #chart-container {
+            overflow: hidden;
+            max-height: 300px;
+        }
+
+        .search {
+            padding-top: 23px;
+        }
+    </style>
+
+{% endblock %}
+{% block extra_scripts %}
+    {#    <script src="{% static 'js/init_google_map_plf.js' %}"></script>#}
+
+    <script src="{% static 'employee/js/dashboard_customer.js' %}"></script>
 {% endblock %}
 {% block content %}
     <div class="main-section">
         {% include 'includes/cover.html' %}
         <div class="page-section account-header buyer-logged-in">
-            <div class="container">
-                <div class="row">
+            <div class="container-field">
+                <div class="row px-5">
                     <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
                         {% include 'includes/c_sidebar.html' %}
-                        
+
                     </div>
                     <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
-                        <div class="user-dashboard loader-holder">
+                        <div class="user-dashboard loader-holder w-100 p-3">
                             <div class="user-holder">
-
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="row">
+                                    <div class="">
+                                        <h5>Recent Orders</h5>
+
                                         <div class="element-title has-border right-filters-row">
-                                            <h5>Recent Orders</h5>
-                                            <div class="right-filters row pull-right">
-                                                <div class="col-lg-6 col-md-6 col-xs-6">
-                                                    <div class="input-field">
-                                                        <select class="chosen-select-no-single">
-                                                            <option selected="selected" value="">Select Orders Status
-                                                            </option>
-                                                            <option value="Processing">Processing</option>
-                                                            <option value="Cancelled">Cancelled</option>
-                                                            <option value="Completed">Completed</option>
+                                            <form id="search-form" class="mb-4">
+                                                <div class="flex space-x-4">
+                                                    <div class="search">
+                                                        <label for="start_date"
+                                                               class="block text-sm font-medium text-gray-700">Start
+                                                            Date</label>
+                                                        <input type="date" id="start_date" name="start_date"
+                                                               value="{{ request.GET.start_date }}"
+                                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                                    </div>
+                                                    <div class="search">
+                                                        <label for="end_date"
+                                                               class="block text-sm font-medium text-gray-700">End
+                                                            Date</label>
+                                                        <input type="date" id="end_date" name="end_date"
+                                                               value="{{ request.GET.end_date }}"
+                                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                                    </div>
+                                                    <div class="search">
+                                                        <label for="search"
+                                                               class="block text-sm font-medium text-gray-700">Search
+                                                            Orders</label>
+                                                        <input type="text" id="search" name="search"
+                                                               value="{{ search_query }}"
+                                                               placeholder="Order number, name..."
+                                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                                    </div>
+                                                    <div class="search">
+                                                        <label for="status"
+                                                               class="block text-sm font-medium text-gray-700">Order
+                                                            Status</label>
+                                                        <select id="status" name="status"
+                                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                                            <option value="">All Statuses</option>
+                                                            {% for status in statuses %}
+                                                                <option value="{{ status.0 }}"
+                                                                        {% if status.0 == status_filter %}selected{% endif %}>{{ status.1 }}</option>
+                                                            {% endfor %}
                                                         </select>
                                                     </div>
+                                                    <div class="flex items-end  search">
+                                                        <button type="submit"
+                                                                class="btn btn-group btn-primary"
+                                                                style="    padding: 12px 71px 12px 71px;">
+                                                            Filter
+                                                        </button>
+                                                    </div>
                                                 </div>
+                                            </form>
 
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                         <div class="user-orders-list">
-                                            <div class="responsive-table">
-                                                <ul class="table-generic">
-                                                    <li class="order-heading-titles">
-                                                        <div>Order id</div>
-                                                        <div>Date</div>
-                                                        <div>Total Price</div>
-                                                        <div>Charges</div>
-                                                        <div>Received</div>
-                                                        <div>Status</div>
-                                                    </li>
-                                                    <li class="order-heading-titles">
-                                                        <div><a href="#" data-toggle="modal"
-                                                                data-target="#order-det-22606">order-22606</a></div>
-                                                        <div>Apr 9,2020</div>
-                                                        <div>£ 38.99</div>
-                                                        <div>£ 3.90</div>
-                                                        <div>£ 35.09</div>
-                                                        <div><span class="order-status"
-                                                                   style="background-color: #047a06;">Completed</span>
-                                                        </div>
-                                                    </li>
-
-
-                                                    <li class="order-heading-titles">
-                                                        <div><a href="#" data-toggle="modal"
-                                                                data-target="#order-det-22606">order-22583</a></div>
-                                                        <div>Apr 9,2020</div>
-                                                        <div>£ 26.22</div>
-                                                        <div>£ 2.62</div>
-                                                        <div>£ 23.60</div>
-                                                        <div><span class="order-status"
-                                                                   style="background-color: #1e73be;">Processing</span>
-                                                        </div>
-                                                    </li>
-                                                    <li class="order-heading-titles">
-                                                        <div><a href="#" data-toggle="modal"
-                                                                data-target="#order-det-22606">order-22493</a></div>
-                                                        <div>Apr 2,2020</div>
-                                                        <div>£ 28.24</div>
-                                                        <div>£ 2.82</div>
-                                                        <div>£ 25.42</div>
-                                                        <div><span class="order-status"
-                                                                   style="background-color: #047a06;">Completed</span>
-                                                        </div>
-                                                    </li>
-                                                </ul>
-
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                    <div class="element-title">
+                                                        <h5>Order Summary</h5>
+                                                    </div>
+                                                    <canvas id="orderChart" width="400" height="200"></canvas>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                    <div class="element-title">
+                                                        <h5>Status Order</h5>
+                                                    </div>
+                                                    <div id="chart-container"
+                                                         style="width: 300px; height: 300px; position: relative; margin: 0 auto;">
+                                                        <canvas id="statusOrderChart"></canvas>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="user-orders-list">
+                                            <div class="">
+                                                <div class="element-title">
+                                                    <h5>Transaction History</h5>
+                                                </div>
+                                                <canvas id="transactionChart" width="400" height="200"></canvas>
+                                                {#                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">#}
+                                                {#                                                    <div class="element-title">#}
+                                                {#                                                        <h5>Status Order</h5>#}
+                                                {#                                                    </div>#}
+                                                {#                                                    <div id="chart-container"#}
+                                                {#                                                         style="width: 300px; height: 300px; position: relative; margin: 0 auto;">#}
+                                                {#                                                        <canvas id="statusOrderChart"></canvas>#}
+                                                {#                                                    </div>#}
+                                                {#                                                </div>#}
                                             </div>
                                         </div>
                                     </div>
@@ -102,4 +148,131 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js is not loaded');
+                return;
+            }
+
+            if (typeof ChartDataLabels !== 'undefined') {
+                Chart.register(ChartDataLabels);
+            }
+            const orderCtx = document.getElementById('orderChart').getContext('2d');
+            const transactionCtx = document.getElementById('transactionChart').getContext('2d');
+            const statusCtx = document.getElementById('statusOrderChart').getContext('2d');
+
+            const orderDates = {{ order_dates|safe }};
+            const totalAmounts = {{ total_amounts|safe }};
+            const transactionDates = {{ transaction_dates|safe }};
+            const depositData = {{ deposit_data|safe }};
+            const withdrawData = {{ withdraw_data|safe }};
+            const successfulOrdersCount = {{ successful_orders_count }};
+            const failedOrdersCount = {{ failed_orders_count }};
+
+            new Chart(orderCtx, {
+                type: 'line',
+                data: {
+                    labels: orderDates,
+                    datasets: [{
+                        label: 'Total Amount',
+                        data: totalAmounts,
+                        borderColor: 'blue',
+                        backgroundColor: 'rgba(0, 0, 255, 0.2)',
+                        fill: true,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Amount'
+                            }
+                        }
+                    }
+                }
+            });
+
+            new Chart(transactionCtx, {
+                type: 'line',
+                data: {
+                    labels: transactionDates,
+                    datasets: [
+                        {
+                            label: 'Deposits',
+                            data: depositData,
+                            borderColor: 'rgb(75, 192, 192)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Withdrawals',
+                            data: withdrawData,
+                            borderColor: 'rgb(255, 99, 132)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Number of Transactions'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            new Chart(statusCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Successful Orders', 'Failed Orders'],
+                    datasets: [{
+                        data: [successfulOrdersCount, failedOrdersCount],
+                        backgroundColor: ['#36A2EB', '#FF6384'],
+                        hoverBackgroundColor: ['#48A9F4', '#FF6B91']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Order Status'
+                        }
+                    }
+                }
+            });
+
+        });
+        document.getElementById('date-range-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const searchParams = new URLSearchParams(formData);
+            window.location.href = `${window.location.pathname}?${searchParams.toString()}`;
+        });
+    </script>
 {% endblock %}

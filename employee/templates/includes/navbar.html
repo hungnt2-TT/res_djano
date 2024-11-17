@@ -85,6 +85,22 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
                                       style="">{{ cart_count }}</span>
 
                             </a>
+
+                        {% endif %}
+                        {% if role == 'owner' %}
+                            <a href="{% url 'request_orders' %}" class="nav-bar-cart">
+                                <i class="fa fa-utensils text-danger fa-2x" style="font-size: 2em"></i>
+                                <span class="badge badge-warning " id="cart_counter"
+                                      style="">{{ pending_orders_count }}</span>
+
+                            </a>
+                        {% elif role ==  'shipper' %}
+                            <a href="{% url 'request_ship' %}" class="nav-bar-cart">
+                                <i class="fa fa-truck text-danger fa-2x" style="font-size: 2em"></i> <span
+                                    class="badge badge-warning " id="cart_counter"
+                                    style="">{{ pending_ship_count }}</span>
+
+                            </a>
                         {% endif %}
                         {% if user.is_authenticated %}
                             <a href="{% url 'marketplace' %}" class="btn btn-outline-danger text-uppercase
@@ -95,34 +111,41 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
                                class="btn btn-outline-danger text-uppercase font-weight-bold"
                                style="margin-top: 16px">Marketplace</a>
                         {% endif %}
-
                         {% if user.is_authenticated %}
 
                             <div class="user-dashboard-menu">
                                 <ul>
                                     <li class="user-dashboard-menu-children" style="margin-left: 32px">
                                         <a href="javascript:void(0);" class="">
-                                            <figure class="profile-image">
-                                                <img src="assets/extra-images/team-medium-img1.jpg" alt="">
-                                            </figure>
+                                            {% if profile_picture %}
+                                                <img src="{{ profile_picture.url }}" alt="Profile Picture">
+                                            {% else %}
+                                                <img src="{% static 'employee/img/images.png' %}"
+                                                     alt="Default Profile Picture" style="    width: 25px;">
+                                            {% endif %}
                                             {{ user.username }}
                                         </a>
                                         <ul>
                                             <li class=""><a href="{% url 'middleware_account' %}"><i
                                                     class="icon-dashboard3"></i>Dashboard</a></li>
+                                            {% if role == 'shipper' %}
+
+                                                <li class=""><a href="{% url 'order_ship' %}"><i
+                                                        class="icon-ship"></i>Ship</a></li>
+                                            {% endif %}
                                             <li class=""><a href="{% url 'setting_wallet' %}"><i
                                                     class="icon-wallet"></i>Wallet</a></li>
                                             <li><a href="buyer-bookings.html" class="btn-edit-profile"><i
                                                     class="icon-file-text2"></i>My Bookings</a></li>
                                             <li><a href="buyer-reviews.html" class="btn-edit-profile"><i
                                                     class="icon-comment2"></i>My Reviews</a></li>
-                                            <li><a href="buyer-orders.html" class="btn-edit-profile"><i
+                                            <li><a href="{% url 'my_orders' %}" class="btn-edit-profile"><i
                                                     class="icon-add_shopping_cart"></i>My Orders</a></li>
-                                            <li><a href="buyer-shortlists.html"><i class="icon-heart"></i>Shortlists</a>
+                                            <li><a href="{% url 'favorite_list' %}"><i class="icon-heart"></i>Shortlists</a>
                                             </li>
                                             <li><a href="buyer-statement.html"><i class="icon-file-text22"></i>Statement</a>
                                             </li>
-                                            <li><a href="buyer-account-setting.html"><i class="icon-build"></i>Account
+                                            <li><a href="{% url 'customer_setting' %}"><i class="icon-build"></i>Account
                                                 Settings</a></li>
                                     </li>
                                     <li>
@@ -171,7 +194,8 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
 
 {% block extra_scripts %}
     {#    <script src="{% static 'js/init_google_map_plf.js' %}"></script>#}
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&defer"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&defer" async
+            defer></script>
 
     <script src="{% static 'employee/js/location.js' %}"></script>
 {% endblock %}

@@ -1,4 +1,13 @@
 $(document).ready(function () {
+    const form = $('form');
+    const hiddenAddressInput = $('#id_address');
+    const djangoAddressInput = $('input[name="address"]');
+
+    form.on('submit', function () {
+        if (hiddenAddressInput.length && djangoAddressInput.length) {
+            djangoAddressInput.val(hiddenAddressInput.val());
+        }
+    });
     $('.collect-btn').on('click', function (e) {
         e.preventDefault();
 
@@ -65,6 +74,7 @@ $(document).ready(function () {
             });
         }
     });
+
     $('.menu-order-confirm').on('click', function (e) {
         e.preventDefault();
         var payment_method = $('input[name="payment_method"]:checked').val();

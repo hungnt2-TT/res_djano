@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_scripts %}
+    <script src="{% static 'employee/js/dashboard.js' %}"></script>
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/request_order.css' %}">
+
+    <link href="{% static 'css/cart_store.css' %}" rel="stylesheet">
+{% endblock %}
+
+
+{% block content %}
+    <div class="main-section pt-5">
+        <div class="page-section">
+            <div class="container">
+
+                <div class="row">
+                    <div class="col-lg-9 col-md-9 col-sm-8 col-xs-12">
+                        <div class="tabs-holder horizontal">
+                            <ul class="stickynav-tabs nav nav-tabs">
+                                <li class="active"><a data-toggle="tab" href="#home"> <i
+                                        class="fa fa-shopping-cart text-danger fa-2x"></i>Order Request</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div id="home" class="tab-pane in active">
+                                    <div class="menu-itam-holder" style="padding:8px 30px">
+                                        <div id="menu-item-list-6272" data-marketplace-url="{% url 'marketplace' %}"
+                                             class="menu-itam-list cart-border-market">
+                                            {% if pending_orders %}
+                                                {% for order in pending_orders %}
+                                                    <div class="list-cart-item order-card"
+                                                         data-order-id="{{ order.id }} "
+                                                         style="margin-bottom: 20px; border: 1px solid #ddd; border-radius: 10px; padding: 20px; background-color: #fff;">
+                                                        <!-- Order Header -->
+                                                        <div class="order-header d-flex justify-content-between align-items-center mb-3">
+                                                            <h6 class="order-number">
+                                                                <a href="" class="badge badge-warning">
+                                                                    <i class="fa-solid fa-utensils "></i> {{ order.order_number }}
+                                                                </a>
+                                                            </h6>
+                                                            <div class="order-status">
+                                                                <span class="badge badge-warning">{{ order.status }}</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Order Details -->
+                                                        <ul class="order-details-list">
+                                                            {% for detail in order.order_details %}
+                                                                <li class="order-detail d-flex justify-content-between align-items-center mb-2">
+                                                                    <div class="food-info d-flex align-items-center">
+                                                                        <h6 class="food-name">{{ detail.food_item }}</h6>
+                                                                        <span class="badge badge-primary ml-2">x {{ detail.quantity }}</span>
+                                                                    </div>
+                                                                    <div class="food-price">
+                                                                        <span class="price">{{ detail.price }} VND</span>
+                                                                    </div>
+                                                                </li>
+                                                            {% endfor %}
+                                                        </ul>
+
+                                                        <!-- Order Total -->
+                                                        <div class="order-total d-flex justify-content-between align-items-center mt-3">
+                                                            <h2>Total:</h2>
+                                                            <div class="food-price">
+                                                                <span class="price">{{ order.subtotal }} VND</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Action Buttons -->
+                                                        <div class="button-container d-flex justify-content-between mt-3">
+                                                            <button class="btn btn-danger reject-btn"
+                                                                    data-url="{% url 'reject_order' order.id %}"
+                                                                    style="width: 45%; background-color: #e74c3c; border-color: #e74c3c;">
+                                                                <i class="fa fa-times"></i> Reject
+                                                            </button>
+                                                            <button class="btn btn-success accept-btn"
+                                                                    data-url="{% url 'accept_order' order.id %}"
+                                                                    style="width: 45%; background-color: #2ecc71; border-color: #2ecc71;">
+                                                                <i class="fa fa-check"></i> Accept
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <hr class="my-4">
+                                                {% endfor %}
+                                            {% else %}
+                                                <!-- No Pending Orders -->
+                                                <div class="text-center p-5" role="alert"
+                                                     style="border: 2px dashed #ccc; border-radius: 10px; background-color: #f9f9f9;">
+                                                    <i class="fa fa-shopping-cart fa-3x text-muted mb-3"></i>
+                                                    <h3>Your cart is empty</h3>
+                                                    <p>Browse our menu and add items to your cart.</p>
+                                                    <a href="{% url 'marketplace' %}" class="btn btn-primary mt-3">Start
+                                                        Shopping</a>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sticky-sidebar col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        <div class="user-order-holder">
+                            <div class="user-order">
+                                <div class="vendor-info d-flex align-items-center">
+                                    <!-- Vendor Avatar -->
+                                    <div class="vendor-avatar"
+                                         style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; margin-right: 15px;">
+                                        <img src="{{ vendor.user_profile.profile_picture.url }}" alt="Vendor Avatar"
+                                             style="width: 100%; height: 100%; object-fit: cover;">
+                                    </div>
+                                    <!-- Vendor Name -->
+                                    <div class="vendor-details">
+                                        <h6><i class="icon-restaurant_menu"></i> {{ vendor.vendor_name }}</h6>
+
+                                    </div>
+
+                                </div>
+                                <p class="vendor-location"
+                                   style="font-size: 14px; color: #888;">User name: {{ vendor.user.username }}</p>
+                                <p class="vendor-location"
+                                <p class="vendor-location"
+                                   style="font-size: 14px; color: #888;">Phone
+                                    number: {{ vendor.user.phone_number }}</p>
+                                <p class="vendor-location"
+                                   style="font-size: 14px; color: #888;">Fax number: {{ vendor.fax_number }}</p>
+                                <p class="vendor-location"
+                                   style="font-size: 14px; color: #888;">Address: {{ vendor.address_line_1 }}</p>
+                                <!-- Menu Order Information -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

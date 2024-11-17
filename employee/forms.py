@@ -196,3 +196,7 @@ class ShipperRegistrationForm(UserCreationForm):
         if not license:
             raise forms.ValidationError("Driving license is required.")
         return license
+
+
+class PasswordConfirmationForm(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput, label='Password')

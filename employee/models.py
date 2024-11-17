@@ -170,6 +170,8 @@ class EmployeeProfile(models.Model):
             super(EmployeeProfile, self).save()
         return super(EmployeeProfile, self).save()
 
+    def get_location(self):
+        return f'{self.latitude}, {self.longitude}'
 class CustomProfile(AbstractUser):
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     nickname = models.CharField(max_length=50, blank=True, null=True)

@@ -5,11 +5,17 @@
 
 {% block title %}Forgot password? | {{ block.super }}{% endblock %}
 {% block css %}
-    {% block extra_scripts %}
-        <script src="{% static 'js/cart.js' %}"></script>
-    {% endblock %}
-
+    <style>
+        .icon-heart4.favorited {
+            color: red !important;
+        }
+    </style>
 {% endblock %}
+{% block extra_scripts %}
+    <script src="{% static 'js/cart.js' %}"></script>
+    <script src="{% static 'js/favorite.js' %}"></script>
+{% endblock %}
+
 {% block content %}
     <div class="main-section">
         <div class="page-section nopadding cs-nomargin"
@@ -363,10 +369,12 @@
                                                     </div>
                                                 </div>
                                                 <div class="list-option">
-
                                                     <a href="javascript:void(0);" class="shortlist-btn"
-                                                       data-toggle="modal" data-target="#sign-in"><i
-                                                            class="icon-heart4"></i> </a>
+                                                       data-id="{{ vendor.id }}"
+                                                       data-url="{% url 'toggle_favorite' vendor.id %}"
+                                                       data-favorited="{% if vendor in user.favorites.all %}true{% else %}false{% endif %}">
+                                                        <i class="icon-heart4 {% if vendor in user.favorites.all %}favorited{% endif %}"></i>
+                                                    </a>
                                                     <a href="{% url 'vendor_detail' vendor.vendor_slug %}"
                                                        class="viewmenu-btn text-color">View Menu</a>
                                                 </div>

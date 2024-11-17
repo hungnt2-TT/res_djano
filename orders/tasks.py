@@ -5,15 +5,34 @@ from django.db import transaction
 from menu.models import Coupon
 from wallet.models import Wallet, Transaction, SubTransaction
 from .models import Order
+from .utils import extract_points
 
 
 @shared_task
 def process_order(order_id):
-    validate_order_task.apply_async(args=[order_id], link=process_payment_task.s(order_id))
-    process_payment_task.apply_async(args=[order_id], link=cancel_order_if_unconfirmed.s(order_id))
-    cancel_order_if_unconfirmed.apply_async(args=[order_id], countdown=1200)
-    track_delivery_status_task.apply_async(args=[order_id], countdown=2000)
-    complete_order_task.apply_async(args=[order_id], countdown=86400)
+    validate_order_task.apply_async(args=[order_id], link=process_payment_task.s())  # link tới process_payment_task
+
+    process_payment_task.apply_async(
+        args=[order_id],
+        link=cancel_order_if_unconfirmed.s()
+    )
+
+    cancel_order_if_unconfirmed.apply_async(
+        args=[order_id],
+        countdown=1200,
+        link=track_delivery_status_task.s()
+    )
+
+    track_delivery_status_task.apply_async(
+        args=[order_id],
+        countdown=4000,
+        link=complete_order_task.s()
+    )
+
+    complete_order_task.apply_async(
+        args=[order_id],
+        countdown=86400
+    )
 
 
 @shared_task
@@ -46,9 +65,9 @@ def validate_order_task(order_id):
             return "Coupon already redeemed"
         order.status = "Waiting for Confirmation"
         redeemed.save()
-        return "Order Validated"
+        return order_id
     else:
-        return "Order not using coupon"
+        return order_id
 
 
 @shared_task
@@ -103,12 +122,12 @@ def process_payment_task(order_id, *args, **kwargs):
             order.status = "Waiting for Confirmation"
             order.is_payment_completed = True
             order.save()
-            return "Payment Processed"
+            return order_id
         except Wallet.DoesNotExist:
             order.status = "Cancelled"
             order.message_error = "User's wallet not found"
             order.save()
-            return "Wallet not found"
+            return order_id
     elif int(order.payment_method) == 3:
         try:
             from django.db import transaction
@@ -143,16 +162,16 @@ def process_payment_task(order_id, *args, **kwargs):
 
                 order.status = "Processing Payment"
                 order.save()
-                return "Payment Processed"
+                return order_id
         except Wallet.DoesNotExist:
             order.status = "Cancelled"
             order.message_error = "User's wallet not found"
             order.save()
-            return "Wallet not found"
+            return order_id
     else:
         order.status = "Waiting for Confirmation"
         order.save()
-        return "Payment Processed"
+        return order_id
 
 
 #
@@ -178,7 +197,7 @@ def notify_user_task(order_id, status):
     user = order.user
 
     user.send_email_notification(order_number=order.order_number, status=status)
-    return "Notification Sent"
+    return order_id
 
 
 @shared_task
@@ -201,26 +220,26 @@ def track_delivery_status_task(order_id, *args, **kwargs):
         order.status = "In Transit"
     else:
         order.status = "Cancelled"
-        order.message_error = "Delivery Failed"
+        order.message_error = "Delivery Failed! Contact support for more information."
 
     order.save()
-    return "Delivery Status Updated"
+    return order_id
 
 
 @shared_task
 def complete_order_task(order_id):
     order_id = int(order_id)
     order = Order.objects.get(id=order_id)
-    user_profile = order.user.profile
+    user_profile = order.user
     # cart_items = Cart.objects.filter(user=order.user, is_ordered=False)
     if order.status != "Completed":
-        return "Order not yet delivered"
+        return order_id
     order.status = "Completed"
     order.save()
 
     # Gửi thông báo cho người dùng
     notify_user_task.delay(order_id, "Your order has been completed.")
-    return "Order Completed"
+    return order_id
 
 
 @shared_task
@@ -229,12 +248,12 @@ def cancel_order_if_unconfirmed(order_id, *args, **kwargs):
         order_id = int(order_id)
         order = Order.objects.get(id=order_id)
 
-        if order.status in ['Processing Payment', 'Waiting for Confirmation', 'Shipper Assigned']:
+        if order.status in ['Processing Payment', 'Waiting for Confirmation', 'Shipper Pending']:
             order.status = 'Cancelled'
             order.message_error = "Order auto-cancelled due to inactivity"
             order.save()
-            return "Order auto-cancelled due to inactivity"
+            return order_id
         else:
-            return "Order already processed or confirmed"
+            return order_id
     except Order.DoesNotExist:
         return f"Order does not exist: {order_id}"

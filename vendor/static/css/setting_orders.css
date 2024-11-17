@@ -1,0 +1,146 @@
+.order-status-list {
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+}
+
+.order-status-list.new-order {
+    background-color: #047a06; /* Green for New Order */
+    padding: 11px;
+}
+
+.order-status-list.processing-payment {
+    background-color: #ff9800; /* Orange for Processing Payment */
+    padding: 11px;
+}
+
+.order-status-list.payment-failed {
+    background-color: #f44336; /* Red for Payment Failed */
+    padding: 11px;
+}
+
+.order-status-list.payment-completed {
+    background-color: #4caf50; /* Green for Payment Completed */
+    padding: 11px;
+}
+
+.order-status-list.waiting-for-confirmation {
+    background-color: #ffeb3b; /* Yellow for Waiting for Confirmation */
+    padding: 11px;
+}
+
+.order-status-list.accepted {
+    background-color: #2196f3; /* Blue for Accepted */
+    padding: 11px;
+}
+
+.order-status-list.shipper-pending {
+    background-color: #9e9e9e; /* Grey for Shipper Pending */
+    padding: 11px;
+}
+
+.order-status-list.shipper-assigned {
+    background-color: #3f51b5; /* Indigo for Shipper Assigned */
+    padding: 11px;
+}
+
+.order-status-list.shipper-rejected {
+    background-color: #e91e63; /* Pink for Shipper Rejected */
+    padding: 11px;
+}
+
+.order-status-list.completed {
+    background-color: #8bc34a; /* Light Green for Completed */
+    padding: 11px;
+}
+
+.order-status-list.cancelled {
+    background-color: #9c27b0; /* Purple for Cancelled */
+    padding: 11px;
+}
+
+.order-status-list.in-transit {
+    background-color: #03a9f4; /* Light Blue for In Transit */
+    padding: 11px;
+}
+
+.order-status-list.delivered {
+    background-color: #8e44ad; /* Purple for Delivered */
+    padding: 11px;
+}
+
+
+/* Đặt một số kiểu cho khung bao quanh input và button */
+.input-field {
+    position: relative; /* Giúp icon nằm bên trong input */
+    width: 100%;
+    max-width: 500px; /* Có thể điều chỉnh theo nhu cầu */
+    margin: 0 auto; /* Căn giữa nếu cần */
+}
+
+.input-field input {
+    width: 100%;
+    padding: 10px 40px 10px 20px; /* Thêm khoảng cách cho icon bên trái */
+    border: 1px solid #ccc; /* Viền mờ */
+    border-radius: 5px; /* Bo góc input */
+    font-size: 14px; /* Kích thước chữ */
+    box-sizing: border-box; /* Bao gồm cả padding và border trong width */
+}
+
+.input-field input:focus {
+    border-color: #007bff; /* Màu viền khi focus */
+    outline: none; /* Loại bỏ viền mặc định */
+}
+
+.input-field button {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 8px 15px;
+    background-color: #007bff; /* Màu nền của button */
+    color: white;
+    border: none;
+    border-radius: 5px; /* Bo góc button */
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.input-field button:hover {
+    background-color: #0056b3; /* Màu khi hover */
+}
+
+/* Đặt cho icon thêm style */
+.input-field i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px; /* Kích thước icon */
+    color: #007bff;
+    pointer-events: none; /* Không làm ảnh hưởng đến việc tương tác với input */
+}
+
+/* Căn chỉnh form để không có khoảng cách thừa */
+form {
+    margin: 0;
+    padding: 0;
+}
+
+/* Các kiểu cho responsive */
+@media (max-width: 768px) {
+    .input-field {
+        width: 100%;
+        margin: 10px 0; /* Thêm khoảng cách giữa các phần tử khi màn hình nhỏ */
+    }
+
+    .input-field input {
+        padding: 10px 20px; /* Giảm padding cho input */
+    }
+
+    .input-field button {
+        padding: 8px 10px; /* Giảm kích thước button trên màn hình nhỏ */
+    }
+}

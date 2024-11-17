@@ -88,6 +88,7 @@ class FoodItem(models.Model):
     time_range = models.CharField(max_length=10, choices=TIME_RANGES, default='morning')
     image = models.ImageField(upload_to='food_items/')
     is_available = models.BooleanField(default=True)
+    quantity_order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

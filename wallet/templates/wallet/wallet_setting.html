@@ -7,13 +7,13 @@
     <div class="main-section">
         {% include 'includes/cover.html' %}
         <div class="page-section account-header buyer-logged-in">
-            <div class="container">
-                <div class="row">
+            <div class="container-field">
+                <div class="row px-5">
                     <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
                         {% include 'includes/c_sidebar.html' %}
                     </div>
                     <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
-                        <div class="user-dashboard loader-holder">
+                        <div class="user-dashboard loader-holder w-100 p-3">
 
                             {#                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">#}
                             {#                                    <div class="row">#}
@@ -93,12 +93,12 @@
                                                                                         style="padding: 5px 0px 0px 43px;"
                                                                                         class="add-wallet">
                                             <icon
-                                                    class="icon-plus"></icon>
+                                                    class="icon-account_balance_wallet"></icon>
                                         </a>
                                             </a>
                                         </div>
                                         <div class="wallet-card">
-                                            <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png"
+                                            <img src="{% static 'employee/img/gamo e-wallet.png' %}"
                                                  alt="Visa Logo">
                                             <div class="wallet-details">
                                                 <p>Username: {{ wallet.user.username }}</p>
@@ -136,7 +136,8 @@
                                                 {% csrf_token %}
                                                 <button id="checkin-btn"
                                                         class="checkin-btn" type="submit"
-                                                        {% if checkin_status.0.checked_in %} disabled="true" {% endif %}>
+                                                        {% if checkin_status.0.checked_in %}
+                                                        disabled="true" {% endif %}>
                                                     <i class="fas fa-check-circle"></i> Check In
                                                 </button>
                                             </form>
@@ -157,7 +158,7 @@
                                                               aria-expanded="false">History Wallet</a></li>
                                 </ul>
                                 <div class="tab-content">
-                                    <div id="infor-wallet" class="tab-pane fade active in">
+                                    <div id="infor-wallet" class="tab-pane active">
                                         <div class="row">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                 <div class="right-trans " id="infor-wallet">
@@ -227,37 +228,53 @@
                                         <div class="row">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                 <div class="right-trans " id="infor-wallet">
-                                                    <h4 id="balance"></h4>
+                                                    <h4 id="balance">Wallet Balance</h4>
                                                     <div class="balance">
                                                         <div class="balance-header">
-                                                            Current Balance <span>({{wallet.balance_point}})</span>
+                                                            Current Balance: <br>
+                                                            <span>Cash: {{ wallet.balance_cash }}</span>
+                                                            <br>
+                                                            <span>Points: {{ wallet.balance_point }}</span>
                                                         </div>
-                                                        <div class="transaction">
-                                                            <div>
-                                                                <div class="transaction-description">Apple iPhone 6, 6g
-                                                                    GB
+                                                        {% for sub_transaction in sub_transactions %}
+                                                            <div class="transaction">
+                                                                <div>
+                                                                    <div class="transaction-description">
+                                                                        {% if sub_transaction.transaction_id.transaction_type == sub_transaction.TRANSACTION_TYPE_DEPOSIT %}
+                                                                            Funds Added
+                                                                        {% else %}
+                                                                            Funds Withdrawn
+                                                                        {% endif %}
+                                                                    </div>
+                                                                    <div class="transaction-details">
+                                                                        Transaction
+                                                                        #{{ sub_transaction.transaction_id.id }}
+                                                                        - {{ sub_transaction.create_at|date:"d F, Y" }}
+                                                                    </div>
+                                                                    <div class="transaction-status">
+                                                                        Status: {{ sub_transaction.get_status_display }}
+                                                                    </div>
                                                                 </div>
-                                                                <div class="transaction-details">Electronics #343223 -
-                                                                    12
-                                                                    July,
-                                                                    2015
+                                                                <div class="transaction-amount {% if sub_transaction.transaction_id.transaction_type == sub_transaction.TRANSACTION_TYPE_DEPOSIT %}positive{% else %}negative{% endif %}">
+                                                                    {% if sub_transaction.transaction_id.transaction_type == sub_transaction.TRANSACTION_TYPE_DEPOSIT %}
+                                                                        +{% else %}-{% endif %}
+                                                                    {{ sub_transaction.amount_cash }}
+                                                                    (Cash)
+                                                                    <br>
+                                                                    {% if sub_transaction.transaction_id.transaction_type == sub_transaction.TRANSACTION_TYPE_DEPOSIT %}
+                                                                        +{% else %}-{% endif %}
+                                                                    {{ sub_transaction.amount_point }} (Points)
                                                                 </div>
                                                             </div>
-                                                            <div class="transaction-amount negative">$650.00</div>
-                                                        </div>
-                                                        <div class="transaction">
-                                                            <div>
-                                                                <div class="transaction-description">Funds Added</div>
-                                                                <div class="transaction-details">Payment #343212 - 11
-                                                                    July,
-                                                                    2015
+                                                        {% empty %}
+                                                            <div class="transaction">
+                                                                <div class="transaction-description">No transactions
+                                                                    found.
                                                                 </div>
                                                             </div>
-                                                            <div class="transaction-amount positive">$900.00</div>
-                                                        </div>
+                                                        {% endfor %}
                                                     </div>
                                                 </div>
-
                                             </div>
                                         </div>
                                     </div>

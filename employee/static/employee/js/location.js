@@ -125,12 +125,16 @@ function updateRestaurantList(vendors) {
         });
     } else {
         const noVendorsMessage = `
-            <li class="no-vendors">
-                <figure>
-                    <img src="/static/employee/img/download.png" alt="No Restaurants" class="no-vendors-img">
-                    <figcaption>Không có nhà hàng nào gần bạn.</figcaption>
-                </figure>
-            </li>`;
+<div class="container mx-auto p-4">
+            <li class="no-vendors" style="    list-style-type: none;
+">
+    <figure style="text-align: center; padding: 20px;">
+        <img src="/static/employee/img/download.png" alt="No Restaurants" class="no-vendors-img" style="width: 100px; height: 100px; margin-bottom: 10px;">
+        <figcaption style="font-size: 16px; color: #555;"><div class="alert alert-warning" role="alert">
+  No restaurants found near you.
+</div></figcaption>
+    </figure>
+</li></div>`;
         vendorList.innerHTML = noVendorsMessage;
         restaurantList.innerHTML = noVendorsMessage;
     }

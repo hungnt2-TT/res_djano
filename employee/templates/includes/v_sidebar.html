@@ -2,10 +2,10 @@
     <div class="user-nav-list">
         <ul>
             <h4 class="box-label">Activity</h4>
-            <li class="{% if 'customer_dashboard' in request.path  or '/customers/customer/' == request.path %} active {% endif %}">
+            <li class="{% if 'owner_dashboard' in request.path  or 'employee/owner/' == request.path %} active {% endif %}">
                 <a
-                        href="{% url 'customer_dashboard' %}"><i class="icon-dashboard3"></i>Dashboard</a></li>
-            <li class="{% if 'profile' in request.path  or 'vendor_map' in request.path %}
+                        href="{% url 'owner_dashboard' %}"><i class="icon-dashboard3"></i>Dashboard</a></li>
+            <li class="{% if 'profile' in request.path  or 'employee/profile/' == request.path %}
             	active
             {% endif %} "><a href="{% url 'profile' %}"><i class="icon-building"></i>My Restaurant</a></li>
             <li class="{% if 'menu_build' in request.path or 'food_menu' in request.path %}active  {% endif %}"><a

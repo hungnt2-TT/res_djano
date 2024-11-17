@@ -26,22 +26,24 @@ def find_nearest_shipper(order_id, *args, **kwargs):
         vendor_location = vendor.location
         vendor_point = GEOSGeometry(f'POINT({vendor.longitude} {vendor.latitude})', srid=4326)
         shipper = Profile.objects.filter(employee_type=5, is_active=True)
+        print('shipper', shipper)
         nearest_shipper = EmployeeProfile.objects.filter(
             user__in=shipper,
-            location__distance_lte=(vendor_point, 5000)
-        ).annotate(
+            location__distance_lte=(vendor_point, 20000)
+        ).exclude(user__in=[order.shipper for order in Order.objects.filter(status='Shipper Assigned')]).annotate(
             distance=Distance('location', vendor_point)
         ).order_by('distance').first()
-
+        print('nearest_shipper', nearest_shipper)
         if nearest_shipper:
             send_order_request_to_shipper(order, nearest_shipper)
 
-            order.status = 'Shipper Assigned'
+            order.status = 'Shipper Pending'
             order.shipper = nearest_shipper.user
             order.assigned_at = timezone.now()
             order.save()
 
-            reassign_shipper_if_no_response.apply_async((order_id,), countdown=600)
+            reassign_shipper_if_no_response.apply_async((order_id,), kwargs={'type': 'shipper_not_responding'},
+                                                        countdown=600)
 
         else:
             order.status = 'Cancelled'
@@ -61,8 +63,10 @@ def send_order_request_to_shipper(order, nearest_shipper):
         'message': message,
         'subject': subject,
         'order_number': order.order_number,
-        'status': order.status
+        'status': order.status,
     }
+    print('Sending order request to:', nearest_shipper.user)
+    print('email:', nearest_shipper.user.email)
     send_mail(subject, 'mails/notification_shipper.html', context)
 
 
@@ -70,27 +74,84 @@ def send_order_request_to_shipper(order, nearest_shipper):
 def reassign_shipper_if_no_response(order_id, *args, **kwargs):
     try:
         order_id = int(order_id)
-        order = Order.objects.get(id=order_id, status='Shipper Assigned')
-        elapsed_time = timezone.now() - order.assigned_at
-        if elapsed_time.total_seconds() > 600:
-            vendor_location = order.vendor.location
-            vendor_point = Point(vendor_location.longitude, vendor_location.latitude, srid=4326)
+        type_of_rejection = kwargs.get('type', None)
+
+        order = Order.objects.get(id=order_id)
+
+        if order.attempts >= 3:
+            order.status = 'Cancelled'
+            order.message_error = 'Maximum attempts reached, no available shipper'
+            order.save()
+            return f"Order {order_id} cancelled due to maximum attempts"
+
+        if type_of_rejection == 'shipper_rejected':
+            order.status = 'Shipper Rejected'
+            vendor = order.vendors.first()
+            vendor_point = GEOSGeometry(f'POINT({vendor.longitude} {vendor.latitude})', srid=4326)
             next_shipper = Profile.objects.filter(
                 user_type='Shipper',
                 location__distance_lte=(vendor_point, 5000)
-            ).exclude(user=order.shipper).annotate(
+            ).exclude(user=order.shipper)
+
+            next_shipper = next_shipper.exclude(
+                user__in=[o.shipper for o in Order.objects.filter(status='Shipper Assigned')])
+
+            next_shipper = next_shipper.annotate(
                 distance=Distance('location', vendor_point)
             ).order_by('distance').first()
 
-            order.shipper = next_shipper.user
-            order.assigned_at = timezone.now()
-            order.save()
+            if next_shipper:
+                order.shipper = next_shipper.user
+                order.assigned_at = timezone.now()
+                order.status = 'Shipper Pending'
+                order.attempts += 1
+                order.save()
 
-            reassign_shipper_if_no_response.apply_async((order_id,), countdown=600)
+                reassign_shipper_if_no_response.apply_async((order_id,), kwargs={'type': 'shipper_not_responding'},
+                                                            countdown=600)
+            else:
+                order.status = 'Cancelled'
+                order.message_error = 'No available shipper found'
+                order.save()
+
+        elif type_of_rejection == 'shipper_not_responding':
+            elapsed_time = timezone.now() - order.assigned_at
+
+            if elapsed_time.total_seconds() > 600:
+                vendor = order.vendors.first()
+                vendor_point = GEOSGeometry(f'POINT({vendor.longitude} {vendor.latitude})', srid=4326)
+
+                next_shipper = Profile.objects.filter(
+                    user_type='Shipper',
+                    location__distance_lte=(vendor_point, 5000)
+                ).exclude(user=order.shipper)
+
+                next_shipper = next_shipper.exclude(
+                    user__in=[o.shipper for o in Order.objects.filter(status='Shipper Assigned')])
+
+                next_shipper = next_shipper.annotate(
+                    distance=Distance('location', vendor_point)
+                ).order_by('distance').first()
+
+                if next_shipper:
+                    order.shipper = next_shipper.user
+                    order.assigned_at = timezone.now()
+                    order.attempts += 1
+                    order.save()
+
+                    reassign_shipper_if_no_response.apply_async((order_id,), kwargs={'type': 'shipper_not_responding'},
+                                                                countdown=600)
+                else:
+                    order.status = 'Cancelled'
+                    order.message_error = 'No available shipper found after multiple attempts'
+                    order.save()
 
         else:
             order.status = 'Cancelled'
             order.message_error = 'No shipper available'
             order.save()
+
     except Order.DoesNotExist:
         return f"Invalid order ID: {order_id}"
+    except Exception as e:
+        return f"An error occurred: {str(e)}"

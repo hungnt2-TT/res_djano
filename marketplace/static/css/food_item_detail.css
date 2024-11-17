@@ -59,3 +59,34 @@
     margin-right: 0;
     font-size: 14px;
 }
+
+
+.widget.widget_archive {
+    position: relative;
+    padding: 10px;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: #888;
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+.new-price {
+    font-weight: bold;
+    font-size: 18px;
+    color: #e74c3c; /* Màu đỏ nổi bật cho giá mới */
+}
+
+.sale-tag {
+    display: inline-block;
+    background-color: #f39c12;
+    color: #fff;
+    padding: 2px 6px;
+    font-size: 12px;
+    border-radius: 4px;
+    top: 0;
+    right: 0;
+    transform: translate(50%, -50%);
+}

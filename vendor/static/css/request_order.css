@@ -1,0 +1,134 @@
+.list-cart-item {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.order-header .order-number {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.order-status .badge {
+    font-size: 0.9rem;
+}
+
+.order-detail {
+    font-size: 1rem;
+}
+
+.food-info {
+    display: flex;
+    justify-content: flex-start;;
+    width: 71%;
+    align-items: center;
+}
+
+.food-name {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.food-price .price {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #e74c3c;
+}
+
+.button-container .btn {
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+.reject-btn:hover {
+    background-color: #c0392b;
+}
+
+.accept-btn:hover {
+    background-color: #27ae60;
+}
+
+hr {
+    border-color: #ddd;
+    margin-top: 20px;
+}
+
+.user-order {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.vendor-info {
+    margin-bottom: 15px;
+}
+
+.vendor-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 15px;
+}
+
+.vendor-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.vendor-details h6 {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.vendor-location {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.price-area {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.price-area ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.price-area ul li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.price-title {
+    font-weight: bold;
+    color: #333;
+}
+
+.price em {
+    font-weight: normal;
+}
+
+.total-price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 15px;
+    text-align: right;
+    color: #333;
+}
+
+.total-words {
+    font-size: 11px;
+    color: #777;
+}

@@ -61,21 +61,38 @@
                 <aside class="page-sidebar right col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <div class="widget-holder">
 
-                        <div class="widget widget_archive">
+                        <div class=" widget_archive">
                             <div class="widget-title">
                                 <h2>{{ food_item.food_name }}
                                 </h2>
                             </div>
                         </div>
-                        <div class="widget widget_archive">
-                            <span class="amount" id="price-display">{{ food_item.price }} VND</span>
+
+                        <div class=" widget_archive">
+                            <h5>{{ food_item.quantity_order }} Orders</h5>
                         </div>
-                        <div class="widget widget_archive">
-                            <p>{{ food_item.food_title }}</p>
+                        <div class=" widget_archive">
+                            <span class="old-price" id="price">{{ food_item.old_price }} VND</span>
+                            <div>
+                                <span class="new-price" id="price-display">{{ food_item.price }} VND</span>
+                                <span class="sale-tag">Sale</span>
+                            </div>
+                        </div>
+
+                        <div class=" widget_archive">
+                            {% if  food_item.food_title is None %}
+                                <h5>{{ food_item.food_title }}</h5>
+                            {% else %}
+                                <h5>No title available for this item.</h5>
+                            {% endif %}
                         </div>
                         <hr>
                         <div class="sub_title">
-                            <p>{{ food_item.sub_food_title }}</p>
+                            {% if food_item.sub_food_title is None %}
+                                <h5>{{ food_item.sub_food_title }}</h5>
+                            {% else %}
+                                <h5>No sub title available for this item.</h5>
+                            {% endif %}
                         </div>
                         <hr>
                         <div class="widget widget-related-post">
@@ -163,7 +180,7 @@
                                                 <div class="tab-content">
                                                     <div id="home" class="tab-pane in active">
                                                         <div class="menu-itam-holder" style="padding:8px 30px">
-                                                            {% if food_item.description %}
+                                                            {% if food_item.description|striptags|cut:" " %}
                                                                 <p>{{ food_item.description | safe }}</p>
                                                             {% else %}
                                                                 <p>No description available for this item.</p>

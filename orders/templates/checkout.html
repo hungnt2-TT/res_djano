@@ -119,14 +119,30 @@
                                                                             {% endif %}
                                                                         </div>
                                                                         <div class="form-group col-md-6 col-sm-12 col-lg-6">
-                                                                            Address : {{ form.address }}
+                                                                            <div style="display: none;">
+                                                                                {{ form.address }}
+                                                                            </div>
+                                                                            Address
+
+                                                                            <input type="text"
+                                                                                   class="location-field-text filter"
+                                                                                   id="search_box"
+                                                                                   placeholder="All Locations">
                                                                             {% if form.address.errors %}
                                                                                 <span class="error">
-                            {% for error in form.address.errors %}
-                                {{ error }}
-                            {% endfor %}
-                        </span>
+                                                                                {% for error in form.address.errors %}
+                                                                                    {{ error }}
+                                                                                {% endfor %}
+                                                                            </span>
                                                                             {% endif %}
+                                                                            <input type="hidden" name="address" value=""
+                                                                                   id="id_address">
+
+                                                                            <input type="hidden" name="lat" value=""
+                                                                                   id="id_latitude">
+                                                                            <input type="hidden" name="lng" value=""
+                                                                                   id="id_lngitude">
+
                                                                         </div>
                                                                     </div>
                                                                     <div class="row">
@@ -159,65 +175,68 @@
                                 <div class="user-order-holder">
                                     <div class="user-order">
                                         <h6><i class="icon-sticky-note"></i>Coupon</h6>
-                                    {% if coupons %}
-                                        {% for coupon in coupons %}
-                                            <div class="swiper mySwiper" thumbsSlider="">
-                                                <div class="swiper-wrapper">
-                                                    <div class="swiper-slide">
-                                                        <div class="swiper mySwiperNested
+                                        {% if coupons %}
+                                            {% for coupon in coupons %}
+                                                <div class="swiper mySwiper" thumbsSlider="">
+                                                    <div class="swiper-wrapper">
+                                                        <div class="swiper-slide">
+                                                            <div class="swiper mySwiperNested
                                                         {% if coupon.type_of_discount == 'Percentage' %}  swiperHomeElectric
                                                         {% elif coupon.type_of_discount == 'Free Delivery' %}swiperHomeLife
                                                         {% elif coupon.type_of_discount == 'Refund Coin' %}swiperFashion
                                                         {% else %}swiperHomeFashion
                                                         {% endif %}
                                                         ">
-                                                            <div class="swiper-wrapper"
-                                                                 style="flex-flow: column;   margin-left: 8px  ">
-                                                                <div class="swiper-slide">
-                                                                    <div class="coupon__wrap">
-                                                                        <div class="coupon__title">
-                                                                            <div class="couple__category">{{ coupon.coupon_code }}</div>
-                                                                            <div class="coupon__max">
-                                                                                Maximum {{ coupon.max_discount }} VND
+                                                                <div class="swiper-wrapper"
+                                                                     style="flex-flow: column;   margin-left: 8px  ">
+                                                                    <div class="swiper-slide">
+                                                                        <div class="coupon__wrap">
+                                                                            <div class="coupon__title">
+                                                                                <div class="couple__category">{{ coupon.coupon_code }}</div>
+                                                                                <div class="coupon__max">
+                                                                                    Maximum {{ coupon.max_discount }}
+                                                                                    VND
+                                                                                </div>
                                                                             </div>
-                                                                        </div>
-                                                                        <div class="coupon__detail">
-                                                                            <div class="coupon__price">
-                                                                                {% if coupon.type_of_discount == 'Percentage' %}
-                                                                                    {{ coupon.discount_value }}%
-                                                                                {% elif coupon.type_of_discount == 'Free Delivery' %}
-                                                                                    {{ coupon.discount_value }} VND
-                                                                                {% elif coupon.type_of_discount == 'Refund Coin' %}
-                                                                                    {{ coupon.discount_value }} Coin
-                                                                                {% else %}
-                                                                                    {{ coupon.discount_value }}
-                                                                                {% endif %}
-                                                                                Discount
-                                                                            </div>
-                                                                            <div class="coupon__info">
-                                                                                <span>Orders from {{ coupon.min_order_value }} VND</span>
-                                                                                <span>Thời hạn: {{ coupon.coupon_creation_date|date:"F d" }} - {{ coupon.coupon_expiry_date|date:"d, Y" }}</span>
-                                                                            </div>
-                                                                            <div class="coupon__footer">
-                                                                                <div class="coupon__condition">
+                                                                            <div class="coupon__detail">
+                                                                                <div class="coupon__price">
+                                                                                    {% if coupon.type_of_discount == 'Percentage' %}
+                                                                                        {{ coupon.discount_value }}%
+                                                                                    {% elif coupon.type_of_discount == 'Free Delivery' %}
+                                                                                        {{ coupon.discount_value }} VND
+                                                                                    {% elif coupon.type_of_discount == 'Refund Coin' %}
+                                                                                        {{ coupon.discount_value }} Coin
+                                                                                    {% else %}
+                                                                                        {{ coupon.discount_value }}
+                                                                                    {% endif %}
+                                                                                    Discount
+                                                                                </div>
+                                                                                <div class="coupon__info">
+                                                                                    <span>Orders from {{ coupon.min_order_value }} VND</span>
+                                                                                    <span>Thời hạn: {{ coupon.coupon_creation_date|date:"F d" }} - {{ coupon.coupon_expiry_date|date:"d, Y" }}</span>
+                                                                                </div>
+                                                                                <div class="coupon__footer">
+                                                                                    <div class="coupon__condition">
                                                                                 <span style="font-size: 9px"
                                                                                       class="error-message pre-order-msg">{{ coupon.description|truncatechars:30|safe }}</span>
-                                                                                </div>
-                                                                                <div class="coupon__btn">
-                                                                                    <button type="button"
-                                                                                            onclick="selectCoupon({{ coupon.id }})"
-                                                                                            data-id="{{ coupon.id }}"
-                                                                                            class="btn btn-primary collect-btn">
-                                                                                        Collect
-                                                                                    </button>
-                                                                                    <input type="hidden"
-                                                                                           id="selected_coupon_id"
-                                                                                           name="coupon_id" value="">
+                                                                                    </div>
+                                                                                    <div class="coupon__btn">
+                                                                                        <button type="button"
+                                                                                                onclick="selectCoupon({{ coupon.id }})"
+                                                                                                data-id="{{ coupon.id }}"
+                                                                                                class="btn btn-primary collect-btn">
+                                                                                            Collect
+                                                                                        </button>
+                                                                                        <input type="hidden"
+                                                                                               id="selected_coupon_id"
+                                                                                               name="coupon_id"
+                                                                                               value="">
 
 
+                                                                                    </div>
                                                                                 </div>
+                                                                                <div class="coupon__border"></div>
                                                                             </div>
-                                                                            <div class="coupon__border"></div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -225,13 +244,12 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <div class="alert alert-info">
+                                                No coupon available
                                             </div>
-                                        {% endfor %}
-                                    {% else %}
-                                        <div class="alert alert-info">
-                                            No coupon available
-                                        </div>
-                                    {% endif %}
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -412,6 +430,54 @@
 
         var convertToWordsUrl = "{% url 'convert_to_words' %}";
 
+        function initSearchLocationOrder() {
+            const input = document.getElementById('search_box');
+            console.log("input=>", input)
+            const autocomplete = new google.maps.places.Autocomplete(input, {
+                center: {
+                    lat: 48,
+                    lng: 4
+                },
+                componentRestrictions: {'country': ['vn']}
+            });
+
+
+            autocomplete.addListener('place_changed', function () {
+                const place = autocomplete.getPlace();
+                if (!place.geometry) {
+                    console.log("No details available for input: '" + place.name + "'");
+                    return;
+                }
+                console.log("place=>", place)
+                const addressComponents = place.address_components;
+                if (!addressComponents || addressComponents.length === 0) {
+                    console.log("No address components found");
+                    return;
+                }
+
+                const address = place.formatted_address;
+                const latitude = place.geometry.location.lat();
+                const longitude = place.geometry.location.lng();
+
+                console.log("address=>", address);
+
+                const addressElement = document.getElementById('id_address');
+                const latitudeElement = document.getElementById('id_latitude');
+                const longitudeElement = document.getElementById('id_lngitude');
+
+                if (addressElement && latitudeElement && longitudeElement) {
+                    addressElement.value = address;
+                    latitudeElement.value = latitude;
+                    longitudeElement.value = longitude;
+                } else {
+                    console.error("One or more elements not found");
+                }
+            });
+        }
+
+        window.onload = function () {
+            initSearchLocationOrder();
+        }
     </script>
 {% endblock %}
 

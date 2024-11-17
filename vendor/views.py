@@ -1,5 +1,8 @@
+import copy
 from decimal import Decimal
 from traceback import print_tb
+from datetime import datetime, timedelta
+from django.utils import timezone
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -21,7 +24,7 @@ from menu.models import Category, FoodItem, Size
 from orders.models import Order, OrderedFood
 from vendor.forms import VendorForm, VendorUpdateForm, VendorUpdateMapForm, OpeningHourForm
 from django.conf import settings
-from vendor.models import Vendor, OpeningHour
+from vendor.models import Vendor, OpeningHour, Favorite
 from wallet.models import Wallet
 from django.db import transaction
 from django.http import HttpResponseServerError
@@ -456,8 +459,114 @@ def my_orders(request):
     vendor = Vendor.objects.get(user=request.user)
     food_items = vendor.vendor_food_items.all()
     ordered_foods = OrderedFood.objects.filter(fooditem__in=food_items)
-    orders = Order.objects.filter(id__in=ordered_foods.values('order_id'), is_ordered=True).order_by('created_at')
+    orders = Order.objects.filter(id__in=ordered_foods.values('order_id'), is_ordered=True).order_by('-updated_at')
+    date_range = request.GET.get('date_range', None)
+    print('date_range', date_range)
+    if date_range:
+        try:
+            if ' to ' in date_range:
+                start_date_str, end_date_str = date_range.split(' to ')
+
+                start_date = timezone.make_aware(datetime.strptime(start_date_str, '%Y-%m-%d'))
+                end_date = timezone.make_aware(datetime.strptime(end_date_str, '%Y-%m-%d'))
+
+                orders = orders.filter(created_at__range=[start_date, end_date])
+                print('orders', orders)
+                print('orders', orders.query)
+            else:
+                start_date_str = date_range
+                start_date = timezone.make_aware(datetime.strptime(start_date_str, '%Y-%m-%d'))
+
+                end_date = timezone.make_aware(datetime.strptime(start_date_str, '%Y-%m-%d') + timedelta(days=1))
+                print('start_date', start_date)
+                print('end_date', end_date)
+
+                orders = orders.filter(created_at__range=[start_date, end_date])
+                print('orders', orders)
+                print('orders', orders.query)
+        except ValueError:
+            pass
+    order_status = request.GET.get('order_status', None)
+    if order_status:
+        orders = orders.filter(status=order_status)
+    order_statuses = Order.objects.values_list('status', flat=True).distinct()
+
+    vendors_cache = {vendor.id: vendor for vendor in Vendor.objects.all()}
+    sizes_cache = {size.id: size.size for size in Size.objects.all()}
+
+    orders_with_details = []
+
+    for order in orders:
+        order_details_copy = copy.deepcopy(order.order_details)
+        print('order_details_copy', order.user)
+        order_data = {
+            'order_id': order.id,
+            'order_number': order.order_number,
+            'created_at': order.created_at,
+            'subtotal': order.subtotal,
+            'is_payment_completed': order.is_payment_completed,
+            'shipper': order.shipper,
+            'status': order.status,
+            'user': order.user,
+            'address': order.address,
+            'phone_number': order.phone,
+            'order_details': order_details_copy,
+            'total_delivery_time': order.total_delivery_time,
+            'updated_at': order.updated_at,
+        }
+
+        for item in order_data['order_details']:
+            food_item = FoodItem.objects.get(id=item['food_item'])
+            item['food_name'] = food_item.food_name
+            item['food_title'] = food_item.food_title
+            item['size'] = sizes_cache.get(item['size_id'])
+            item['vendor'] = vendors_cache.get(food_item.vendor_id)
+
+        orders_with_details.append(order_data)
     context = {
-        'orders': orders,
+        'order_statuses': order_statuses,
+        'vendor': vendor,
+        'orders': orders_with_details,
     }
     return render(request, 'vendor/my_orders.html', context)
+
+
+def request_orders(request):
+    from employee.views import check_role_vendor, get_pending_orders_for_vendor
+
+    user = request.user
+    vendor = Vendor.objects.get(user=user)
+    print('owner_dashboard', vendor)
+    pending_orders = get_pending_orders_for_vendor(vendor.id)
+    context = {
+        'vendor': vendor,
+        'pending_orders': pending_orders,
+    }
+
+    return render(request, 'vendor/request_order.html', context)
+
+
+def get_all_orders_res(vendor_id):
+    from employee.views import get_order_details
+
+    pending_orders = Order.objects.filter(
+        vendors=vendor_id,
+    ).select_related('user', 'payment')
+    print('pending_orders', pending_orders)
+    return get_order_details(pending_orders)
+
+
+@login_required
+def toggle_favorite(request, vendor_id):
+    try:
+        print('vendor_id', vendor_id)
+        vendor = Vendor.objects.get(id=vendor_id)
+
+        favorite, created = Favorite.objects.get_or_create(user=request.user, vendor=vendor)
+        print('favorite', favorite, created)
+        if not created:
+            favorite.delete()  # Xóa nếu đã tồn tại
+            return JsonResponse({'status': 'removed'}, status=200)
+        return JsonResponse({'status': 'added'}, status=200)
+    except Vendor.DoesNotExist:
+        return JsonResponse({'error': 'Vendor not found'}, status=404)
