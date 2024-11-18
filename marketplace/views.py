@@ -47,7 +47,8 @@ def marketplace(request):
 
 def find_restaurant_in_map(request):
     vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)
-    vendors_data = json.dumps(list(vendors.values('vendor_name', 'address_line_1', 'latitude', 'longitude')))
+    vendors_data = json.dumps(list(vendors.values('vendor_name', 'address_line_1', 'latitude', 'longitude', 'vendor_type', 'vendor_slug', 'fax_number')))
+
     context = {
         'vendors': vendors_data,
         'vendor_locations': vendors,

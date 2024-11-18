@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Find Restaurant |{{ block.super }}{% endblock %}
+{% block css %}
+    <style>
+        .map-container {
+            height: 750px;
+            display: flex;
+            max-width: 1650px;
+            margin: 2rem auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .map-wrapper {
+            flex: 2;
+            min-height: 400px;
+        }
+
+        .map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .map-sidebar {
+            flex: 1;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            overflow: auto;
+        }
+
+        .map-sidebar h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .location-list {
+            list-style-type: none !important;
+            padding: 0;
+        }
+
+        .location-item {
+            background-color: #fff;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            list-style-type: none
+        }
+
+        .location-item h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #007bff;
+        }
+
+        .location-item p {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .map-container {
+                flex-direction: column;
+            }
+
+            .map-wrapper {
+                min-height: 300px;
+            }
+        }
+        .info-content.premium-vendor {
+        background-color: gold;
+        border: 2px solid #FFD700;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="main-section">
+        <div class="page-section nopadding cs-nomargin"
+             style="margin-top: 0px;padding-top: 80px;padding-bottom: 60px;margin-bottom: 0px;background: url({% static '' %}) no-repeat center top / cover;">
+            <!-- Container Start -->
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="banner-text">
+                            <h1>Find Restaurant</h1>
+                            <p>Find your favorite restaurant in the map.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="page-section nopadding cs-nomargin"
+                 style="margin-top: 0px;padding-top: 60px;padding-bottom: 10px;margin-bottom: 0px;">
+                <div class="map-container">
+                    <div class="map-wrapper">
+                        <div id="map" class="map"></div>
+                    </div>
+                    <div class="map-sidebar">
+                        <h2>Locations</h2>
+                        <ul class="location-list">
+                            {% for vendor in vendor_locations %}
+                                <li class="location-item"
+                                    onclick="centerMap({{ vendor.latitude }}, {{ vendor.longitude }})">
+                                    <img src="{{ vendor.user_profile.cover_photo }}" alt="{{ vendor.vendor_name }}"
+                                         style="width: 100%; height: auto; border-radius: 4px; margin-bottom: 0.5rem;">
+                                    <h3>{{ vendor.vendor_name }}</h3>
+                                    <p>{{ vendor.address_line_1 }}</p>
+                                </li>
+                            {% empty %}
+                                <li>No locations found.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            function centerMap(lat, lng) {
+                const latLng = {lat: parseFloat(lat), lng: parseFloat(lng)};
+                map.setCenter(latLng);
+                map.setZoom(15);
+            }
+
+            let map;
+            let infoWindow;
+
+            function initMap() {
+                const center = {lat: 21.0285, lng: 105.8542};
+
+                map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 12,
+                    center: center,
+                    disableDefaultUI: true
+
+                });
+
+                infoWindow = new google.maps.InfoWindow();
+
+                const vendors = JSON.parse('{{ vendors|safe }}');
+
+                vendors.forEach(vendor => {
+                    const latLng = {lat: parseFloat(vendor.latitude), lng: parseFloat(vendor.longitude)};
+                    console.log(' latLng', latLng);
+
+                    let iconUrl;
+                    let infoContentClass = '';
+                    console.log('vendor', vendor.vendor_type);
+                    if (vendor.vendor_type === 2 || vendor.vendor_type === 3) {
+                        iconUrl = 'https://img.icons8.com/?size=100&id=2BeIdZyy0fFG&format=png&color=000000'; // Replace with the actual URL for premium vendors
+                        infoContentClass = 'premium-vendor';
+                    } else {
+                        iconUrl = 'https://img.icons8.com/?size=100&id=hDZAPBoj5SPu&format=png&color=000000'; // Default icon URL
+                    }
+                    const marker = new google.maps.Marker({
+                        position: latLng,
+                        map: map,
+                        draggable: true,
+                        icon: {
+                            url: iconUrl,
+                            scaledSize: new google.maps.Size(32, 32) // scaled size
+                        },
+                        title: vendor.vendor_name,
+                    });
+
+                    marker.addListener('click', function () {
+                        const vendorSlug = vendor.vendor_slug;
+                        const url = `/marketplace/${vendorSlug}/`;
+                        const contentString = `
+                            <div class="info-content ${infoContentClass}">
+                                <h3>${vendor.vendor_name}</h3>
+                                <p><strong>Address:</strong> ${vendor.address_line_1}</p>
+                                <p><strong>Phone:</strong> ${vendor.fax_number}</p>
+                                <a href="${url}" class="btn btn-primary">View Details</a>
+                                <a href="https://www.google.com/maps/dir/?api=1&destination=${vendor.latitude},${vendor.longitude}" class="btn btn-info">Get Direction</a>
+                            </div>
+                            `;
+                        infoWindow.setContent(contentString);
+                        infoWindow.open(map, marker);
+                    });
+                });
+            }
+
+            window.onload = function () {
+                initMap();
+            }
+        </script>
+{% endblock %}
