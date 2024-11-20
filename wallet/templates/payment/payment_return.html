@@ -2,38 +2,93 @@
 
 {% extends 'base.html' %}
 {% load static %}
+{#    <div class="main-section">#}
+{#        <div class="page-section account-header buyer-logged-in">#}
+{#            <div class="container">#}
+{#                <div class="row">#}
+{##}
+{#                    <div class="panel panel-default">#}
+{#                        <div class="panel-heading">{{ title }}: {{ result }}</div>#}
+{#                        <div class="panel-body">#}
+{#                            <p>order_id:{{ order_id }}</p>#}
+{#                            <p>amount:{{ amount }}</p>#}
+{#                            <p>order_desc:{{ order_desc }}</p>#}
+{#                            <p>vnp_TransactionNo:{{ vnp_TransactionNo }}</p>#}
+{#                            {% if vnp_ResponseCode == '00' %}#}
+{#                                <p>vnp_ResponseCode: {{ vnp_ResponseCode }} - Thành công</p>#}
+{#                            {% else %}#}
+{#                                <p>vnp_ResponseCode: {{ vnp_ResponseCode }} - Lỗi</p>#}
+{#                            {% endif %}#}
+{#                            {% if msg %}#}
+{#                                <p class="alert-warning"> {{ msg }}</p>#}
+{#                            {% endif %}#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#                            #}
+{##}
+{#{% extends 'base.html' %}#}
+{#{% load static %}#}
+{#{% block css %}#}
+{#    <link href="{% static 'css/wallet.css' %}" rel="stylesheet">#}
+{#{% endblock %}#}
+{#{% block content %}#}
+{#    <div class="main-section">#}
+{#        {% include 'includes/cover.html' %}#}
+{#        <div class="page-section account-header buyer-logged-in">#}
+{#            <div class="container">#}
+{#                <div class="row">#}
+{#                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">#}
+{#                        {% include 'includes/c_sidebar.html' %}#}
+{#                    </div>#}
+{#                    <h2 class="text-center">Payment Success</h2>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{##}
+{#{% endblock %}#}
+
+
 {% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/form_register.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'employee/css/form_success.css' %}">
     <link href="{% static 'css/jumbotron.css' %}" rel="stylesheet">
+
 {% endblock %}
+{% block title %}Success{{ block.super }} {% endblock %}
 {% block content %}
+
     <div class="main-section">
-        {% include 'includes/cover.html' %}
-        <div class="page-section account-header buyer-logged-in">
+        <div class="page-section nopadding cs-nomargin"
+             style="margin-top: 0px;padding-top: 60px;padding-bottom: 60px;margin-bottom: 0px;">
             <div class="container">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
-                        {% include 'includes/c_sidebar.html' %}
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading">{{ title }}: {{ result }}</div>
-                        <div class="panel-body">
-                            <p>order_id:{{ order_id }}</p>
-                            <p>amount:{{ amount }}</p>
-                            <p>order_desc:{{ order_desc }}</p>
-                            <p>vnp_TransactionNo:{{ vnp_TransactionNo }}</p>
-                            {% if vnp_ResponseCode == '00' %}
-                                <p>vnp_ResponseCode: {{ vnp_ResponseCode }} - Thành công</p>
-                            {% else %}
-                                <p>vnp_ResponseCode: {{ vnp_ResponseCode }} - Lỗi</p>
-                            {% endif %}
-                            {% if msg %}
-                                <p class="alert-warning"> {{ msg }}</p>
-                            {% endif %}
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                    <div class="user-dashboard loader-holder">
+                        <div class="user-holder">
+                            <h4 class="text-center" style="margin-bottom: 0;">Success VNPay</h4>
+                            <hr>
+                            <div id="restaurant-sets-holder">
+                                <div class="success-container">
+                                    <img src="{% static 'employee/img/checked.png' %}" alt="Success">
+                                    <h1>
+                                        Payment successfully</h1>
+
+                                    <p>amount:{{ amount }}</p>
+                                    <p>order_id:{{ order_id }}</p>
+                                    <br>
+                                </div>
+                            </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 
 {% endblock %}

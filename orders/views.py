@@ -245,7 +245,7 @@ def place_order(request):
                         ordered_food.price = item.get_total_price()
                         ordered_food.size = item.size
                         ordered_food.save()
-                        item.is_ordered = True
+                    print('order = ', order)
                     try:
                         process_order.delay(order.id)
                     except Exception as e:
@@ -257,12 +257,13 @@ def place_order(request):
                             'message': order.message_error
                         })
                     else:
-
+                        print('order = ', order.id)
                         return JsonResponse({
                             'status': 'success',
                             'redirect_url': reverse('paypal_payment', kwargs={'order_id': order.id}),
                             'success_url': reverse('payment_success'),
                             'failed_url': reverse('payment_failed'),
+                            'vn_pay_url': reverse('payment', kwargs={'order_id': order.id}),
                             'message': 'Your order has been processed successfully.',
                             'order': {
                                 'id': order.id,

@@ -9,7 +9,7 @@ import requests
 from datetime import datetime
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 # from django.utils.http import urlquote
 
 from django.contrib import messages
@@ -20,6 +20,8 @@ import datetime
 from django.utils import timezone
 from django.db import transaction
 from paypal.pro.forms import PaymentForm
+
+from orders.models import Order
 from wallet.forms import BVNForm, VnpayPaymentForm
 from wallet.models import Wallet, Event, Transaction, SubTransaction
 from datetime import datetime, timedelta
@@ -183,14 +185,27 @@ def hmacsha512(key, data):
     return hmac.new(byteKey, byteData, hashlib.sha512).hexdigest()
 
 
-def payment(request):
+def payment(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    print('payment', order.total)
+    print('payment', order)
     if request.method == 'POST':
-        # Process input data and build url payment
-        form = VnpayPaymentForm(request.POST)
+        print('POST', request.POST)
+        data = {
+            'order_id': order_id,
+            'order_type': request.POST['order_type'],
+            'amount': order.total,
+            'order_desc': request.POST['order_desc'],
+            'bank_code': request.POST['bank_code'],
+            'language': request.POST['language'],
+        }
+        form = VnpayPaymentForm(data)
+        print('form', form)
         if form.is_valid():
             order_type = form.cleaned_data['order_type']
             order_id = form.cleaned_data['order_id']
             amount = form.cleaned_data['amount']
+            print('amount', amount)
             order_desc = form.cleaned_data['order_desc']
             bank_code = form.cleaned_data['bank_code']
             language = form.cleaned_data['language']
@@ -224,7 +239,16 @@ def payment(request):
         else:
             print("Form input not validate")
     else:
-        return render(request, 'payment/payment_vnpay.html', {"title": "Thanh toán"})
+        print('GET')
+        vnpay_payment_data = {
+            'order_id': order_id,
+            'order_type': 'billpayment',
+            'amount': order.total,
+            'order_desc': 'Thanh toán hóa đơn',
+            'language': 'vn'
+        }
+        form = VnpayPaymentForm(initial=vnpay_payment_data)
+        return render(request, 'payment/payment_vnpay.html', {'form': form, 'order': order})
 
 
 def payment_ipn(request):

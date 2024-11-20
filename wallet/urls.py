@@ -8,7 +8,7 @@ urlpatterns = [
     path('paypal', include('paypal.standard.ipn.urls')),
 
     path('payment', views.payment_service_paypal, name='payment_paypal'),
-    path('vn_pay', views.payment, name='payment'),
+    path('vn_pay/<int:order_id>/', views.payment, name='payment'),
     path('payment_ipn', views.payment_ipn, name='payment_ipn'),
     path('payment_return', views.payment_return, name='payment_return'),
     path('query', views.query, name='query'),

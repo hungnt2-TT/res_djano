@@ -31,15 +31,32 @@ def cprofile(request):
 
 def customer_setting(request):
     profile = get_object_or_404(EmployeeProfile, user=request.user)
+    user = get_object_or_404(Profile, id=request.user.id)
+
     if request.method == 'POST':
         profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
         user_form = UserInfoForm(request.POST, instance=request.user)
-        print(profile_form.errors)
-        print('request.POST = ', request.POST)
+
+        new_phone_number = request.POST.get('phone_number')
+        current_phone_number = user.phone_number
+
+        print('New Phone Number:', new_phone_number)
+        print('Current Phone Number:', current_phone_number)
+        print('Profile Form Errors:', profile_form.errors)
+        print('User Form Errors:', user_form.errors)
+        print('POST Data:', request.POST)
 
         if profile_form.is_valid() and user_form.is_valid():
             profile_form.save()
+
+            if new_phone_number and new_phone_number != current_phone_number:
+                print('Updating Phone Number...')
+                user.phone_number = new_phone_number
+                user.phone_number_verified = False
+                user.save()  # Lưu các thay đổi cho đối tượng `user`
+
             user_form.save()
+
             messages.success(request, 'Profile updated')
             return redirect('cprofile')
         else:
@@ -55,6 +72,7 @@ def customer_setting(request):
         'profile': profile,
     }
     return render(request, 'customers/cprofile.html', context)
+
 
 
 @login_required

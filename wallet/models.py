@@ -20,12 +20,14 @@ class PaymentMethod(models.Model):
     PAYMENT_METHOD_WALLET = 2
     PAYMENT_METHOD_PAYPAL = 3
     PAYMENT_METHOD_CASH = 4
+    PAYMENT_METHOD_VNPAY = 5
     PAYMENT_METHOD_CHOICES = (
         (PAYMENT_METHOD_UNKNOWN, _('Unknown')),
         (PAYMENT_METHOD_BANK_TRANSFER, _('Bank Transfer')),
         (PAYMENT_METHOD_WALLET, _('Wallet')),
         (PAYMENT_METHOD_PAYPAL, _('Paypal')),
-        (PAYMENT_METHOD_CASH, _('Cash'))
+        (PAYMENT_METHOD_CASH, _('Cash')),
+        (PAYMENT_METHOD_VNPAY, _('Vnpay'))
     )
     uid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("name"), max_length=100)

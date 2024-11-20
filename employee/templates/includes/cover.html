@@ -1,7 +1,7 @@
 {% load static %}
 <div class="page-section restaurant-detail-image-section"
-     style=" background: url({% if vendor.user_profile.cover_photo.url is not None %}
-         {{ vendor.user_profile.cover_photo.url }}
+     style=" background: url({% if user.employeeprofile.cover_photo.url is not None %}
+         {{ user.employeeprofile.cover_photo.url }}
      {% else %}
          {% static 'extra-images/bg-image1.jpg' %}
      {% endif %}) no-repeat scroll 0 0 / cover;">
@@ -12,8 +12,8 @@
                     <div class="company-info">
                         <div class="img-holder">
                             <figure>
-                                {% if vendor.user_profile.profile_picture.url is not None %}
-                                    <img src="{{ vendor.user_profile.profile_picture.url }}" alt="">
+                                {% if user.employeeprofile and user.employeeprofile.profile_picture %}
+                                    <img src="{{ user.employeeprofile.profile_picture.url }}" alt="">
                                 {% else %}
                                     <img src="{% static 'extra-images/fb-restaurant-02.jpg' %}" alt="">
                                 {% endif %}

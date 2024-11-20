@@ -103,12 +103,13 @@
                                                     </div>
                                                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                                         <div class="field-holder">
+
                                                             <label>Phone Number *</label>
                                                             <div class="input-group" style="    flex-wrap: nowrap;">
                                                                 {{ user_form.phone_number }}
 
                                                                 <div class="input-group-append">
-                                                                    {% if user_form.phone_number_verified %}
+                                                                    {% if user.phone_number_verified %}
                                                                         <span class="input-group-text bg-success text-white"
                                                                               title="Phone number verified">
                                                                         <i class="fas fa-check-circle"></i>

@@ -34,13 +34,18 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         })
             .then(response => response.json())
-            .then(data => {
+            .then(data =>   {
                 if (data.status === 'success') {
                     const orderDetails = data.order;
-                    console.log('Order placed successfully:', orderDetails);
+                    console.log('Order placed successfully:', data);
                     if (orderDetails.payment_method == 3) {
                         // Redirect to PayPal payment page
                         window.location.href = data.redirect_url;
+                        return;
+                    }
+                    else if (orderDetails.payment_method == 1) {
+                        // Redirect to Stripe payment page
+                        window.location.href = data.vn_pay_url;
                         return;
                     }
                     Swal.fire({

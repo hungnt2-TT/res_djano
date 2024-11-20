@@ -108,7 +108,7 @@ $(document).ready(function () {
                                         confirmButtonText: 'Sure'
                                     }).then((result) => {
                                         if (result.isConfirmed) {
-                                            window.location.reload(); // Chuyển hướng đến trang xác minh
+                                            window.location.reload();
                                         }
                                     });
                                 }
