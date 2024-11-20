@@ -16,7 +16,7 @@ def process_payment_bank_shipper_task(order_id, *args, **kwargs):
         return f"Invalid order ID: {order_id}"
 
     # wallet - paypal
-    if int(order.payment_method) == 2 or int(order.payment_method) == 3:
+    if int(order.payment_method) == 2 or int(order.payment_method) == 3 or int(order.payment_method) == 1:
         from django.db import transaction
         try:
             with transaction.atomic():
