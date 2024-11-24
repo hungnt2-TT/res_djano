@@ -3,16 +3,18 @@ from decimal import Decimal
 from traceback import print_tb
 from datetime import datetime, timedelta
 from django.utils import timezone
+from geopy.geocoders import Nominatim
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.forms import inlineformset_factory
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.text import slugify
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.db.models import F
+from geopy import Point
 
 from employee import consts
 from employee.consts import PAGE
@@ -204,24 +206,31 @@ def register_shipper(request):
     # })
 
 
-@login_required
+
 def vendor_map(request):
     vendor = get_object_or_404(Vendor, user=request.user)
     vendor_form = VendorUpdateMapForm(instance=vendor)
+
+    if request.method == 'POST':
+        print('request.POST', request.POST)
+        vendor_form = VendorUpdateMapForm(request.POST, instance=vendor)
+        if vendor_form.is_valid():
+            vendor.pin_code = request.POST.get('pin_code')
+            vendor.address_line_1 = request.POST.get('address_line_1')
+            vendor.latitude = request.POST.get('latitude')
+            vendor.longitude = request.POST.get('longitude')
+            vendor.save()
+            messages.success(request, 'Vendor updated successfully')
+            return redirect('vendor_map')
+
+        else:
+            messages.error(request, 'Invalid address')
+            return redirect('vendor_map')
 
     ctx = {
         'vendor_form': vendor_form,
         'initSearchBox': 'initSearchBox'
     }
-    if request.method == 'POST':
-        vendor_form = VendorUpdateMapForm(request.POST, request.FILES, instance=vendor)
-        if vendor_form.is_valid():
-            vendor = vendor_form.save()
-            if vendor:
-                messages.success(request, 'Vendor updated successfully')
-                return redirect('vendor_map')
-            messages.error(request, 'Vendor not updated')
-            return redirect('vendor_map')
     return render(request, 'vendor/vendor_map_update.html', ctx)
 
 
@@ -297,7 +306,8 @@ def food_menu(request):
         print('request.POST', request.POST)
         food_form = FoodItemForm(request.POST or None, request.FILES)
         size_formset = SizeFormSet(request.POST, instance=food_form.instance)
-        print('food_form', food_form)
+        print('food_form', food_form.errors)
+        print('size_formset', size_formset.errors)
         if food_form.is_valid() and size_formset.is_valid():
             food = food_form.save(commit=False)
             food.category = Category.objects.get(pk=request.POST.get('category'))
@@ -367,6 +377,7 @@ def menu_delete_detail(request, pk):
 @require_http_methods(["POST"])
 def food_item_detail(request, pk):
     try:
+
         print('request.body', request.POST)
         food = FoodItem.objects.get(pk=pk)
 
@@ -376,8 +387,10 @@ def food_item_detail(request, pk):
         food.sub_food_title = request.POST.get('food_sub_title')
         food.description = request.POST.get('description')
         food.price = Decimal(request.POST.get('price', '0'))
+        food.old_price = Decimal(request.POST.get('old_price', '0'))
         food.is_available = request.POST.get('is_available') == 'true'
-
+        category_id = request.POST.get('category')
+        food.category = Category.objects.get(pk=category_id)
         if 'image' in request.FILES:
             food.image = request.FILES['image']
 
@@ -428,14 +441,14 @@ def get_vendor(request):
     return vendor
 
 
-def opening_hours(request):
-    opening_hours = OpeningHour.objects.filter(vendor=get_vendor(request))
-    form = OpeningHourForm()
-    context = {
-        'form': form,
-        'opening_hours': opening_hours,
-    }
-    return render(request, 'vendor/opening_hours.html', context)
+# def opening_hours(request):
+#     opening_hours = OpeningHour.objects.filter(vendor=get_vendor(request))
+#     form = OpeningHourForm()
+#     context = {
+#         'form': form,
+#         'opening_hours': opening_hours,
+#     }
+#     return render(request, 'vendor/opening_hours.html', context)
 
 
 def order_detail(request, order_number):
@@ -570,3 +583,92 @@ def toggle_favorite(request, vendor_id):
         return JsonResponse({'status': 'added'}, status=200)
     except Vendor.DoesNotExist:
         return JsonResponse({'error': 'Vendor not found'}, status=404)
+
+
+@login_required()
+def opening_hours(request):
+    vendor_time_open = OpeningHour.objects.filter(vendor=get_vendor(request))
+    form = OpeningHourForm()
+    context = {
+        'form': form,
+        'vendor_time_open': vendor_time_open,
+    }
+    return render(request, 'vendor/opening_hour.html', context)
+
+
+@login_required
+def opening_hours_add(request):
+    if request.user.is_authenticated:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' and request.method == 'POST':
+            form = OpeningHourForm(request.POST)
+            if form.is_valid():
+
+                opening_hour = form.save(commit=False)
+                opening_hour.vendor = get_vendor(request)
+                opening_hour.save()
+                if opening_hour.is_closed:
+                    response = {
+                        'message': 'Opening hour added successfully!',
+                        'status': 'success',
+                        'id': opening_hour.id,
+                        'day': opening_hour.get_day_display(),
+                        'is_closed': 'Closed',
+
+                    }
+                else:
+                    response = {
+                        'message': 'Opening hour added successfully!',
+                        'status': 'success',
+                        'id': opening_hour.id,
+                        'day': opening_hour.get_day_display(),
+                        'from_hour': opening_hour.from_hour,
+                        'to_hour': opening_hour.to_hour,
+                    }
+                return JsonResponse(response, status=200)
+            return JsonResponse({'message': 'Opening hour not added!', 'alert': 'danger'}, status=400)
+    return HttpResponse('opening_hours_add')
+
+
+def opening_hours_edit(request, pk):
+    if request.user.is_authenticated:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' and request.method == 'POST':
+            opening_hour = OpeningHour.objects.get(pk=pk)
+            print('opening_hour', opening_hour)
+            print('request.POST', request.POST)
+            form = OpeningHourForm(request.POST, instance=opening_hour)
+            if form.is_valid():
+                opening_hour = form.save(commit=False)
+                opening_hour.save()
+                if opening_hour.is_closed:
+                    response = {
+                        'message': 'Opening hour updated successfully!',
+                        'status': 'success',
+                        'id': opening_hour.id,
+                        'day': opening_hour.get_day_display(),
+                        'is_closed': 'Closed',
+                    }
+                else:
+                    response = {
+                        'message': 'Opening hour updated successfully!',
+                        'status': 'success',
+                        'id': opening_hour.id,
+                        'day': opening_hour.get_day_display(),
+                        'from_hour': opening_hour.from_hour,
+                        'to_hour': opening_hour.to_hour,
+                    }
+                return JsonResponse(response, status=200)
+            return JsonResponse({'message': 'Opening hour not updated!', 'alert': 'danger'}, status=400)
+    return HttpResponse('opening_hours_edit')
+
+
+@login_required()
+@csrf_exempt
+def opening_hours_delete(request, pk):
+    if request.user.is_authenticated:
+        print('request', request)
+        print('pk', pk)
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' and request.method == 'DELETE':
+            opening_hour = OpeningHour.objects.get(pk=pk)
+            opening_hour.delete()
+            return JsonResponse({'message': 'Opening hour deleted successfully!', 'status': 'success'}, status=200)
+    return HttpResponse('opening_hours_delete')

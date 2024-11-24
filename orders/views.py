@@ -125,13 +125,9 @@ def checkout(request):
     }
 
     if request.method == 'POST':
-        print('total_shipping_cost = ', total_shipping_cost)
 
-        print('request.POST = ', request.POST)
         new_total = request.POST.get('new_total')
         form = OrderForm(request.POST)
-        print('form ==== ', form)
-        print('form - ', form.errors)
         if form.is_valid():
             coupon_ids = request.POST.getlist('coupon_id')
             selected_coupon_id = next((id for id in coupon_ids if id), None)
@@ -150,7 +146,6 @@ def checkout(request):
                 'lat': request.POST.get('lat'),
                 'lng': request.POST.get('lng'),
             }
-            print('context = ', context)
             if request.POST.get('payment_method') == 'Cash':
                 if user_profile.phone_number_verified:
                     return render(request, 'place_order.html', context=context)
@@ -193,7 +188,6 @@ def checkout(request):
 @csrf_protect
 def place_order(request):
     if request.method == 'POST':
-        print('request.POST = ', request.POST)
         data = {
             'first_name': request.POST.get('first_name'),
             'last_name': request.POST.get('last_name'),
@@ -207,7 +201,6 @@ def place_order(request):
         }
         order_details = json.loads(request.POST.get('order_details'))
         vendor_ids = list({item['vendor'] for item   in order_details if 'vendor' in item})
-        print('vendor_ids = ', vendor_ids)
         form = OrderForm(data)
         if form.is_valid():
             try:
@@ -245,7 +238,9 @@ def place_order(request):
                         ordered_food.price = item.get_total_price()
                         ordered_food.size = item.size
                         ordered_food.save()
-                    print('order = ', order)
+
+                        item.is_ordered = True
+                        item.save()
                     try:
                         process_order.delay(order.id)
                     except Exception as e:
@@ -265,6 +260,7 @@ def place_order(request):
                             'failed_url': reverse('payment_failed'),
                             'vn_pay_url': reverse('payment', kwargs={'order_id': order.id}),
                             'message': 'Your order has been processed successfully.',
+                            'order_detail': reverse('order_detail', kwargs={'order_number': order.order_number}),
                             'order': {
                                 'id': order.id,
                                 'order_number': order.order_number,

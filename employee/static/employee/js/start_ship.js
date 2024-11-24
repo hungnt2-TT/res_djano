@@ -1,5 +1,4 @@
 $(document).ready(function () {
-    showLoading();
     console.log("Start Ship page loaded");
     $("#btn-accept-order").on("click", function () {
         console.log("Accept order button clicked");
@@ -98,6 +97,7 @@ $(document).ready(function () {
     }
 
     function getLatLng(location) {
+        console.log("location", location);
         if (typeof location.lat === "function" && typeof location.lng === "function") {
             return {lat: location.lat(), lng: location.lng()};
         } else if (typeof location === "string") {

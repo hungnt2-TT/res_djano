@@ -27,7 +27,7 @@ class FoodItemForm(forms.ModelForm):
     class Meta:
         model = FoodItem
         fields = ['food_name', 'category', 'description', 'price', 'image', 'is_available', 'food_title',
-                  'sub_food_title']
+                  'sub_food_title', 'old_price']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -42,4 +42,5 @@ class FoodItemForm(forms.ModelForm):
         self.fields['food_title'].widget.attrs['placeholder'] = 'Food Title'
         self.fields['sub_food_title'].widget.attrs['placeholder'] = 'Sub Food Title'
         self.fields['is_available'].widget.attrs['placeholder'] = 'Available'
+        self.fields['old_price'].widget.attrs['placeholder'] = 'Old Price'
         self.fields['description'].widget = CKEditor5Widget(config_name='extends')

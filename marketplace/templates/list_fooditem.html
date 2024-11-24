@@ -5,7 +5,6 @@
 
 {% block title %}List FoodItems Recommened{{ block.super }}{% endblock %}
 {% block extra_scripts %}
-    <script src="{% static 'js/cart.js' %}"></script>
 {% endblock %}
 {% block css %}
     <style>
@@ -45,17 +44,15 @@
                                     <!-- Column Start -->
                                     <div class="listing-main-search">
                                         <div class="main-search">
-                                            <form action="#">
+                                            <form method="POST" action="{% url 'food_item' %}">
                                                 <div class="restaurant-search-element-container row">
                                                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                                         <div class="field-holder" style="display: flex"><span
                                                                 class="restaurant-element-search-btn"><i
                                                                 class="icon-search5"></i> </span>
-                                                            <form method="GET" action="{% url 'search' %}">
                                                                 <input placeholder="Restaurant name" name="search_title"
                                                                        value="" type="text">
                                                                 <button type="submit" class="btn-search">Search</button>
-                                                            </form>
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">

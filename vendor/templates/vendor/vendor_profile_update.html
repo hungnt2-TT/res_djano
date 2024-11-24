@@ -24,7 +24,7 @@
                                 <form action="{% url 'profile' %}" method="POST" enctype="multipart/form-data">
                                     <ul class="restaurant-settings-nav progressbar-nav">
                                         <li class="active cond-restaurant-settings processing">
-                                            <a href="restaurant-restaurant.html">Restaurant Settings</a>
+                                            <a href="{% url 'profile' %}">Restaurant Settings</a>
                                         </li>
                                         <li class="cond-restaurant-settings">
                                             <a href="{% url 'vendor_map' %}">Location/Map</a>
@@ -45,14 +45,15 @@
                                                                     <li class="gal-img">
                                                                         <div class="drag-list">
                                                                             <div class="item-thumb">
-                                                                                <a href="{{ img_logo }}" id="slider_up"
-                                                                                   data-src="{{ img_logo }}"
-                                                                                   data-sub-html="<h4>Restaurant Demo</h4>">
+                                                                                {% if profile.profile_picture %}
                                                                                     <img class="thumbnail"
-                                                                                         src="{{ img_logo }}"
-                                                                                         id="imagePreview" onclick=""
+                                                                                         src="{{ profile.profile_picture.url }}"
                                                                                          alt="profile_picture">
-                                                                                </a>
+                                                                                {% else %}
+                                                                                    <img class="thumbnail"
+                                                                                         src="{% static 'default_profile.png' %}"
+                                                                                         alt="profile_picture">
+                                                                                {% endif %}
                                                                             </div>
                                                                             <div class="item-assts">
                                                                                 <ul class="list-inline pull-right">
@@ -66,25 +67,17 @@
                                                                 </ul>
                                                             </div>
                                                             <div class="text-holder">
-                                                                <strong>Restaurant Demo</strong>
+                                                                <strong>Update Logo</strong>
                                                                 <div class="upload-gallery">
-                                                                    <label>Update Logo</label>
-                                                                    {#                                                                    {{ emp_forms.profile_picture }}#}
-                                                                    <div class="upload-gallery">
-                                                                        <input type="file"
-
-                                                                               class="btn btn-info"
-                                                                               id="imageUpload"
-                                                                               name="img_logo">
-                                                                        <label for="imageUpload"
-                                                                               class="text-danger">{{ img_logo.errors }}</label>
-
-                                                                    </div>
+                                                                    <input type="file" class="btn btn-info"
+                                                                           id="" name="profile_picture">
+                                                                    <label class="text-danger">{{ emp_forms.profile_picture.errors }}</label>
                                                                 </div>
-                                                                <span>Update your avatar manually, If the not set the default Gravatar will be the same as your login email/user account. Max Upload Size: 1MB,</span>
+                                                                <span>Max Upload Size: 1MB</span>
                                                             </div>
                                                         </div>
                                                     </div>
+
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                         <div class="restaurant-info">
                                                             <div class="img-holder">
@@ -92,16 +85,15 @@
                                                                     <li class="gal-img">
                                                                         <div class="drag-list">
                                                                             <div class="item-thumb">
-                                                                                <a href="{{ img_cover }}"
-                                                                                   id="slider_up_cover"
-                                                                                   data-src="{{ img_cover }}"
-                                                                                   data-sub-html="<h4>Restaurant Demo</h4>">
+                                                                                {% if profile.cover_photo %}
                                                                                     <img class="thumbnail"
-                                                                                         src="{{ img_cover }}"
-                                                                                         id="imagePreviewCover"
-                                                                                         onclick=""
+                                                                                         src="{{ profile.cover_photo.url }}"
                                                                                          alt="profile_picture">
-                                                                                </a>
+                                                                                {% else %}
+                                                                                    <img class="thumbnail"
+                                                                                         src="{% static 'default_profile.png' %}"
+                                                                                         alt="profile_picture">
+                                                                                {% endif %}
                                                                             </div>
                                                                             <div class="item-assts">
                                                                                 <ul class="list-inline pull-right">
@@ -115,25 +107,17 @@
                                                                 </ul>
                                                             </div>
                                                             <div class="text-holder">
+                                                                <label for="imageUploadCover">Upload New Cover</label>
                                                                 <div class="upload-gallery">
-                                                                    <label>Update Cover</label>
-                                                                    {#                                                                    {{ emp_forms.profile_picture }}#}
-                                                                    <div class="upload-gallery">
-                                                                        <input type="file"
-
-                                                                               class="btn btn-info"
-                                                                               id="imageUploadCover"
-                                                                               name="img_cover">
-                                                                        <label for="imageUploadCover"
-                                                                               class="text-danger">{{ img_cover.errors }}</label>
-
-                                                                        {#                                                                                    {{ vendor_form.vendor_license }}#}
-                                                                    </div>
+                                                                    <input type="file" class="btn btn-info"
+                                                                           id="imageUploadCover" name="cover_photo">
+                                                                    <label class="text-danger">{{ emp_forms.cover_photo.errors }}</label>
                                                                 </div>
-                                                                <span>Update your cover image manually, If the not set the default cover image will be showing on your restaurant detail page. Max Upload Size: 1MB,</span>
+                                                                <span>Max Upload Size: 1MB</span>
                                                             </div>
                                                         </div>
                                                     </div>
+
                                                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                                         <div class="field-holder">
                                                             <label>Restaurant name *</label>
@@ -149,26 +133,37 @@
                                                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                                         <div class="field-holder">
                                                             <label>Manager Name</label>
-                                                            {{ user.username }}
+                                                            {{ user_form.username }}
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                                         <div class="field-holder">
                                                             <label>Email </label>
-                                                            {{ user.email }}
+                                                            {{ user_form.email }}
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                                         <div class="field-holder">
                                                             <label>Manager Contact phone</label>
-                                                            {{ user.phone_number }}
+                                                            {{ user_form.phone_number }}
                                                         </div>
                                                     </div>
-
+                                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                        <div class="field-holder">
+                                                            <label>First name</label>
+                                                            {{ user_form.first_name }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                        <div class="field-holder">
+                                                            <label>Last name</label>
+                                                            {{ user_form.last_name }}
+                                                        </div>
+                                                    </div>
                                                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                                         <div class="field-holder">
                                                             <label>Contact Email</label>
-                                                            {{ user.email_contact }}
+                                                            {{ user_form.email_contact }}
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -204,42 +199,7 @@
                                                             {{ vendor_service.booking }}
                                                         </div>
                                                     </div>
-                                                    {#                                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">#}
-                                                    {#                                                        <div class="field-holder">#}
-                                                    {#                                                            <label>Delivery/Pickup</label>#}
-                                                    {#                                                            <select class="chosen-select">#}
-                                                    {#                                                                <option value="delivery">Delivery</option>#}
-                                                    {#                                                                <option value="pickup">Pickup</option>#}
-                                                    {#                                                                <option value="delivery_and_pickup">Delivery &amp;#}
-                                                    {#                                                                    Pickup#}
-                                                    {#                                                                </option>#}
-                                                    {#                                                            </select>#}
-                                                    {#                                                        </div>#}
-                                                    {#                                                    </div>#}
-                                                    {#                                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">#}
-                                                    {#                                                        <div class="field-holder">#}
-                                                    {#                                                            <label>Minimum Delivery Order</label>#}
-                                                    {#                                                            <input type="text" placeholder="i.e 15">#}
-                                                    {#                                                        </div>#}
-                                                    {#                                                    </div>#}
-                                                    {#                                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">#}
-                                                    {#                                                        <div class="field-holder">#}
-                                                    {#                                                            <label>Maximum Delivery Order</label>#}
-                                                    {#                                                            <input type="text" placeholder="i.e 200">#}
-                                                    {#                                                        </div>#}
-                                                    {#                                                    </div>#}
-                                                    {#                                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">#}
-                                                    {#                                                        <div class="field-holder">#}
-                                                    {#                                                            <label>Minimum Pickup Order</label>#}
-                                                    {#                                                            <input type="text" placeholder="i.e 15">#}
-                                                    {#                                                        </div>#}
-                                                    {#                                                    </div>#}
-                                                    {#                                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">#}
-                                                    {#                                                        <div class="field-holder">#}
-                                                    {#                                                            <label>Maximum Pickup Order</label>#}
-                                                    {#                                                            <input type="text" placeholder="i.e 200">#}
-                                                    {#                                                        </div>#}
-                                                    {#                                                    </div>#}
+
                                                     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                                         <div class="field-holder">
                                                             <label>Delivery Fee</label>
@@ -253,109 +213,6 @@
                                                         </div>
                                                     </div>
 
-                                                    {#                                                    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">#}
-                                                    {#                                                        <div class="field-holder">#}
-                                                    {#                                                            <label>Specials</label>#}
-                                                    {#                                                            <select data-placeholder="Specials Deals"#}
-                                                    {#                                                                    class="multiple chosen-select">#}
-                                                    {#                                                                <option value="">Specials Deals</option>#}
-                                                    {#                                                                <option value="deals">Deals</option>#}
-                                                    {#                                                                <option value="free-delivery">Free Delivery</option>#}
-                                                    {#                                                            </select>#}
-                                                    {#                                                        </div>#}
-                                                    {#                                                    </div>#}
-                                                    {#                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">#}
-                                                    {#                                                        <div class="foodbakery-dev-appended-cats">#}
-                                                    {#                                                            <div class="field-holder">#}
-                                                    {#                                                                <label>Categories *</label>#}
-                                                    {#                                                                <select class="multiple chosen-select">#}
-                                                    {#                                                                    <option value="">ALL Categories</option>#}
-                                                    {#                                                                    <option value="apple-juice">Apple Juice</option>#}
-                                                    {#                                                                    <option value="bb-q">BB.Q</option>#}
-                                                    {#                                                                    <option value="beef-roast">Beef Roast</option>#}
-                                                    {#                                                                    <option value="carrot-juice">Carrot Juice</option>#}
-                                                    {#                                                                    <option value="cheese-burger">Cheese Burger</option>#}
-                                                    {#                                                                    <option value="chicken-roast">Chicken Roast</option>#}
-                                                    {#                                                                    <option value="chines-soup">Chines Soup</option>#}
-                                                    {#                                                                    <option value="cold-coffee">Cold Coffee</option>#}
-                                                    {#                                                                    <option value="cold-drink">Cold Drink</option>#}
-                                                    {#                                                                    <option value="cupcake">Cupcake</option>#}
-                                                    {#                                                                    <option value="doughnut">Doughnut</option>#}
-                                                    {#                                                                    <option value="drum-stick">Drum Stick</option>#}
-                                                    {#                                                                    <option value="egg-fry">Egg Fry</option>#}
-                                                    {#                                                                    <option value="fish-fry">Fish Fry</option>#}
-                                                    {#                                                                    <option value="fresh-juice">Fresh Juice</option>#}
-                                                    {#                                                                    <option value="hot-dogs">Hot Dogs</option>#}
-                                                    {#                                                                    <option value="ice-cream">Ice Cream</option>#}
-                                                    {#                                                                    <option value="magi">Magi</option>#}
-                                                    {#                                                                    <option value="noodles">Noodles</option>#}
-                                                    {#                                                                    <option value="pastry">Pastry</option>#}
-                                                    {#                                                                    <option value="pizza">Pizza</option>#}
-                                                    {#                                                                    <option value="potato-fries">Potato Fries</option>#}
-                                                    {#                                                                    <option value="prawns">Prawns</option>#}
-                                                    {#                                                                    <option value="sham-pane">Sham pane</option>#}
-                                                    {#                                                                    <option value="shawarma">Shawarma</option>#}
-                                                    {#                                                                    <option value="soda-water">Soda water</option>#}
-                                                    {#                                                                    <option value="stakes">Stakes</option>#}
-                                                    {#                                                                    <option value="steam-roast">Steam Roast</option>#}
-                                                    {#                                                                    <option value="tea">Tea</option>#}
-                                                    {#                                                                </select>#}
-                                                    {#                                                            </div>#}
-                                                    {#                                                        </div>#}
-                                                    {#                                                    </div>#}
-                                                    {#                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">#}
-                                                    {#                                                        <div class="element-title">#}
-                                                    {#                                                            <h4>Tags Clouds</h4>#}
-                                                    {#                                                        </div>#}
-                                                    {##}
-                                                    {#                                                        <ul id="foodbakery-tags" class="tagit">#}
-                                                    {#                                                            <li class="tagit-choice">#}
-                                                    {#                                                                <span class="tagit-label">applejuice</span>#}
-                                                    {#                                                            </li>#}
-                                                    {#                                                            <li class="tagit-choice">#}
-                                                    {#                                                                <span class="tagit-label">stakes</span>#}
-                                                    {#                                                            </li>#}
-                                                    {#                                                        </ul>#}
-                                                    {#                                                        <span class="most-used">Mostly Used Tags</span>#}
-                                                    {#                                                        <ul class="tag-cloud-container" id="tag-cloud">#}
-                                                    {#                                                            <li class="tag-cloud"#}
-                                                    {#                                                                onclick="jQuery('#foodbakery-tags').tagit('createTag', 'apple pie');return false;">#}
-                                                    {#                                                                apple pie#}
-                                                    {#                                                            </li>#}
-                                                    {#                                                            <li class="tag-cloud"#}
-                                                    {#                                                                onclick="jQuery('#foodbakery-tags').tagit('createTag', 'applejuice');return false;">#}
-                                                    {#                                                                applejuice#}
-                                                    {#                                                            </li>#}
-                                                    {#                                                            <li class="tag-cloud"#}
-                                                    {#                                                                onclick="jQuery('#foodbakery-tags').tagit('createTag', 'burgger');return false;">#}
-                                                    {#                                                                burgger#}
-                                                    {#                                                            </li>#}
-                                                    {#                                                            <li class="tag-cloud"#}
-                                                    {#                                                                onclick="jQuery('#foodbakery-tags').tagit('createTag', 'coffee');return false;">#}
-                                                    {#                                                                coffee#}
-                                                    {#                                                            </li>#}
-                                                    {#                                                            <li class="tag-cloud"#}
-                                                    {#                                                                onclick="jQuery('#foodbakery-tags').tagit('createTag', 'food');return false;">#}
-                                                    {#                                                                food#}
-                                                    {#                                                            </li>#}
-                                                    {#                                                            <li class="tag-cloud"#}
-                                                    {#                                                                onclick="jQuery('#foodbakery-tags').tagit('createTag', 'Pasta');return false;">#}
-                                                    {#                                                                Pasta#}
-                                                    {#                                                            </li>#}
-                                                    {#                                                            <li class="tag-cloud"#}
-                                                    {#                                                                onclick="jQuery('#foodbakery-tags').tagit('createTag', 'pizza');return false;">#}
-                                                    {#                                                                pizza#}
-                                                    {#                                                            </li>#}
-                                                    {#                                                            <li class="tag-cloud"#}
-                                                    {#                                                                onclick="jQuery('#foodbakery-tags').tagit('createTag', 'stakes');return false;">#}
-                                                    {#                                                                stakes#}
-                                                    {#                                                            </li>#}
-                                                    {#                                                            <li class="tag-cloud"#}
-                                                    {#                                                                onclick="jQuery('#foodbakery-tags').tagit('createTag', 'water');return false;">#}
-                                                    {#                                                                water#}
-                                                    {#                                                            </li>#}
-                                                    {#                                                        </ul>#}
-                                                    {#                                                    </div>#}
                                                 </div>
                                             </li>
                                         </ul>

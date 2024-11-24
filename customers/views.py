@@ -79,9 +79,7 @@ def customer_setting(request):
 def order_ship(request):
     user = request.user
     orders = Order.objects.filter(shipper=request.user).filter(Q(status='Shipper Accepted') | Q(status='Delivering'))
-    print('Delivering', orders)
     date_range = request.GET.get('date_range', None)
-    print('date_range', date_range)
     if date_range:
         try:
             if ' to ' in date_range:
@@ -138,7 +136,7 @@ def order_ship(request):
             'vendors': list(order.vendors.all()),
             'user_location': f'{order.lat}, {order.lng}',
             'shipper_location': order.shipper.employeeprofile.get_location(),
-            'map': True if order.status == 'Delivering' else False,
+            'map': True if order.status == 'Delivering' or order.status == 'Shipper Accepted' else False,
             'proof_image': order.proof_image if order.proof_image else None,
         }
         print('order_data', order_data)

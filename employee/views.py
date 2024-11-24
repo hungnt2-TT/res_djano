@@ -1,9 +1,11 @@
 import os
 from cgi import print_environ_usage
 
+from django.contrib.gis.measure import D
 from django.db.models import Q, Prefetch, Sum, Count
 from django.db.models.functions import TruncDate
 from django.utils import timezone
+from django.db.models import Case, When, BooleanField
 
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
@@ -12,7 +14,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordContextMixin, PasswordResetCompleteView, \
     PasswordResetConfirmView, PasswordChangeView, PasswordChangeDoneView
-from django.contrib.gis.geos import Point
+from django.contrib.gis.geos import Point, GEOSGeometry
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
@@ -24,13 +26,14 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
 from django.views.generic import TemplateView
+from django.contrib.gis.db.models.functions import Distance
 from google.auth.transport import requests
 from google.oauth2 import id_token
 
-from menu.models import FoodItem
+from menu.models import FoodItem, Category
 from orders.models import Order, OrderedFood
 from vendor.forms import VendorUpdateForm, VendorServiceForm
-from vendor.models import Vendor, Favorite
+from vendor.models import Vendor, Favorite, VendorService
 from vendor.views import render_file_img
 from wallet.decorators import verified
 from wallet.models import Wallet, Transaction, SubTransaction
@@ -38,99 +41,101 @@ from .forms import RegisterForm, MyPasswordResetForm, MySetPasswordForm, Employe
     ProfileUpdateForm, RegisterFormByEmail, PasswordConfirmationForm
 from .mails import send_verification_email
 from .models import Profile, EmployeeProfile, District
-from .utils import detect_usertype
+from .utils import detect_usertype, get_or_set_current_location
 from datetime import datetime
 from .tasks import find_nearest_shipper, reassign_shipper_if_no_response
-
 from twilio.rest import Client
-
 from django.contrib.auth.models import AnonymousUser
-
+from django.shortcuts import get_object_or_404
 from django.core.serializers import serialize
-
 from django.contrib.gis.geos import Point
+import datetime
 
+
+def filter_orders(orders, start_date=None, end_date=None, search_query='', status_filter=''):
+    if start_date and end_date:
+        start_date = parse_date(start_date)
+        end_date = parse_date(end_date)
+        orders = orders.filter(created_at__date__range=[start_date, end_date])
+
+    if search_query:
+        orders = orders.filter(
+            Q(order_number__icontains=search_query) |
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query)
+        )
+
+    if status_filter:
+        orders = orders.filter(status=status_filter)
+
+    return orders
+
+
+def calculate_revenue(orders):
+    return sum(order.subtotal for order in orders)
 
 def home(request):
-    lat = request.GET.get('lat')
-    lng = request.GET.get('lng')
+    if get_or_set_current_location(request) is not None:
+        vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)
+        lat, lng = get_or_set_current_location(request)
+        pnt = GEOSGeometry(f'POINT(%s %s)' % (lng, lat), srid=4326)
+        vendors_by_location = vendors.filter(
+            location__distance_lte=(pnt, D(km=20))
+        ).annotate(distance=Distance('location', pnt)).order_by('distance')
+        for i in vendors_by_location:
+            print('i', i.user_profile.id)
+        for vendor in vendors_by_location:
+            vendor.kms = round(vendor.distance.km, 2)
 
-    vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)
-    if request.user.is_authenticated:
-        vendors = vendors.exclude(user=request.user)
+        if request.user.is_authenticated:
+            vendors = vendors.exclude(user=request.user)
 
-    vendors_premium = vendors.filter(vendor_type=Vendor.VENDOR_TYPE_PREMIUM)[:5]
-    profile = Profile.objects.filter(is_active=True)
+        vendors_premium = vendors.filter(vendor_type=Vendor.VENDOR_TYPE_PREMIUM)[:5]
+        profile = Profile.objects.filter(is_active=True)
 
-    information = {
-        'vendors': vendors.count(),
-        'profile': profile.count()
-    }
+        information = {
+            'vendors': vendors.count(),
+            'profile': profile.count()
+        }
 
-    current_hour = timezone.now().hour + 7
-    if 6 <= current_hour < 12:
-        time_range = 'morning'
-    elif 12 <= current_hour < 18:
-        time_range = 'afternoon'
-    elif 18 <= current_hour < 24:
-        time_range = 'evening'
+        current_hour = timezone.now().hour + 7
+        if 6 <= current_hour < 12:
+            time_range = 'morning'
+        elif 12 <= current_hour < 18:
+            time_range = 'afternoon'
+        elif 18 <= current_hour < 24:
+            time_range = 'evening'
+        else:
+            time_range = 'evening'
+        category_ranger = Category.objects.filter(time_range=time_range)
+        food_items = FoodItem.objects.filter(category__in=category_ranger)
+        list_food_items = FoodItem.objects.all()
+        districts = District.objects.filter(geom__contains=pnt).first()
+        vendor_district = None
+        if districts:
+            vendor_district = vendors.filter(name_district=districts)
+
+        context = {
+            'vendors': vendors,
+            'lat': lat,
+            'lng': lng,
+            'information': information,
+            'food_items': food_items,
+            'vendors_premium': vendors_premium,
+            'time_range': time_range,
+            'list_food_items': list_food_items,
+            'vendor_district': vendor_district,
+            'vendors_by_location': vendors_by_location
+        }
+        print('context', context)
+        return render(request, 'home.html', context)
+
     else:
-        time_range = 'evening'
-    food_items = FoodItem.objects.filter(Q(time_range=time_range) | Q(time_range='all_day'))
-    list_food_items = FoodItem.objects.all()
-    if lat and lng:
-        try:
-            lat = float(lat)
-            lng = float(lng)
-            user_location = Point(lng, lat, srid=4326)
-
-            if request.user.is_authenticated:
-                EmployeeProfile.objects.filter(user=request.user).update(latitude=lat, longitude=lng)
-
-            districts = District.objects.filter(geom__contains=user_location).first()
-
-            if districts:
-                vendor_district = vendors.filter(name_district=districts)
-                vendors_list = list(vendor_district.values('id', 'vendor_name', 'user__first_name', 'user__last_name',
-                                                           'vendor_slug'))
-
-                districts_dict = {
-                    'id': districts.id,
-                    'ten_tinh': districts.ten_tinh,
-                    'ten_huyen': districts.ten_huyen,
-                    'dan_so': districts.dan_so,
-                    'nam_tk': districts.nam_tk,
-                    'code_vung': districts.code_vung,
-                    'location': {'lat': districts.geom.centroid.y,
-                                 'lng': districts.geom.centroid.x} if districts.geom else None
-                }
-                return JsonResponse({
-                    'vendors': vendors_list,
-                    'information': information,
-                    'districts': districts_dict,
-                    'status': 'success',
-                    'vendors_premium': list(
-                        vendors_premium.values('id', 'vendor_name', 'user__first_name', 'user__last_name',
-                                               'vendor_slug'))
-                })
-            else:
-                return JsonResponse({'status': 'error', 'message': 'No district found for the given coordinates'})
-        except ValueError:
-            return JsonResponse({'status': 'error', 'message': 'Invalid latitude or longitude'})
-    else:
-        vendors = vendors[:8]
+        vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)[:8]
 
     context = {
         'vendors': vendors,
-        'lat': lat,
-        'lng': lng,
-        'information': information,
-        'food_items': food_items,
-        'vendors_premium': vendors_premium,
-        'time_range': time_range,
-        'list_food_items': list_food_items
     }
-    print('vendors_premium', vendors_premium)
     return render(request, 'home.html', context)
 
 
@@ -394,18 +399,85 @@ def middleware_account(request):
     return redirect(redirect_url)
 
 
+
 @login_required(redirect_field_name='next', login_url='_login')
 @user_passes_test(check_role_vendor, login_url='_login')
 def owner_dashboard(request):
-    user = request.user
-    vendor = Vendor.objects.get(user=user)
-    print('owner_dashboard', vendor)
-    pending_orders = get_pending_orders_for_vendor(vendor.id)
+    from datetime import datetime
+    vendor = Vendor.objects.get(user=request.user)
+    orders = Order.objects.filter(vendors__in=[vendor.id], is_ordered=True, status='Completed').order_by('created_at')
+    orders_count = orders.count()
+
+    # food
+    food_items = FoodItem.objects.filter(vendor=vendor)
+    food_items_count = food_items.count()
+
+    food_items_sold = FoodItem.objects.filter(vendor=vendor).annotate(total_sold=Sum('quantity_order'))
+    food_names = [item.food_name for item in food_items_sold]
+    total_sold = [item.total_sold for item in food_items_sold]
+
+    # Lọc đơn hàng
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    search_query = request.GET.get('search', '')
+    status_filter = request.GET.get('status', '')
+    filtered_orders = filter_orders(orders, start_date, end_date, search_query, status_filter)
+
+    # Tính doanh thu
+    current_month = datetime.now().month
+    current_month_orders = orders.filter(created_at__month=current_month)
+    current_month_revenue = calculate_revenue(current_month_orders)
+    total_revenue = calculate_revenue(orders)
+
+    user_wallet = Wallet.objects.get(user=request.user)
+    transactions = Transaction.objects.filter(wallet=user_wallet)
+    if start_date and end_date:
+        transactions = transactions.filter(create_at__date__range=[start_date, end_date])
+
+    total_order_amounts = (
+        filtered_orders
+        .values('created_at__date')
+        .annotate(total_amount=Sum('subtotal'))
+        .order_by('created_at__date')
+    )
+    successful_orders_count = orders.filter(status='Completed').count()
+    failed_orders_count = orders.filter(status='Cancelled').count()
+    transactions_by_date = (
+        transactions
+        .annotate(date=TruncDate('create_at'))
+        .values('date', 'transaction_type')
+        .annotate(count=Count('id'))
+        .order_by('date', 'transaction_type')
+    )
+
+    transaction_dates = sorted(set(t['date'].strftime('%Y-%m-%d') for t in transactions_by_date))
+    deposit_data = {d: 0 for d in transaction_dates}
+    withdraw_data = {d: 0 for d in transaction_dates}
+
+    for t in transactions_by_date:
+        date_str = t['date'].strftime('%Y-%m-%d')
+        if t['transaction_type'] == Transaction.TRANSACTION_TYPE_DEPOSIT:
+            deposit_data[date_str] = t['count']
+        else:
+            withdraw_data[date_str] = t['count']
+
     context = {
         'vendor': vendor,
-        'pending_orders': pending_orders,
+        'food_names': food_names,
+        'total_sold': total_sold,
+        'pending_orders': get_pending_orders_for_vendor(vendor.id),
+        'recent_orders': filtered_orders[:10],
+        'current_month_revenue': current_month_revenue,
+        'transaction_dates': transaction_dates,
+        'deposit_data': list(deposit_data.values()),
+        'withdraw_data': list(withdraw_data.values()),
+        'total_revenue': total_revenue,
+        'orders_count': orders_count,
+        'successful_orders_count': successful_orders_count,
+        'failed_orders_count': failed_orders_count,
+        'order_dates': [entry['created_at__date'].strftime('%Y-%m-%d') for entry in total_order_amounts],
+        'total_amounts': [entry['total_amount'] for entry in total_order_amounts],
     }
-
     return render(request, 'owner.html', context)
 
 
@@ -426,40 +498,24 @@ def shipper_dashboard(request):
 @login_required(redirect_field_name='next', login_url='_login')
 @user_passes_test(check_role_employee, login_url='_login')
 def customer_dashboard(request):
-    # Date range filtering
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
     search_query = request.GET.get('search', '')
     status_filter = request.GET.get('status', '')
 
-    # Order data
     completed_orders = Order.objects.filter(user=request.user, status__in=['Completed', 'Delivered'])
+    filtered_orders = filter_orders(completed_orders, start_date, end_date, search_query, status_filter)
 
-    if start_date and end_date:
-        start_date = parse_date(start_date)
-        end_date = parse_date(end_date)
-        completed_orders = completed_orders.filter(created_at__date__range=[start_date, end_date])
-
-    if search_query:
-        completed_orders = completed_orders.filter(
-            Q(order_number__icontains=search_query) |
-            Q(first_name__icontains=search_query) |
-            Q(last_name__icontains=search_query)
-        )
-
-    if status_filter:
-        completed_orders = completed_orders.filter(status=status_filter)
-
-    total_order_amounts = completed_orders.values('created_at__date').annotate(total_amount=Sum('total')).order_by(
-        'created_at__date')
+    total_order_amounts = (
+        filtered_orders
+        .values('created_at__date')
+        .annotate(total_amount=Sum('total'))
+        .order_by('created_at__date')
+    )
     order_status = Order.objects.filter(user=request.user)
     successful_orders_count = order_status.filter(status__in=['Completed', 'Delivered']).count()
     failed_orders_count = order_status.filter(status__in=['Payment Failed', 'Cancelled']).count()
-    order_dates = [entry['created_at__date'].strftime('%Y-%m-%d') for entry in total_order_amounts]
-    total_amounts = [entry['total_amount'] for entry in total_order_amounts]
-    statuses = Order.STATUS
 
-    # Transaction data
     user_wallet = Wallet.objects.get(user=request.user)
     transactions = Transaction.objects.filter(wallet=user_wallet)
     if start_date and end_date:
@@ -485,9 +541,9 @@ def customer_dashboard(request):
             withdraw_data[date_str] = t['count']
 
     context = {
-        'order_dates': order_dates,
-        'total_amounts': total_amounts,
-        'statuses': statuses,
+        'order_dates': [entry['created_at__date'].strftime('%Y-%m-%d') for entry in total_order_amounts],
+        'total_amounts': [entry['total_amount'] for entry in total_order_amounts],
+        'statuses': Order.STATUS,
         'successful_orders_count': successful_orders_count,
         'failed_orders_count': failed_orders_count,
         'transaction_dates': transaction_dates,
@@ -554,66 +610,53 @@ class PasswordChangeDone(PasswordChangeDoneView):
     template_name = 'password_change_done.html'
 
 
+# views.py
+from django.shortcuts import get_object_or_404
+
+
+@login_required()
 def vendor_profile_update(request):
-    print('vendor_profile_update', request.user)
-    print('vendor_profile_update', request.POST)
-    profile = EmployeeProfile.objects.get(user=request.user)
-    print('profile', profile.profile_picture)
-    vendor = Vendor.objects.get(user=request.user)
+    profile, _ = EmployeeProfile.objects.get_or_create(user=request.user)
+    vendor, _ = Vendor.objects.get_or_create(user=request.user)
+    vendor_service, _ = VendorService.objects.get_or_create(vendor=vendor)
+
     if request.method == 'POST':
-        print('request.POST', request.POST)
         vendor_forms = VendorUpdateForm(request.POST, instance=vendor)
-        vendor_service = VendorServiceForm(request.POST, instance=vendor.vendor_service)
+        vendor_service_form = VendorServiceForm(request.POST, instance=vendor_service)
         emp_forms = EmployeeProfileForm(request.POST, request.FILES, instance=profile)
-        user = ProfileUpdateForm(request.POST, instance=request.user)
-        print('vendor_forms errors =', vendor_service.errors)
+        user_form = ProfileUpdateForm(request.POST, instance=request.user)
 
-        if vendor_forms.is_valid() and emp_forms.is_valid() and user.is_valid() and vendor_service.is_valid():
-            print('vendor_forms.cleaned_data', vendor_service.cleaned_data)
+        if vendor_forms.is_valid() and vendor_service_form.is_valid() and emp_forms.is_valid() and user_form.is_valid():
             vendor_forms.save()
-            print('vendor_service.cleaned_data', vendor_service)
-            print('vendor_service.vendor', vendor)
+            vendor_service_form.save()
 
-            vendor_service = vendor_service.save(commit=False)
-            vendor_service.vendor = vendor
-            vendor_service.save()
-            try:
-                emp = EmployeeProfile.objects.get(user=request.user)
-                emp.profile_picture = request.FILES.get('img_logo') if request.FILES.get(
-                    'img_logo') else emp.profile_picture
-                emp.cover_photo = request.FILES.get('img_cover') if request.FILES.get('img_cover') else emp.cover_photo
-                emp.save()
-            except Exception as e:
-                print('Error when saving user:', e)
-            user.save()
-            messages.success(request, 'Profile updated successfully')
+            emp = emp_forms.save(commit=False)
+            emp.user = request.user
+            emp.save()
 
+            user_form.save()
+            messages.success(request, "Profile updated successfully.")
             return redirect('profile')
 
-    if profile.profile_picture or profile.cover_photo:
-        img_logo = render_file_img(request, profile.profile_picture)
-        img_cover = render_file_img(request, profile.cover_photo)
-    else:
-        img_logo = None
-        img_cover = None
+        print("Vendor form errors:", vendor_forms.errors)
+        print("Vendor service form errors:", vendor_service_form.errors)
+        print("Employee form errors:", emp_forms.errors)
+        print("User form errors:", user_form.errors)
 
     vendor_forms = VendorUpdateForm(instance=vendor)
     emp_forms = EmployeeProfileForm(instance=profile)
-    vendor_service = VendorServiceForm(instance=vendor.vendor_service)
-    print('vendor_service', vendor_service)
-    user = ProfileUpdateForm(instance=request.user)
-    print('profile.cover_photo', profile.cover_photo)
-    print('profile.profile_picture', profile.profile_picture)
+    vendor_service_form = VendorServiceForm(instance=vendor_service)
+    user_form = ProfileUpdateForm(instance=request.user)
+
     ctx = {
         'vendor_forms': vendor_forms,
         'emp_forms': emp_forms,
-        'img_cover': img_cover,
-        'img_logo': img_logo,
-        'user': user,
-        'vendor_service': vendor_service
+        'user_form': user_form,
+        'vendor_service': vendor_service_form,
+        'profile': profile,
+        'user': request.user,  # Pass the user object directly
     }
     return render(request, 'vendor/vendor_profile_update.html', ctx)
-
 
 @csrf_exempt
 def auth_receiver(request):

@@ -29,10 +29,18 @@ from django_ckeditor_5.fields import CKEditor5Field
 
 # Create your models here.
 class Category(models.Model):
+    TIME_RANGES = [
+        ('morning', '6:00-12:00'),
+        ('afternoon', '12:00-18:00'),
+        ('evening', '18:00-24:00'),
+        ('night', '0:00-6:00'),
+        ('all_day', '00:01-23:59')
+    ]
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     category_name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50, unique=True)
     description = CKEditor5Field(null=True, blank=True, config_name='default')
+    time_range = models.CharField(max_length=10, choices=TIME_RANGES, default='morning')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -46,6 +54,26 @@ class Category(models.Model):
             self, *args, **kwargs
     ):
         self.slug = slugify(self.category_name) + '-' + str(self.id)
+        model_path = os.path.join(settings.BASE_DIR, 'menu', 'food_time_model.pkl')
+        vectorizer_path = os.path.join(settings.BASE_DIR, 'menu', 'vectorizer.pkl')
+
+        print('model_path', model_path)
+        print('vectorizer_path', vectorizer_path)
+        # Kiểm tra nếu model và vectorizer tồn tại
+        if os.path.exists(model_path) and os.path.exists(vectorizer_path):
+            # Tải mô hình và vectorizer
+            clf = joblib.load(model_path)
+            vectorizer = joblib.load(vectorizer_path)
+            print('clf', clf)
+            # Kiểm tra nếu time_range chưa được xác định, tiến hành dự đoán
+            print('self.food_name', self.category_name)
+            food_name_lower = self.category_name.lower()
+            # Chuyển tên món ăn thành vector
+            test_category = vectorizer.transform([food_name_lower])
+            print('test_food', test_category)
+            # Dự đoán time_range và gán vào thuộc tính của đối tượng
+            print('clf.predict(test_food)', clf.predict(test_category))
+            self.time_range = clf.predict(test_category)[0]
         super(Category, self).save(*args, **kwargs)
 
 
@@ -67,12 +95,6 @@ class Size(models.Model):
 
 
 class FoodItem(models.Model):
-    TIME_RANGES = [
-        ('morning', '6:00-12:00'),
-        ('afternoon', '12:00-18:00'),
-        ('evening', '18:00-24:00'),
-        ('night', '0:00-6:00'),
-    ]
     sizes = models.ManyToManyField(Size, related_name="food_items")
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='vendor_food_items')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='food_items')
@@ -85,7 +107,6 @@ class FoodItem(models.Model):
     old_price = models.IntegerField(null=True, default=0)
     discounted_price = models.IntegerField(null=True, default=0)
     sale_end_time = models.DateTimeField(null=True, blank=True)
-    time_range = models.CharField(max_length=10, choices=TIME_RANGES, default='morning')
     image = models.ImageField(upload_to='food_items/')
     is_available = models.BooleanField(default=True)
     quantity_order = models.PositiveIntegerField(default=0)
@@ -101,29 +122,6 @@ class FoodItem(models.Model):
         self.slug = slugify(self.food_name)
         if self.price < 0 or None:
             self.price = 0
-            # Đường dẫn tới các file model và vectorizer đã được huấn luyện và lưu trữ trước đó
-        model_path = os.path.join(settings.BASE_DIR, 'menu', 'food_time_model.pkl')
-        vectorizer_path = os.path.join(settings.BASE_DIR, 'menu', 'vectorizer.pkl')
-        # model_path = os.path.join('path_to_saved_model', 'food_time_model.pkl')
-        # vectorizer_path = os.path.join('path_to_saved_vectorizer', 'vectorizer.pkl')
-        print('model_path', model_path)
-        print('vectorizer_path', vectorizer_path)
-        # Kiểm tra nếu model và vectorizer tồn tại
-        if os.path.exists(model_path) and os.path.exists(vectorizer_path):
-            # Tải mô hình và vectorizer
-            clf = joblib.load(model_path)
-            vectorizer = joblib.load(vectorizer_path)
-            print('clf', clf)
-            # Kiểm tra nếu time_range chưa được xác định, tiến hành dự đoán
-            print('self.food_name', self.food_name)
-            food_name_lower = self.food_name.lower()
-            # Chuyển tên món ăn thành vector
-            test_food = vectorizer.transform([food_name_lower])
-            print('test_food', test_food)
-            # Dự đoán time_range và gán vào thuộc tính của đối tượng
-            print('clf.predict(test_food)', clf.predict(test_food))
-            self.time_range = clf.predict(test_food)[0]
-        # Gọi phương thức save của lớp cha để lưu đối tượng vào DB
         super(FoodItem, self).save(*args, **kwargs)
 
 

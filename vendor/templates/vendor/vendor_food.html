@@ -116,6 +116,20 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                                                    <div class="field-holder">
+                                                                        <label>Old price * (VND)</label>
+                                                                        {% if food_form.instance.old_price %}
+                                                                            <input type="text" name="old_price"
+                                                                                   value="{{ food_form.instance.old_price }}"
+                                                                                   class="form-control" required>
+                                                                        {% else %}
+                                                                            <input type="text" name="old_price"
+                                                                                   value="0"
+                                                                                   class="form-control" required>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                                                     <div class="field-holder checkbox-wrapper">
                                                                         <label>Is Available</label>
                                                                         <label class="switch">
@@ -350,6 +364,18 @@
                                                                                                         type="text"
                                                                                                         id="price{{ food.id }}"
                                                                                                         value="{{ food.price }}"
+                                                                                                        placeholder="Menu Item Price">
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                                                                                <div class="field-holder">
+                                                                                                    <label>Old price
+                                                                                                        *
+                                                                                                        (VND)</label><input
+                                                                                                        class="menu-item-price"
+                                                                                                        type="text"
+                                                                                                        id="old_price{{ food.id }}"
+                                                                                                        value="{{ food.old_price }}"
                                                                                                         placeholder="Menu Item Price">
                                                                                                 </div>
                                                                                             </div>

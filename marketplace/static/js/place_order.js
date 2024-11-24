@@ -55,7 +55,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         confirmButtonText: 'OK'
                     })
                     // Redirect to order confirmation page
-                    window.location.href = data.success_url
+                    // window.location.href = data.success_url
+                    window.location.href = data.order_detail
                 } else {
                     Swal.fire({
                         title: 'Error!',

@@ -1,6 +1,7 @@
 import json
 import math
 from collections import defaultdict
+from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from http.client import responses
 from unicodedata import category
@@ -29,7 +30,7 @@ from marketplace.templatetags.custom_filters import to_vnd_words
 from menu.models import Category, FoodItem, Size, Coupon
 from orders.forms import OrderForm
 from orders.models import Order
-from vendor.models import Vendor
+from vendor.models import Vendor, OpeningHour
 from wallet.models import Transaction, Wallet, SubTransaction
 from wallet.tasks import convert_currency, format_currency_conversion
 
@@ -82,7 +83,19 @@ def food_item_recomment(request):
     return render(request, 'list_fooditem.html', context)
 
 
+@csrf_exempt
 def food_item(request):
+    print('food_item', request.POST)
+    if request.method == 'POST':
+        keyword = request.POST.get('search_title')
+        food_items = FoodItem.objects.filter(food_name__icontains=keyword)
+        vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)
+        context = {
+            'vendors': vendors,
+            'food_items': food_items,
+            'food_item_count': food_items.count()
+        }
+        return render(request, 'list_fooditem.html', context)
     food_items = FoodItem.objects.all()
     print('food_items', food_items)
     vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)
@@ -99,6 +112,13 @@ def vendor_detail(request, vendor_slug):
     vendor = Vendor.objects.get(vendor_slug=vendor_slug)
     vendor_id = vendor.id
     vendor_slug = vendor.vendor_slug
+    opening_hours = OpeningHour.objects.filter(vendor=vendor).order_by('day', '-from_hour')
+    today_date = date.today()
+    today = today_date.isoweekday()
+    current_today = None
+    if opening_hours:
+        current_today = opening_hours.filter(day=today)
+    is_open = vendor.is_open()
     user = Profile.objects.get(email=request.user.email)
     categories = Category.objects.filter(vendor=vendor).prefetch_related(
         Prefetch('food_items', queryset=FoodItem.objects.filter(is_available=True)))
@@ -114,7 +134,6 @@ def vendor_detail(request, vendor_slug):
             'user': user,
             'vendor': vendor
         }
-        print('vendor_id', vendor_id)
         form = ReservationForm(initial=user_data)
         context = {
             'vendor': vendor,
@@ -122,7 +141,10 @@ def vendor_detail(request, vendor_slug):
             'categories': categories,
             'cart_items': cart_items,
             'form': form,
-            'vendor_id': vendor.id
+            'vendor_id': vendor.id,
+            'opening_hours': opening_hours,
+            'current_today': current_today,
+            'is_open': is_open
         }
         return render(request, 'vendor_maketplace_detail.html', context)
 
@@ -130,7 +152,10 @@ def vendor_detail(request, vendor_slug):
         'vendor': vendor,
         'vendor_slug': vendor_slug,
         'categories': categories,
-        'vendor_id': vendor.id
+        'vendor_id': vendor.id,
+        'opening_hours': opening_hours,
+        'current_today': current_today,
+        'is_open': is_open
     }
     return render(request, 'vendor_maketplace_detail.html', context)
 

@@ -228,13 +228,12 @@ def payment(request, order_id):
                 # Check bank_code, if bank_code is empty, customer will be selected bank on VNPAY
             if bank_code and bank_code != "":
                 vnp.requestData['vnp_BankCode'] = bank_code
-
+            order_number = order.order_number  # Get the order number
+            vnp_return_url = settings.VNPAY_RETURN_URL.format(order_number=order_number)
             vnp.requestData['vnp_CreateDate'] = datetime.now().strftime('%Y%m%d%H%M%S')
             vnp.requestData['vnp_IpAddr'] = ipaddr
-            vnp.requestData['vnp_ReturnUrl'] = settings.VNPAY_RETURN_URL
-            print('--------------------------------------------')
+            vnp.requestData['vnp_ReturnUrl'] = vnp_return_url
             vnpay_payment_url = vnp.get_payment_url(settings.VNPAY_PAYMENT_URL, settings.VNPAY_HASH_SECRET_KEY)
-            print(vnpay_payment_url)
             return redirect(vnpay_payment_url)
         else:
             print("Form input not validate")

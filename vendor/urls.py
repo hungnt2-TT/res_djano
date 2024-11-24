@@ -23,4 +23,9 @@ urlpatterns = [
     # toggle_favorite
     path('toggle-favorite/<int:vendor_id>/', views.toggle_favorite, name='toggle_favorite'),
 
+    # opening hours
+    path('opening_hours/', views.opening_hours, name='opening_hours'),
+    path('opening_hours_add/', views.opening_hours_add, name='opening_hours_add'),
+    path('opening_hours_edit/<int:pk>', views.opening_hours_edit, name='opening_hours_edit'),
+    path('opening_hours_delete/<int:pk>', views.opening_hours_delete, name='opening_hours_delete'),
 ]

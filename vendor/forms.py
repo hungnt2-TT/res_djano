@@ -53,7 +53,7 @@ class VendorUpdateForm(forms.ModelForm):
 class VendorUpdateMapForm(forms.ModelForm):
     class Meta:
         model = Vendor
-        fields = ['fax_number', 'state', 'city', 'longitude', 'latitude', 'address_line_1', 'pin_code', 'location', 'street_number']
+        fields = ['fax_number', 'state', 'city', 'longitude', 'latitude', 'address_line_1', 'pin_code', 'street_number']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -68,7 +68,6 @@ class VendorUpdateMapForm(forms.ModelForm):
         self.fields['fax_number'].widget.attrs['placeholder'] = 'Fax Number'
         self.fields['pin_code'].widget.attrs['placeholder'] = 'Pin Code'
         self.fields['pin_code'].widget.attrs['id'] = 'postal_code'
-        self.fields['location'].widget.attrs['placeholder'] = 'Location'
         self.fields['street_number'].widget.attrs['placeholder'] = 'Street number'
         self.fields['street_number'].widget.attrs['id'] = 'street_number'
 
@@ -101,3 +100,13 @@ class OpeningHourForm(forms.ModelForm):
     class Meta:
         model = OpeningHour
         fields = ['day', 'from_hour', 'to_hour', 'is_closed']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        from_hour = cleaned_data.get('from_hour')
+        to_hour = cleaned_data.get('to_hour')
+        is_closed = cleaned_data.get('is_closed')
+
+        if not is_closed and from_hour and to_hour and from_hour >= to_hour:
+            self.add_error('from_hour', 'From hour must be less than to hour.')
+            self.add_error('to_hour', 'To hour must be greater than from hour.')

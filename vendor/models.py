@@ -10,6 +10,7 @@ from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import Point
 from datetime import time, date, datetime
 
+from employee.utils import conver_timezone_viettnam
 from res import settings
 
 
@@ -105,6 +106,22 @@ class Vendor(models.Model):
     def vendor_id(self):
         return self.id
 
+    def is_open(self):
+        today_date = date.today()
+        now = conver_timezone_viettnam()
+        today = today_date.isoweekday()
+        opening_hours = OpeningHour.objects.filter(vendor=self.id).order_by('day', '-from_hour')
+        current_today = opening_hours.filter(day=today)
+
+        if current_today:
+            for hour in current_today:
+                start = str(datetime.strptime(hour.from_hour, "%I:%M %p").time())
+                end = str(datetime.strptime(hour.to_hour, "%I:%M %p").time())
+                if hour.is_closed:
+                    return False
+                if start <= now <= end:
+                    return True
+        return False
     class Meta:
         db_table = 'vendor'
         verbose_name = 'Vendor'
@@ -159,7 +176,7 @@ class OpeningHour(models.Model):
 
     class Meta:
         ordering = ('day', '-from_hour')
-        unique_together = ('vendor', 'day', 'from_hour', 'to_hour')
+        unique_together = ('vendor', 'day')
 
     def __str__(self):
         return self.get_day_display()

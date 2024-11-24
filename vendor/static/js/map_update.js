@@ -102,3 +102,7 @@ function initSearchBox() {
         map.fitBounds(bounds);
     });
 }
+
+window.onload = function () {
+    initSearchBox();
+}

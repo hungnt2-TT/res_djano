@@ -21,7 +21,7 @@
                                 <p>Total Amount: ${{ formatted_total }}</p>
                                 <span id="confirm-url" data-url="{% url 'confirm_paypal_payment' %}"
                                       style="display: none;"></span>
-                                <span id="payment_success" data-url="{% url 'payment_success' %}"
+                                <span id="payment_success" data-url="{% url 'order_detail' order.order_number %}"
                                       style="display: none;"></span>
                                 <span id="payment_failed" data-url="{% url 'payment_failed' %}"
                                       style="display: none;"></span>

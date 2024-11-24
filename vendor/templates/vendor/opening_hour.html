@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_scripts %}
+    {#    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>#}
+    <script src="{% static 'js/opening_hours.js' %}"></script>
+{% endblock %}
+
+{% block css %}
+    <style>
+        .closed-hour {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .closed-hour td {
+            color: #721c24;
+        }
+    </style>
+
+    <link rel="stylesheet" type="text/css" href="{% static '/css/setting_orders.css' %}">
+{% endblock %}
+
+{% block title %}Order{{ block.super }} {% endblock %}
+
+%}
+{% block content %}
+    {% include 'includes/alerts.html' %}
+
+    <!-- Main Section Start -->
+    <div class="main-section">
+
+        {% include 'includes/cover.html' %}
+        <div class="page-section account-header buyer-logged-in">
+            <div class="container-field">
+                <div class="row px-5">
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        <!-- Load the sidebar here -->
+                        {% include 'includes/v_sidebar.html' %}
+                    </div>
+                    <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                        <div class="user-dashboard loader-holder w-100 p-3">
+                            <div class="user-holder">
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="row" style="display: block">
+                                        <div class="element-title has-border right-filters-row">
+                                            <h5 class='text-uppercase'>Opening Hours</h5>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="row" style="display: block">
+                                        <table class="table opening_hours_vendor" style=" border: none">
+                                            <thead>
+                                            <tr>
+                                                <th style="text-align: center">Day</th>
+                                                <th style="text-align: center">Time</th>
+                                                <th style="text-align: center">Action</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for hour in vendor_time_open %}
+                                                <tr data-id="{{ hour.id }}"
+                                                    class="{% if hour.is_closed %}closed-hour{% endif %}">
+                                                    <td style="text-align: center"><b>{{ hour.get_day_display }}</b>
+                                                    </td> <!-- Day -->
+                                                    <td style="text-align: center">
+                                                        {% if hour.is_closed %}
+                                                            Closed
+                                                        {% else %}
+                                                            {{ hour.from_hour }} - {{ hour.to_hour }}
+                                                        {% endif %}
+                                                    </td> <!-- Time -->
+                                                    <td style="text-align: center">
+                                                        <a href="#" class="edit_hour"
+                                                           data-url="{% url 'opening_hours_edit' hour.id %}"
+                                                           data-id="{{ hour.id }}">Edit</a> |
+                                                        <a href="#" class="delete_hour"
+                                                           data-url="{% url 'opening_hours_delete' hour.id %}"
+                                                           data-id="{{ hour.id }}">Remove</a>
+                                                    </td> <!-- Action -->
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="row" style="display: block;">
+                                        <form id="opening_hours add_hour">
+                                            {% csrf_token %}
+                                            <div class="row" style="    padding-left: 250px;">
+                                                <div class="col-md-2">
+                                                    {{ form.day }}
+                                                </div>
+                                                <div class="col-md-2">
+                                                    {{ form.from_hour }}
+                                                </div>
+                                                <div class="col-md-2">
+                                                    {{ form.to_hour }}
+                                                </div>
+                                                <div class="col-md-2">
+                                                    {{ form.is_closed }} Set as closed
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <input type="hidden" value="{% url 'opening_hours_add' %}"
+                                                           id="opening_hours_add">
+                                                    <button type="button" class="btn btn-primary add_hour">Add Hours
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Main Section End -->
+
+            <script>
+                console.log('print');
+
+                function printReceipt() {
+                    var printContent = document.getElementById('receipt').innerHTML;
+                    var originalContent = document.body.innerHTML;
+
+                    document.body.innerHTML = printContent;
+                    window.print();
+                    document.body.innerHTML = originalContent;
+                }
+            </script>
+
+{% endblock %}

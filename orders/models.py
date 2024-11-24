@@ -29,7 +29,6 @@ class Order(models.Model):
     payment = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE)
     shipper = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.SET_NULL, related_name='orders')
     assigned_at = models.DateTimeField(null=True, blank=True)
-
     order_number = models.CharField(max_length=50)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -93,7 +92,11 @@ class Order(models.Model):
             return self.order_details[0]['vendor']
         return None
 
-
+    def get_total_by_vendor(self):
+        total = 0
+        for item in self.order_details:
+            total += item['price']
+        return total
 class OrderedFood(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     payment = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE)

@@ -80,6 +80,7 @@ $(document).ready(function () {
         let foodTitle = $('#food_title' + transactionId).val();
         let foodSubTitle = $('#food_sub_title' + transactionId).val();
         let price = $('#price' + transactionId).val();
+        let oldPrice = $('#old_price' + transactionId).val();
         let category = $('#category' + transactionId).val();
         let isAvailable = $('#is_available' + transactionId).is(':checked');
         let description = editors['description' + transactionId].getData()
@@ -100,6 +101,7 @@ $(document).ready(function () {
         formData.append('food_title', foodTitle);
         formData.append('food_sub_title', foodSubTitle);
         formData.append('price', price);
+        formData.append('old_price', oldPrice);
         formData.append('category', category);
         formData.append('is_available', isAvailable);
         formData.append('description', description);
