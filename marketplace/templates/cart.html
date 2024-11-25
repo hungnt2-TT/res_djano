@@ -29,6 +29,13 @@
                                                  class="menu-itam-list cart-border-market">
                                                 {% if grouped_cart_items %}
                                                     {% for vendor, data in grouped_cart_items %}
+                                                        {% if not vendor.is_open %}
+                                                            <div class="closed-notice">
+                                                                <p>The restaurant is currently closed. You cannot order
+                                                                    food at this
+                                                                    time.</p>
+                                                            </div>
+                                                        {% endif %}
                                                         <div class="list-cart-item" data-vendor-id="{{ vendor.id }}">
                                                             <h6><a href="{% url 'vendor_detail' vendor.vendor_slug %}"
                                                                    class="badge badge-warning">
@@ -39,7 +46,7 @@
                                                                 {% for cart_item in data.items %}
                                                                     <li id="cart-item-{{ cart_item.id }}"
                                                                         data-item-id="{{ cart_item.id }}"
-                                                                        class="cart-item"
+                                                                        class="cart-item "
                                                                         style="padding:25px">
                                                                         <div class="image-holder">
                                                                             <img src="{{ cart_item.food_item.image.url }}"
@@ -186,8 +193,10 @@
 
                                     {#                                <a href="#" class="menu-order-confirm">Confirm Order</a>#}
                                     <button type="submit" id="checkout-cart"
-                                            class="menu-order-confirm text-uppercase font-weight-bold" type="submit">
-                                        PROCEED
+                                            class="menu-order-confirm text-uppercase font-weight-bold" type="submit"
+                                            {% if not vendor_status %}disabled{% endif %}>
+
+                                    PROCEED
                                         TO CHECKOUT
                                     </button>
                                     <span class="menu-loader"></span>

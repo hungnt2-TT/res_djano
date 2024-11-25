@@ -37,7 +37,7 @@ from vendor.models import Vendor, Favorite, VendorService
 from vendor.views import render_file_img
 from wallet.decorators import verified
 from wallet.models import Wallet, Transaction, SubTransaction
-from .decorators import restrict_employee_types
+# from .decorators import restrict_employee_types
 from .forms import RegisterForm, MyPasswordResetForm, MySetPasswordForm, EmployeeProfileForm, \
     ProfileUpdateForm, RegisterFormByEmail, PasswordConfirmationForm
 from .mails import send_verification_email
@@ -83,10 +83,11 @@ def calculate_revenue(orders):
 #         return False
 
 
-@restrict_employee_types
+# @restrict_employee_types
 def home(request):
     if get_or_set_current_location(request) is not None:
         vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)
+
         lat, lng = get_or_set_current_location(request)
         pnt = GEOSGeometry(f'POINT(%s %s)' % (lng, lat), srid=4326)
         vendors_by_location = vendors.filter(
@@ -99,7 +100,7 @@ def home(request):
 
         if request.user.is_authenticated:
             vendors = vendors.exclude(user=request.user)
-
+        print('vendors_by_location', vendors_by_location)
         vendors_premium = vendors.filter(vendor_type=Vendor.VENDOR_TYPE_PREMIUM)[:5]
         profile = Profile.objects.filter(is_active=True)
 

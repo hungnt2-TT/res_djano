@@ -33,7 +33,9 @@ from orders.models import Order
 from vendor.models import Vendor, OpeningHour
 from wallet.models import Transaction, Wallet, SubTransaction
 from wallet.tasks import convert_currency, format_currency_conversion
-from employee.decorators import restrict_employee_types
+
+
+# from employee.decorators import restrict_employee_types
 
 # Create your views here.
 def marketplace(request):
@@ -162,7 +164,7 @@ def vendor_detail(request, vendor_slug):
 
 @csrf_exempt
 @login_required(login_url='login')
-@restrict_employee_types
+# @restrict_employee_types
 def add_to_cart(request, food_item_id):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
@@ -199,7 +201,7 @@ def add_to_cart(request, food_item_id):
 
 @csrf_exempt
 @login_required(login_url='login')
-@restrict_employee_types
+# @restrict_employee_types
 def remove_from_cart(request, food_item_id):
     print('remove_from_cart', request.POST)
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -251,7 +253,7 @@ def get_distance_and_time(api_key, origin, destination, mode="driving"):
 
 @csrf_exempt
 @login_required(login_url='login')
-@restrict_employee_types
+# @restrict_employee_types
 def cart(request):
     user_profile = Profile.objects.get(email=request.user.email)
     profile = EmployeeProfile.objects.get(user=request.user)
@@ -264,9 +266,10 @@ def cart(request):
     subtotal = 0
     tax = 0
     total_shipping_cost = 0
-
+    vendor_status = []
     for item in cart_items:
         vendor = item.food_item.vendor
+        vendor_status.append(vendor.is_open())
         grouped_cart_items[vendor]['items'].append(item)
         grouped_cart_items[vendor]['total_price'] += item.get_total_price()
 
@@ -291,9 +294,10 @@ def cart(request):
         vendor_total_price = data['total_price'] + shipping_cost
         data['total_with_shipping'] = vendor_total_price
         total_shipping_cost += shipping_cost
-
     final_grand_total = grand_total + total_shipping_cost
+    print('vendor_status', vendor_status[0])
     context = {
+        'vendor_status': vendor_status[0],
         'grouped_cart_items': grouped_cart_items.items(),
         'profile': profile,
         'total_shipping_cost': total_shipping_cost,

@@ -20,7 +20,7 @@ food_names = [
     'chè khúc bạch', 'chè thưng', 'gỏi bưởi', 'bánh tiêu', 'xôi gấc', 'xôi gà',
     'xôi xéo', 'lẩu rêu cua', 'lẩu ếch', 'lẩu cá', 'cơm gà', 'cơm sườn', 'cơm chiên', 'bia', 'rượu', 'nước ngọt',
     'cafe', 'cafe', 'cafe',
-    'chiên rán', 'chiên rán'
+    'chiên rán', 'chiên rán', 'trà xanh', 'bánh ngọt'
 
 ]
 
@@ -39,7 +39,7 @@ time_ranges = [
     'evening', 'morning', 'evening', 'night', 'night', 'afternoon',
     'afternoon', 'evening', 'evening', 'afternoon', 'night', 'morning',
     'morning', 'morning', 'evening', 'evening', 'evening', 'evening', 'evening', 'evening', 'evening', 'evening',
-    'all_day', 'morning', 'afternoon', 'evening', 'afternoon', 'evening'
+    'all_day', 'morning', 'afternoon', 'evening', 'afternoon', 'evening', 'all_day', 'all_day'
 ]
 
 print("Số lượng food_names:", len(food_names))

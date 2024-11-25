@@ -164,3 +164,12 @@ image-holder img {
     font-size: 1.4em; /* Tổng số to hơn các thành phần khác */
     color: #000;
 }
+
+.closed-notice {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    text-align: center;
+}

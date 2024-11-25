@@ -83,6 +83,9 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
                                 <i class="fa fa-shopping-cart text-danger fa-2x" style="font-size: 2em"></i>
                                 <span class="badge badge-warning " id="cart_counter"
                                       style="">{{ cart_count }}</span>
+                                <a href="{% url 'marketplace' %}" class="btn btn-outline-danger text-uppercase
+                                                    font-weight-bold"
+                                   style="margin-top: -4px">Marketplace</a>
                             </a>
                         {% endif %}
                         {% if role == 'owner' %}
@@ -103,15 +106,15 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
 
                             </a>
                         {% endif %}
-                        {#                        {% if user.is_authenticated %}#}
-                        {#                            <a href="{% url 'marketplace' %}" class="btn btn-outline-danger text-uppercase#}
-                        {#                            font-weight-bold"#}
-                        {#                               style="margin-top: -4px">Marketplace</a>#}
-                        {#                        {% else %}#}
-                        {#                            <a href="{% url 'marketplace' %}"#}
-                        {#                               class="btn btn-outline-danger text-uppercase font-weight-bold"#}
-                        {#                               style="margin-top: 16px">Marketplace</a>#}
-                        {#                        {% endif %}#}
+                        {#                                                {% if user.is_authenticated %}#}
+                        {#                                                    <a href="{% url 'marketplace' %}" class="btn btn-outline-danger text-uppercase#}
+                        {#                                                    font-weight-bold"#}
+                        {#                                                       style="margin-top: -4px">Marketplace</a>#}
+                        {#                                                {% else %}#}
+                        {#                                                    <a href="{% url 'marketplace' %}"#}
+                        {#                                                       class="btn btn-outline-danger text-uppercase font-weight-bold"#}
+                        {#                                                       style="margin-top: 16px">Marketplace</a>#}
+                        {#                                                {% endif %}#}
                         {% if user.is_authenticated %}
 
                             <div class="user-dashboard-menu">
