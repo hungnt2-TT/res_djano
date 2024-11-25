@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 from django.conf import settings
 
+from employee.decorators import restrict_employee_types
 from employee.models import Profile, EmployeeProfile
 from marketplace.context_processors import get_cart_amount
 from marketplace.distance import calculate_shipping_cost
@@ -37,6 +38,7 @@ from .tasks import validate_order_task, process_payment_task, notify_user_task, 
 
 @login_required
 @csrf_protect
+@restrict_employee_types
 # Create your views here.
 def checkout(request):
     user_profile = Profile.objects.get(email=request.user.email)
@@ -186,6 +188,7 @@ def checkout(request):
 
 @login_required
 @csrf_protect
+@restrict_employee_types
 def place_order(request):
     if request.method == 'POST':
         data = {

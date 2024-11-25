@@ -37,6 +37,7 @@ from vendor.models import Vendor, Favorite, VendorService
 from vendor.views import render_file_img
 from wallet.decorators import verified
 from wallet.models import Wallet, Transaction, SubTransaction
+from .decorators import restrict_employee_types
 from .forms import RegisterForm, MyPasswordResetForm, MySetPasswordForm, EmployeeProfileForm, \
     ProfileUpdateForm, RegisterFormByEmail, PasswordConfirmationForm
 from .mails import send_verification_email
@@ -74,6 +75,15 @@ def filter_orders(orders, start_date=None, end_date=None, search_query='', statu
 def calculate_revenue(orders):
     return sum(order.subtotal for order in orders)
 
+#
+# def check_home_page_by_empl_type(user):
+#     if user.employee_type == 1 or user.employee_type == 2 or user.employee_type == 5:
+#         return True
+#     else:
+#         return False
+
+
+@restrict_employee_types
 def home(request):
     if get_or_set_current_location(request) is not None:
         vendors = Vendor.objects.filter(is_approved=True, user__is_active=True)
@@ -289,6 +299,7 @@ class LoginResView(LoginView):
                     if not vendor.is_approved:
                         messages.warning(self.request, 'Your account is not approved yet')
                         raise PermissionDenied
+
                 except Vendor.DoesNotExist:
                     pass
 
@@ -296,8 +307,13 @@ class LoginResView(LoginView):
             self.request.session['member_last_login'] = True if user and user.last_login else False
             return self.form_valid(form)
         return self.form_invalid(form)
-    # def get_success_url(self):
-    #     return reverse('home')
+
+    def get_success_url(self):
+        user = self.request.user
+        print('get_success_url', user)
+        redirect_url = detect_usertype(user)
+        print('redirect_url', redirect_url)
+        return str(redirect_url)
 
 
 def convert_email_to_username(type):
@@ -397,7 +413,6 @@ def middleware_account(request):
     print('middleware_account', user_type)
     redirect_url = detect_usertype(user_type)
     return redirect(redirect_url)
-
 
 
 @login_required(redirect_field_name='next', login_url='_login')
@@ -657,6 +672,7 @@ def vendor_profile_update(request):
         'user': request.user,  # Pass the user object directly
     }
     return render(request, 'vendor/vendor_profile_update.html', ctx)
+
 
 @csrf_exempt
 def auth_receiver(request):

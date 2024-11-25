@@ -33,7 +33,7 @@ from orders.models import Order
 from vendor.models import Vendor, OpeningHour
 from wallet.models import Transaction, Wallet, SubTransaction
 from wallet.tasks import convert_currency, format_currency_conversion
-
+from employee.decorators import restrict_employee_types
 
 # Create your views here.
 def marketplace(request):
@@ -162,6 +162,7 @@ def vendor_detail(request, vendor_slug):
 
 @csrf_exempt
 @login_required(login_url='login')
+@restrict_employee_types
 def add_to_cart(request, food_item_id):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
@@ -198,6 +199,7 @@ def add_to_cart(request, food_item_id):
 
 @csrf_exempt
 @login_required(login_url='login')
+@restrict_employee_types
 def remove_from_cart(request, food_item_id):
     print('remove_from_cart', request.POST)
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -249,6 +251,7 @@ def get_distance_and_time(api_key, origin, destination, mode="driving"):
 
 @csrf_exempt
 @login_required(login_url='login')
+@restrict_employee_types
 def cart(request):
     user_profile = Profile.objects.get(email=request.user.email)
     profile = EmployeeProfile.objects.get(user=request.user)

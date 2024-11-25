@@ -83,9 +83,7 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
                                 <i class="fa fa-shopping-cart text-danger fa-2x" style="font-size: 2em"></i>
                                 <span class="badge badge-warning " id="cart_counter"
                                       style="">{{ cart_count }}</span>
-
                             </a>
-
                         {% endif %}
                         {% if role == 'owner' %}
                             <a href="{% url 'request_orders' %}" class="nav-bar-cart">
@@ -94,6 +92,9 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
                                       style="">{{ pending_orders_count }}</span>
 
                             </a>
+                            <a href="{% url 'marketplace' %}"
+                               class="btn btn-outline-danger text-uppercase font-weight-bold"
+                               style="margin-top: -12px">My Restaurant</a>
                         {% elif role ==  'shipper' %}
                             <a href="{% url 'request_ship' %}" class="nav-bar-cart">
                                 <i class="fa fa-truck text-danger fa-2x" style="font-size: 2em"></i> <span
@@ -102,26 +103,28 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
 
                             </a>
                         {% endif %}
-                        {% if user.is_authenticated %}
-                            <a href="{% url 'marketplace' %}" class="btn btn-outline-danger text-uppercase
-                            font-weight-bold"
-                               style="margin-top: -4px">Marketplace</a>
-                        {% else %}
-                            <a href="{% url 'marketplace' %}"
-                               class="btn btn-outline-danger text-uppercase font-weight-bold"
-                               style="margin-top: 16px">Marketplace</a>
-                        {% endif %}
+                        {#                        {% if user.is_authenticated %}#}
+                        {#                            <a href="{% url 'marketplace' %}" class="btn btn-outline-danger text-uppercase#}
+                        {#                            font-weight-bold"#}
+                        {#                               style="margin-top: -4px">Marketplace</a>#}
+                        {#                        {% else %}#}
+                        {#                            <a href="{% url 'marketplace' %}"#}
+                        {#                               class="btn btn-outline-danger text-uppercase font-weight-bold"#}
+                        {#                               style="margin-top: 16px">Marketplace</a>#}
+                        {#                        {% endif %}#}
                         {% if user.is_authenticated %}
 
                             <div class="user-dashboard-menu">
                                 <ul>
                                     <li class="user-dashboard-menu-children" style="margin-left: 32px">
-                                        <a href="javascript:void(0);" class="" style="padding: 15px 21px 26px 45px; !important;">
+                                        <a href="javascript:void(0);" class=""
+                                           style="padding: 15px 21px 26px 45px; !important;">
                                             {% if user.employeeprofile and user.employeeprofile.profile_picture %}
                                                 <img src="{{ user.employeeprofile.profile_picture.url }}"
                                                      style="    max-width: 32px;" alt="Profile Picture">
                                             {% else %}
-                                                <img style="    max-width: 32px;" src="{% static 'employee/img/images.png' %}"
+                                                <img style="    max-width: 32px;"
+                                                     src="{% static 'employee/img/images.png' %}"
                                                      alt="Default Profile Picture" style="    width: 25px;">
                                             {% endif %}
                                             {{ user.username }}

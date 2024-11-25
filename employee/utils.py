@@ -1,19 +1,18 @@
+from django.urls import reverse
+
+
 def detect_usertype(user):
     if user.employee_type == 1:
-        redirect_url = 'owner_dashboard'
-        return redirect_url
+        redirect_url = reverse('owner_dashboard')
     elif user.employee_type == 2:
-        redirect_url = 'customer_dashboard'
-        return redirect_url
+        redirect_url = reverse('customer_dashboard')
     elif user.employee_type == 5:
-        redirect_url = 'shipper_dashboard'
-        return redirect_url
+        redirect_url = reverse('shipper_dashboard')
     elif user.employee_type is None and user.is_superuser:
-        redirect_url = '/admin'
-        return redirect_url
+        redirect_url = reverse('admin:index')
     else:
-        redirect_url = '_login'
-        return redirect_url
+        redirect_url = reverse('_login')
+    return redirect_url
 
 
 def conver_timezone_viettnam():

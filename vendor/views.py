@@ -450,7 +450,7 @@ def get_vendor(request):
 #     }
 #     return render(request, 'vendor/opening_hours.html', context)
 
-
+@login_required
 def order_detail(request, order_number):
     try:
         order = Order.objects.get(order_number=order_number, is_ordered=True)
@@ -467,7 +467,7 @@ def order_detail(request, order_number):
         return redirect('vendor')
     return render(request, 'vendor/order_detail.html', context)
 
-
+@login_required
 def my_orders(request):
     vendor = Vendor.objects.get(user=request.user)
     food_items = vendor.vendor_food_items.all()
@@ -543,7 +543,7 @@ def my_orders(request):
     }
     return render(request, 'vendor/my_orders.html', context)
 
-
+@login_required
 def request_orders(request):
     from employee.views import check_role_vendor, get_pending_orders_for_vendor
 
