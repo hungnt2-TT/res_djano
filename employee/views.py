@@ -1,5 +1,8 @@
 import os
 from cgi import print_environ_usage
+from io import BytesIO
+
+import pandas as pd
 
 from django.contrib.gis.measure import D
 from django.db.models import Q, Prefetch, Sum, Count
@@ -75,6 +78,7 @@ def filter_orders(orders, start_date=None, end_date=None, search_query='', statu
 def calculate_revenue(orders):
     return sum(order.subtotal for order in orders)
 
+
 #
 # def check_home_page_by_empl_type(user):
 #     if user.employee_type == 1 or user.employee_type == 2 or user.employee_type == 5:
@@ -118,7 +122,7 @@ def home(request):
             time_range = 'evening'
         else:
             time_range = 'evening'
-        category_ranger = Category.objects.filter(time_range=time_range)
+        category_ranger = Category.objects.filter(Q(time_range=time_range) | Q(time_range='all_day'))
         food_items = FoodItem.objects.filter(category__in=category_ranger)
         list_food_items = FoodItem.objects.all()
         districts = District.objects.filter(geom__contains=pnt).first()
@@ -428,10 +432,33 @@ def owner_dashboard(request):
     food_items = FoodItem.objects.filter(vendor=vendor)
     food_items_count = food_items.count()
 
-    food_items_sold = FoodItem.objects.filter(vendor=vendor).annotate(total_sold=Sum('quantity_order'))
+    food_items_sold = FoodItem.objects.filter(vendor=vendor).annotate(
+        total_sold=Sum('quantity_order', default=0)
+    )
     food_names = [item.food_name for item in food_items_sold]
     total_sold = [item.total_sold for item in food_items_sold]
 
+    if request.GET.get('export') == 'excel':
+        print(len([order.order_number for order in orders]))
+        print(len([order.created_at for order in orders]))
+        print(len([order.subtotal for order in orders]))
+        print(len([item.food_name for item in food_items_sold]))
+        print(len([item.total_sold for item in food_items_sold]))
+        data = {
+            # 'Order Number': [order.order_number or 0 for order in orders],
+            # 'Order Date': [order.created_at.isoformat() for order in orders],
+            # 'Subtotal': [order.subtotal or 0 for order in orders],
+            'Food Item': [item.food_name for item in food_items_sold],
+            'Total Sold': [item.total_sold or 0 for item in food_items_sold],  # Đảm bảo giá trị không phải None
+        }
+        df = pd.DataFrame(data)
+        buffer = BytesIO()
+        df.to_excel(buffer, index=False)
+        buffer.seek(0)
+        response = HttpResponse(buffer, content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="report.xlsx"'
+
+        return response
     # Lọc đơn hàng
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')

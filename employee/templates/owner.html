@@ -98,6 +98,13 @@
                                         </div>
                                     </div>
                                 </div>
+                            
+
+                                <form method="get" action="{% url 'owner_dashboard' %}">
+                                    <button type="submit" name="export" value="excel" class="btn btn-primary">
+                                        Export Report to Excel
+                                    </button>
+                                </form>
                                 <div class="row">
                                     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                         <div class="card">

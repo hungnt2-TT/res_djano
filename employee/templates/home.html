@@ -196,29 +196,61 @@
                         </div>
                     </div>
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                        <div class="company-logo">
-                            <ul id="vendorList" class="premium-vendors-list">
+                        <div class="listing fancy">
+                            <ul class="row ">
                                 {% for vendor in vendors_premium %}
-                                    <li class="has-border premium-vendor-item">
-                                        <figure class="premium-vendor-figure">
-                                            <a href="{{ vendor.get_absolute_url }}" class="vendor-link">
-                                                {% if vendor.user_profile.profile_picture %}
-                                                    <img src="{{ vendor.user_profile.profile_picture.url }}"
-                                                         class="vendor-img"
-                                                         alt="{{ vendor.name }}">
-                                                {% else %}
-                                                    <img src="{% static 'employee/img/download.png' %}"
-                                                         class="vendor-img" alt="No image">
-                                                {% endif %}
+                                    <li class="col-lg-4 col-md-4 col-sm-4 col-xs-12 premium-vendor-item">
+                                        <div class="list-post featured">
+                                            <div class="img-holder">
+                                                <figure>
+                                                    <a href="{% url 'vendor_detail' vendor.vendor_slug %}">
+                                                        {% if vendor.user_profile.profile_picture %}
+                                                            <img src="{{ vendor.user_profile.profile_picture.url }}"
+                                                                 class="img-thumb wp-post-image" alt="">
+                                                        {% else %}
+                                                            <img src="{% static 'employee/img/download.png' %}"
+                                                                 class="img-thumb wp-post-image" alt="">
+                                                        {% endif %}
+                                                    </a>
+                                                </figure>
+
                                                 <div class="premium-badge">VIP</div>
-                                            </a>
-                                            <div class="vendor-name">
-                                                <a href="{% url 'vendor_detail' vendor.vendor_slug %}"
-                                                   class="vendor-name-link">{{ vendor.name }}</a>
+
                                             </div>
-                                        </figure>
+                                            <div class="text-holder">
+
+                                                <div class="post-title">
+                                                    <h5>
+                                                        <a href="{% url 'vendor_detail' vendor.vendor_slug %}"
+                                                           class="vip-vendor">{{ vendor }}</a></h5>
+                                                </div>
+                                                <address>
+                                                    {% if vendor.address_line_1 and vendor.state and vendor.city %}
+                                                        <span>Address:
+                                                    </span>{{ vendor.address_line_1 }}
+                                                        <br>
+                                                        <a href="https://www.google.com/maps?q={{ vendor.latitude }},{{ vendor.longitude }}"
+                                                           target="_blank">Xem trên Google Maps</a>
+
+                                                    {% endif %}</address>
+
+                                                {% if vendor.kms %}
+                                                    <span><small><b>{{ vendor.kms }} km </b>away</small></span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="list-option">
+                                                <a href="javascript:void(0);" class="shortlist-btn"
+                                                   data-id="{{ vendor.id }}"
+                                                   data-url="{% url 'toggle_favorite' vendor.id %}"
+                                                   data-favorited="{% if vendor in user.favorites.all %}true{% else %}false{% endif %}">
+                                                    <i class="icon-heart4 {% if vendor in user.favorites.all %}favorited{% endif %}"></i>
+                                                </a>
+                                            </div>
+                                        </div>
                                     </li>
                                 {% endfor %}
+
+
                             </ul>
                         </div>
                     </div>
@@ -233,33 +265,52 @@
                         <div class="categories-holder" style="    padding: 15px 0 0;">
                             <section class="slider-container">
                                 <div class="slider">
-                                    {% for item in food_items %}
-                                        <div class="container-item">
-                                            <div class="item">
-                                                <div class="item-info">
-                                                    <div class="item-image"
-                                                         style="background: url('{{ item.image.url }}') no-repeat center center; background-size: cover;"></div>
-                                                    <div class="item-details">
-                                                        <h3 class="item-title">{{ item.food_name }}</h3>
-                                                        <p class="item-price">Price: {{ item.price }} VND</p>
-                                                        <p class="item-description">{{ item.food_title|truncatechars:50|safe }}</p>
+                                    {% if food_items %}
+                                        {% for item in food_items %}
+                                            <div class="container-item">
+                                                <div class="item">
+                                                    <div class="item-info">
+                                                        <div class="item-image"
+                                                             style="background: url('{{ item.image.url }}') no-repeat center center; background-size: cover;"></div>
+                                                        <div class="item-details">
+                                                            <h3 class="item-title">{{ item.food_name }}</h3>
+                                                            <p class="item-price old-price" id="price">Old
+                                                                Price: {{ item.old_price }} VND</p>
+                                                            <p class="item-price">Sale: {{ item.price }} VND</p>
+                                                            <p class="item-description">{{ item.food_title|truncatechars:50|safe }}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="item-hover-content">
+                                                        <a href="{% url 'food_item_detail' item.id %}"
+                                                           class="btn buy-now">Buy Now</a>
                                                     </div>
                                                 </div>
-                                                <div class="item-hover-content">
-                                                    <a href="{% url 'food_item_detail' item.id %}"
-                                                       class="btn buy-now">Buy Now</a>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="container-item">
+                                        <div class="item">
+                                            <div class="item-info">
+                                                <div class="item-image
+                                                "
+                                                     style="background: url('{% static 'employee/img/download.png' %}') no-repeat center center; background-size: cover;"></div>
+                                                <div class="item-details">
+                                                    <h3 class="item-title">No food items</h3>
+                                                    <p class="item-price
+                                                    ">Price: 0 VND</p>
+                                                    <p class="item-description">No description</p>
                                                 </div>
                                             </div>
                                         </div>
-                                    {% endfor %}
-                                </div>
+                                    {% endif %}
+                                    </div>
 
-                                <div class="prev-btn">
-                                    <i class="fa fa-chevron-left"></i>
-                                </div>
-                                <div class="next-btn">
-                                    <i class="fa fa-chevron-right"></i>
-                                </div>
+                                    <div class="prev-btn">
+                                        <i class="fa fa-chevron-left"></i>
+                                    </div>
+                                    <div class="next-btn">
+                                        <i class="fa fa-chevron-right"></i>
+                                    </div>
                             </section>
                         </div>
                     </div>
@@ -330,9 +381,11 @@
                                                 {% endif %}
                                             </div>
                                             <div class="list-option">
-                                                <a href="javascript:void(0);" class="shortlist-btn" data-toggle="modal"
-                                                   data-target="#sign-in">
-                                                    <i class="icon-heart-o"></i>
+                                                <a href="javascript:void(0);" class="shortlist-btn"
+                                                   data-id="{{ vendor.id }}"
+                                                   data-url="{% url 'toggle_favorite' vendor.id %}"
+                                                   data-favorited="{% if vendor in user.favorites.all %}true{% else %}false{% endif %}">
+                                                    <i class="icon-heart4 {% if vendor in user.favorites.all %}favorited{% endif %}"></i>
                                                 </a>
                                             </div>
                                         </div>
@@ -403,5 +456,7 @@
 {% block extra_scripts %}
     <script src="{% static 'js/search_location.js' %}"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="{% static 'js/favorite.js' %}"></script>
+
 {% endblock %}
 

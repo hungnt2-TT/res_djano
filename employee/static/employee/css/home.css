@@ -436,3 +436,20 @@
 .feature-btn:hover {
     background-color: #c0392b;
 }
+
+.old-price {
+    text-decoration: line-through;
+    color: #888;
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+.vip-vendor {
+    color: yellow;
+    font-size: 20px; /* Adjust the size as needed */
+    font-weight: bold; /* Optional: make the text bold */
+}
+
+.icon-heart4.favorited {
+    color: red !important;
+}

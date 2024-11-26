@@ -95,7 +95,7 @@ https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css
                                       style="">{{ pending_orders_count }}</span>
 
                             </a>
-                            <a href="{% url 'marketplace' %}"
+                            <a href="{% url 'vendor_detail' user.vendor.vendor_slug %}"
                                class="btn btn-outline-danger text-uppercase font-weight-bold"
                                style="margin-top: -12px">My Restaurant</a>
                         {% elif role ==  'shipper' %}
