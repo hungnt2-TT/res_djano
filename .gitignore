@@ -172,5 +172,53 @@ cython_debug/
 #.idea/
 
 # End of https://www.toptal.com/developers/gitignore/api/django
-1
+
+# Configuration files and secrets - DO NOT COMMIT
+# Environment-specific configuration files
+stg.json
+prod.json
+staging.json
+production.json
+config.json
+secrets.json
+config/*.json
+configs/*.json
+
+# Environment files (additional patterns)
+.env
+.env.local
+.env.development
+.env.staging
+.env.production
+.env.test
+.env.*
+
+# Django settings files for different environments
+settings_local.py
+settings_development.py
+settings_staging.py
+settings_production.py
+local_settings_*.py
+
+# SSL certificates and keys
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Database configuration files
+database.json
+db_config.json
+
+# API keys and credentials
+api_keys.json
+credentials.json
+auth.json
+
+# Backup files that might contain sensitive data
+*.backup
+*.dump
+*.sql
+
 .idea/
